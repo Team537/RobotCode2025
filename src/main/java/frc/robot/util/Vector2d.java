@@ -142,10 +142,10 @@ public class Vector2d {
     /**
      * Computes the angle of this vector
      * 
-     * @return the angle in radians
+     * @return the angle
      */
-    public double angle() {
-        return Math.atan2(y, x);
+    public Rotation2d angle() {
+        return new Rotation2d(Math.atan2(y, x));
     }
 
     /**

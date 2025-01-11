@@ -24,11 +24,25 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
 
+    // Position offsets, used to determine the orientation of the driver
+    public static final Rotation2d BLUE_ALLIANCE_OFFSET = new Rotation2d(-0.5 * Math.PI);
+    public static final Rotation2d RED_ALLIANCE_OFFSET = new Rotation2d(0.5 * Math.PI);
+    public static final Rotation2d DEMO_ALLIANCE_OFFSET = new Rotation2d(-0.5 * Math.PI);
+
     //Controller Constants
     public static final double LINEAR_INPUT_CURVE_POWER = 2.5;
     public static final double ROTATION_INPUT_CURVE_POWER = 2.5;
+    public static final double THROTTLE_LINEAR_MIN_SPEED = 2.0; //Meters per second
+    public static final double THROTTLE_LINEAR_MAX_SPEED = DriveConstants.LINEAR_MAX_SPEED; //Meters per second
+    public static final double THROTTLE_ROTATIONAL_MIN_SPEED = 2.5; //Meters per second
+    public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; //Meters per second
 
     public static final double XBOX_CONTROLLER_JOYSTICK_DEADMAND_RADIUS = 0.01;
+    public static final double XBOX_CONTROLLER_TARGET_MIN_RADIUS = 1.0; //Meters
+    public static final double XBOX_CONTROLLER_TARGET_MAX_RADIUS = 5.0; //Meters
+    public static final double XBOX_CONTROLLER_ROTATIONAL_TARGET_ACTIVATION_ZONE = 0.8;
+    public static final double XBOX_CONTROLLER_ROTATIONAL_TARGET_DEACTIVATION_ZONE = 0.7;
+
   }
 
   //Constants used for items relating to the drivetrain
