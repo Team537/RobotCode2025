@@ -8,6 +8,10 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.utils.Alliance;
+import frc.utils.AutonomousRoutine;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -27,12 +31,20 @@ public class RobotContainer {
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController driverController = new CommandXboxController(
-            OperatorConstants.kDriverControllerPort);
+            OperatorConstants.DRIVER_CONTROLLER_PORT);
+
+    // Smart Dashboard Inputs
+    private final SendableChooser<AutonomousRoutine> autonomousSelector = new SendableChooser<>();
+    private final SendableChooser<Alliance> allianceSelector = new SendableChooser<>();
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
+
+        // Setup Dashboard
+        setupSmartDashboard();
+
         // Configure the trigger bindings
         configureBindings();
     }
@@ -63,11 +75,39 @@ public class RobotContainer {
     }
 
     /**
+     * This method sets up the dashboard so that the drivers can configure the robots settings.
+     */
+    private void setupSmartDashboard() {
+
+        // Setup Autonomous Routine Selection
+        autonomousSelector.setDefaultOption("LEFT_HIGH_SCORE", AutonomousRoutine.LEFT_HIGH_SCORE);
+        for (AutonomousRoutine autonomousRoutine : AutonomousRoutine.values()) {
+            autonomousSelector.addOption(autonomousRoutine.toString(), autonomousRoutine);
+        }
+
+        // Setup Alliance Selection
+        allianceSelector.setDefaultOption("RED", Alliance.RED);
+        for (Alliance alliance : Alliance.values()) {
+            allianceSelector.addOption(alliance.toString(), alliance);
+        }
+
+        // Add the selectors to the dashboard.
+        SmartDashboard.putData(autonomousSelector);
+        SmartDashboard.putData(allianceSelector);
+    }
+
+    /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
      *
-     * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
+
+        // Get and display the currently selected autonomous routine.
+        AutonomousRoutine selectedAutonomousRoutine = autonomousSelector.getSelected();
+        Alliance selectedAlliance = allianceSelector.getSelected();
+        SmartDashboard.putString("Selected Autonomous", selectedAutonomousRoutine.toString());
+        SmartDashboard.putString("Selected Alliance", selectedAlliance.toString());
+
         // An example command will be run in autonomous
         return Autos.exampleAuto(exampleSubsystem);
     }
