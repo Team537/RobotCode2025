@@ -49,11 +49,13 @@ public class SwerveModule extends SubsystemBase{
 
         //Creating the configuration file for the turning motor
         SparkMaxConfig turningConfig = new SparkMaxConfig();
-        turningConfig.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
         turningConfig.encoder.positionConversionFactor(DriveConstants.TURNING_ENCODER_POSITION_FACTOR);
         turningConfig.encoder.velocityConversionFactor(DriveConstants.TURNING_ENCODER_VELOCITY_FACTOR);
+        turningConfig.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
         turningConfig.closedLoop.pidf(DriveConstants.TURNING_KP,DriveConstants.TURNING_KI,DriveConstants.TURNING_KD,DriveConstants.TURNING_FF);
         turningConfig.closedLoop.outputRange(DriveConstants.TURNING_PID_MIN_OUTPUT, DriveConstants.TURNING_PID_MAX_OUTPUT);
+        turningConfig.closedLoop.positionWrappingEnabled(true);
+        turningConfig.closedLoop.positionWrappingInputRange(0, DriveConstants.TURNING_FACTOR);
         turningConfig.idleMode(DriveConstants.TURNING_MOTOR_IDLE_MODE);
         turningConfig.smartCurrentLimit(DriveConstants.TURNING_MOTOR_CURRENT_LIMIT);
         turningConfig.inverted(DriveConstants.TURNING_ENCODER_INVERTED);
@@ -61,6 +63,7 @@ public class SwerveModule extends SubsystemBase{
         drivingSparkMax.configure(drivingConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         turningSparkMax.configure(turningConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+        drivingSparkMax.getEncoder().setPosition(0);
     }
 
     /**
@@ -69,24 +72,24 @@ public class SwerveModule extends SubsystemBase{
      */
     public void setState(SwerveModuleState state) {
 
-        //optimze the desired state so that the robot will never rotate more than PI/2 radians
-        state.optimize(getPosition().angle);
+        // Apply chassis angular offset to the desired state.
+        SwerveModuleState correctedDesiredState = new SwerveModuleState();
+        correctedDesiredState.speedMetersPerSecond = state.speedMetersPerSecond;
+        correctedDesiredState.angle = state.angle.plus(moduleAngularOffset);
 
         // Don't change the orientation of the turning wheels if the speed is low
         if (Math.abs(state.speedMetersPerSecond) < 1e-3) {
-            state.angle = getPosition().angle;
+            correctedDesiredState.angle = getPosition().angle;
         }
 
-        //rotate the state by its angular offset
-        state.angle = state.angle.plus(moduleAngularOffset);
+        // optimze the desired state so that the robot will never rotate more than PI/2 radians
+        correctedDesiredState.optimize(Rotation2d.fromRadians(turningSparkMax.getAbsoluteEncoder().getPosition()));
         
         // Setting the references on the PID controllers
-        drivingSparkMax.getClosedLoopController().setReference(state.speedMetersPerSecond, ControlType.kVelocity);
-        turningSparkMax.getClosedLoopController().setReference(state.angle.getRadians(), ControlType.kPosition);
-        
-
+        drivingSparkMax.getClosedLoopController().setReference(state.speedMetersPerSecond, ControlType.kPosition);
+        turningSparkMax.getClosedLoopController().setReference(state.angle.getRadians(), ControlType.kPosition).toString();
     }
-
+    
     /**
      * gets the module's position
      * @return the position of the module
