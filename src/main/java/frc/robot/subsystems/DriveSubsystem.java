@@ -106,7 +106,6 @@ public class DriveSubsystem extends SubsystemBase {
 
         // Enabling continuos movement on the thetaController, allowing it to go around the circle
         thetaController.enableContinuousInput(-Math.PI,Math.PI);
-
     }
 
     /**
@@ -148,11 +147,9 @@ public class DriveSubsystem extends SubsystemBase {
         double boundedRotationalVelocity = Math.min(Math.max(rotationalVelocity, -DriveConstants.ROTATIONAL_MAX_SPEED),
                 DriveConstants.ROTATIONAL_MAX_SPEED);
 
-
         // Adjusting the target values to set the velocity
         targetLinearVelocity = boundedLinearVelocity;
         targetRotationalVelocity = boundedRotationalVelocity;
-
     }
 
     /**
@@ -266,6 +263,7 @@ public class DriveSubsystem extends SubsystemBase {
                 finalRotationalVelocity = rotationalVelocity * rotationalThrottleMultiplier;
             }
         } else {
+
             // Target rotation is active
             targetRotationOffset.rotateBy(driverRotationalOffset.times(-1.0)); // Adjust for driver orientation
 
