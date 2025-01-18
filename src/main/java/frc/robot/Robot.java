@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   private Command autonomousCommand;
-
   private final RobotContainer robotContainer;
 
   /**
@@ -75,6 +74,8 @@ public class Robot extends TimedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+
+    robotContainer.scheduleTeleOp();
   }
 
   /** This function is called periodically during operator control. */
@@ -83,6 +84,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
   }
