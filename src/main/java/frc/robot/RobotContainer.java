@@ -8,8 +8,8 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
-import frc.utils.Alliance;
-import frc.utils.AutonomousRoutine;
+import frc.utils.Autonomous.Alliance;
+import frc.utils.Autonomous.AutonomousRoutine;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -78,7 +78,7 @@ public class RobotContainer {
      * This method sets up the dashboard so that the drivers can configure the robots settings.
      */
     private void setupSmartDashboard() {
-
+            
         // Setup Autonomous Routine Selection
         autonomousSelector.setDefaultOption("LEFT_HIGH_SCORE", AutonomousRoutine.LEFT_HIGH_SCORE);
         for (AutonomousRoutine autonomousRoutine : AutonomousRoutine.values()) {

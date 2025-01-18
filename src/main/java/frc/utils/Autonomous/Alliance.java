@@ -1,4 +1,4 @@
-package frc.utils;
+package frc.utils.Autonomous;
 
 public enum Alliance {
     RED,

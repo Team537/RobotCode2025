@@ -1,4 +1,4 @@
-package frc.utils;
+package frc.utils.Autonomous;
 
 // NOTE: These values are placeholders. They need to be changed later in the season to something that makes more sense!
 public enum AutonomousRoutine {
