@@ -96,5 +96,4 @@ public class RateLimiter {
     public void setMaxDeltaTime(double maxDeltaTime) {
         this.maxDeltaTime = maxDeltaTime;
     }
-    
 }

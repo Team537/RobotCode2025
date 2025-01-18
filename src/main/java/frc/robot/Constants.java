@@ -158,7 +158,6 @@ public final class Constants {
 
   }
 
-
   public static class VisionConstants {
 
     // Pipeline settings

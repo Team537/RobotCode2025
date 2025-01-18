@@ -101,7 +101,6 @@ public class SwerveModule extends SubsystemBase {
         drivingClosedLoopController.setReference(correctedDesiredState.speedMetersPerSecond, ControlType.kVelocity);
         turningClosedLoopController.setReference(correctedDesiredState.angle.plus(moduleAngularOffset).getRadians(),
                 ControlType.kPosition);
-
     }
 
     /**
