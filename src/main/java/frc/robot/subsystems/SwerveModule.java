@@ -44,38 +44,36 @@ public class SwerveModule extends SubsystemBase {
         drivingClosedLoopController = drivingSparkMax.getClosedLoopController();
         turningClosedLoopController = turningSparkMax.getClosedLoopController();
 
-        if (drivingSparkMax instanceof Object) {
-            // Creating the configuration file for thr driving motor
-            SparkMaxConfig drivingConfig = new SparkMaxConfig();
-            drivingConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder);
-            drivingConfig.encoder.positionConversionFactor(DriveConstants.DRIVING_ENCODER_POSITION_FACTOR);
-            drivingConfig.encoder.velocityConversionFactor(DriveConstants.DRIVING_ENCODER_VELOCITY_FACTOR);
-            drivingConfig.closedLoop.pidf(DriveConstants.DRIVING_KP, DriveConstants.DRIVING_KI, DriveConstants.DRIVING_KD, DriveConstants.DRIVING_FF);
-            drivingConfig.closedLoop.outputRange(DriveConstants.DRIVING_PID_MIN_OUTPUT, DriveConstants.DRIVING_PID_MAX_OUTPUT);
-            drivingConfig.idleMode(DriveConstants.DRIVING_MOTOR_IDLE_MODE);
-            drivingConfig.smartCurrentLimit(DriveConstants.DRIVING_MOTOR_CURRENT_LIMIT);
-            drivingConfig.inverted(DriveConstants.DRIVING_ENCODER_INVERTED);
+        // Creating the configuration file for thr driving motor
+        SparkMaxConfig drivingConfig = new SparkMaxConfig();
+        drivingConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder);
+        drivingConfig.encoder.positionConversionFactor(DriveConstants.DRIVING_ENCODER_POSITION_FACTOR);
+        drivingConfig.encoder.velocityConversionFactor(DriveConstants.DRIVING_ENCODER_VELOCITY_FACTOR);
+        drivingConfig.closedLoop.pidf(DriveConstants.DRIVING_KP, DriveConstants.DRIVING_KI, DriveConstants.DRIVING_KD, DriveConstants.DRIVING_FF);
+        drivingConfig.closedLoop.outputRange(DriveConstants.DRIVING_PID_MIN_OUTPUT, DriveConstants.DRIVING_PID_MAX_OUTPUT);
+        drivingConfig.idleMode(DriveConstants.DRIVING_MOTOR_IDLE_MODE);
+        drivingConfig.smartCurrentLimit(DriveConstants.DRIVING_MOTOR_CURRENT_LIMIT);
+        drivingConfig.inverted(DriveConstants.DRIVING_ENCODER_INVERTED);
 
-            // Creating the configuration file for the turning motor
-            SparkMaxConfig turningConfig = new SparkMaxConfig();
-            turningConfig.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
-            turningConfig.absoluteEncoder.positionConversionFactor(DriveConstants.TURNING_ENCODER_POSITION_FACTOR);
-            turningConfig.absoluteEncoder.velocityConversionFactor(DriveConstants.TURNING_ENCODER_VELOCITY_FACTOR);
-            turningConfig.closedLoop.pid(DriveConstants.TURNING_KP, DriveConstants.TURNING_KI, DriveConstants.TURNING_KD);
-            turningConfig.closedLoop.outputRange(DriveConstants.TURNING_PID_MIN_OUTPUT, DriveConstants.TURNING_PID_MAX_OUTPUT);
-            turningConfig.closedLoop.positionWrappingEnabled(true);
-            turningConfig.closedLoop.positionWrappingInputRange(0, DriveConstants.TURNING_FACTOR);
-            turningConfig.idleMode(DriveConstants.TURNING_MOTOR_IDLE_MODE);
-            turningConfig.smartCurrentLimit(DriveConstants.TURNING_MOTOR_CURRENT_LIMIT);
-            turningConfig.absoluteEncoder.inverted(DriveConstants.TURNING_ENCODER_INVERTED);
-            turningConfig.closedLoop.positionWrappingEnabled(true);
-            turningConfig.closedLoop.positionWrappingInputRange(DriveConstants.TURNING_ENCODER_POSITION_PID_MIN_INPUT, DriveConstants.TURNING_ENCODER_POSITION_PID_MAX_INPUT);
+        // Creating the configuration file for the turning motor
+        SparkMaxConfig turningConfig = new SparkMaxConfig();
+        turningConfig.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
+        turningConfig.absoluteEncoder.positionConversionFactor(DriveConstants.TURNING_ENCODER_POSITION_FACTOR);
+        turningConfig.absoluteEncoder.velocityConversionFactor(DriveConstants.TURNING_ENCODER_VELOCITY_FACTOR);
+        turningConfig.closedLoop.pid(DriveConstants.TURNING_KP, DriveConstants.TURNING_KI, DriveConstants.TURNING_KD);
+        turningConfig.closedLoop.outputRange(DriveConstants.TURNING_PID_MIN_OUTPUT, DriveConstants.TURNING_PID_MAX_OUTPUT);
+        turningConfig.closedLoop.positionWrappingEnabled(true);
+        turningConfig.closedLoop.positionWrappingInputRange(0, DriveConstants.TURNING_FACTOR);
+        turningConfig.idleMode(DriveConstants.TURNING_MOTOR_IDLE_MODE);
+        turningConfig.smartCurrentLimit(DriveConstants.TURNING_MOTOR_CURRENT_LIMIT);
+        turningConfig.absoluteEncoder.inverted(DriveConstants.TURNING_ENCODER_INVERTED);
+        turningConfig.closedLoop.positionWrappingEnabled(true);
+        turningConfig.closedLoop.positionWrappingInputRange(DriveConstants.TURNING_ENCODER_POSITION_PID_MIN_INPUT, DriveConstants.TURNING_ENCODER_POSITION_PID_MAX_INPUT);
 
-            drivingSparkMax.configure(drivingConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-            turningSparkMax.configure(turningConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        drivingSparkMax.configure(drivingConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        turningSparkMax.configure(turningConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-            drivingSparkMax.getEncoder().setPosition(0);
-        }
+        drivingSparkMax.getEncoder().setPosition(0);
     }
 
     /**
