@@ -397,7 +397,7 @@ public class DriveSubsystem extends SubsystemBase {
      * @return the value to go towards
      */
     public double getRotationalFeedback(Rotation2d target) {
-        return Math.tanh(thetaController.calculate(getRobotPose().getRotation().getRadians(),target.getRadians()));
+        return Math.tanh(thetaController.calculate(getRobotPose().getRotation().getRadians(), target.getRadians()));
     }
 
     /**
@@ -530,10 +530,14 @@ public class DriveSubsystem extends SubsystemBase {
         poseEstimator.resetTranslation(translation);
     }
 
+    // Runs whenever the robot is active. Even when dissabled.
     // Periodic method called every loop
     @Override
     public void periodic() {
 
+        // Update the robot pose using the module states
+        poseEstimator.update(getGyroscopeHeading(), getSwerveModulePositions());
+        
         // Accelerates the velocity towards the target
         linearRateLimiter.update(targetLinearVelocity);
         rotationalRateLimiter.update(targetRotationalVelocity);
@@ -542,11 +546,7 @@ public class DriveSubsystem extends SubsystemBase {
         rotationalRateLimiter.setValue(targetRotationalVelocity);
 
         // Driving the robot using the accelerated values
-        setModules(linearRateLimiter.getValue(),rotationalRateLimiter.getValue());
-
-        // Update the robot pose using the module states
-        poseEstimator.update(getGyroscopeHeading(), getSwerveModulePositions());
-
+        setModules(linearRateLimiter.getValue(), rotationalRateLimiter.getValue());
     }
 
 }

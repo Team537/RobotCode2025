@@ -61,6 +61,8 @@ public class SwerveModule extends SubsystemBase{
         turningConfig.absoluteEncoder.velocityConversionFactor(DriveConstants.TURNING_ENCODER_VELOCITY_FACTOR);
         turningConfig.closedLoop.pid(DriveConstants.TURNING_KP,DriveConstants.TURNING_KI,DriveConstants.TURNING_KD);
         turningConfig.closedLoop.outputRange(DriveConstants.TURNING_PID_MIN_OUTPUT, DriveConstants.TURNING_PID_MAX_OUTPUT);
+        turningConfig.closedLoop.positionWrappingEnabled(true);
+        turningConfig.closedLoop.positionWrappingInputRange(0, DriveConstants.TURNING_FACTOR);
         turningConfig.idleMode(DriveConstants.TURNING_MOTOR_IDLE_MODE);
         turningConfig.smartCurrentLimit(DriveConstants.TURNING_MOTOR_CURRENT_LIMIT);
         turningConfig.absoluteEncoder.inverted(DriveConstants.TURNING_ENCODER_INVERTED);
@@ -70,6 +72,7 @@ public class SwerveModule extends SubsystemBase{
         drivingSparkMax.configure(drivingConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         turningSparkMax.configure(turningConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+        drivingSparkMax.getEncoder().setPosition(0);
     }
 
     /**

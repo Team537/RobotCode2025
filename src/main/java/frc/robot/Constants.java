@@ -51,7 +51,8 @@ public final class Constants {
     //Controller Constants
     public static final double LINEAR_INPUT_CURVE_POWER = 2.5;
     public static final double ROTATION_INPUT_CURVE_POWER = 2.5;
-
+    public static final double TURNING_FACTOR = 2.0 * Math.PI;
+    
     // Angular offsets of the modules relative to the chassis in radians
     public static final Rotation2d FRONT_LEFT_MODULE_ANGULAR_OFFSET = new Rotation2d(-0.5 * Math.PI);
     public static final Rotation2d REAR_LEFT_MODULE_ANGULAR_OFFSET = new Rotation2d(Math.PI);
