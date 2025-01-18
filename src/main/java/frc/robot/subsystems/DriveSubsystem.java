@@ -205,7 +205,8 @@ public class DriveSubsystem extends SubsystemBase {
             }
 
             // Lock the robot's position if no movement is commanded
-            if (linearVelocity.magnitude() < 1e-3 && commandedLinearVelocity.magnitude() < 1e-3) {
+            // TODO: test and fix this, delete the "false && " to activate
+            if (false && linearVelocity.magnitude() < 1e-3 && commandedLinearVelocity.magnitude() < 1e-3) {
                 if (!xyLockActive) {
                     xyLockActive = true;
                     xyLockTranslation = getRobotPose().getTranslation();
@@ -249,7 +250,9 @@ public class DriveSubsystem extends SubsystemBase {
             }
 
             // Lock the robot's orientation if no rotation is commanded
-            if (Math.abs(rotationalVelocity) < 1e-3 && Math.abs(commandedRotationalVelocity) < 1e-3) {
+
+            // TODO: test and fix this, delete the "false && " to activate
+            if (false && Math.abs(rotationalVelocity) < 1e-3 && Math.abs(commandedRotationalVelocity) < 1e-3) {
                 if (!thetaLockActive) {
                     thetaLockActive = true;
                     thetaLockRotation = getRobotPose().getRotation();
@@ -310,7 +313,7 @@ public class DriveSubsystem extends SubsystemBase {
         // --- Rotational Velocity Control ---
         // Calculate rotational velocity from the right stick's X-axis input.
         // Apply a deadband to ignore small movements and clamp the value to [-1, 1].
-        double rotationalVelocity = controller.getRightX();
+        double rotationalVelocity = -controller.getRightX();
         if (Math.abs(rotationalVelocity) < OperatorConstants.XBOX_CONTROLLER_JOYSTICK_DEADMAND_RADIUS) {
             rotationalVelocity = 0.0; // Ignore small joystick movements
         } else if (Math.abs(rotationalVelocity) > 1.0) {
@@ -326,7 +329,7 @@ public class DriveSubsystem extends SubsystemBase {
             - OperatorConstants.XBOX_CONTROLLER_TARGET_MIN_RADIUS);
         Translation2d targetTranslationOffset = new Translation2d(
             controller.getLeftX() * linearTargetRadius, 
-            controller.getLeftY() * linearTargetRadius
+            -controller.getLeftY() * linearTargetRadius
         );
         boolean useTargetTranslation = controller.getLeftStickButton();
 
@@ -336,7 +339,7 @@ public class DriveSubsystem extends SubsystemBase {
         // - The right stick button is pressed, OR
         // - The right stick's Y-axis exceeds a specific activation zone, OR
         // - Rotation targeting was already active and the right stick magnitude is above the deactivation threshold.
-        Vector2d rightStickVector = new Vector2d(controller.getRightX(), controller.getRightY());
+        Vector2d rightStickVector = new Vector2d(controller.getRightX(), -controller.getRightY());
         Rotation2d targetRotationOffset = rightStickVector.angle();
         if (
             controller.getRightStickButton() ||
@@ -458,6 +461,7 @@ public class DriveSubsystem extends SubsystemBase {
         rearLeftModule.setState(swerveModuleStates[2]);
         rearRightModule.setState(swerveModuleStates[3]);
 
+        System.out.println(swerveModuleStates[1].toString());
     }
 
     /**
@@ -533,6 +537,9 @@ public class DriveSubsystem extends SubsystemBase {
         // Accelerates the velocity towards the target
         linearRateLimiter.update(targetLinearVelocity);
         rotationalRateLimiter.update(targetRotationalVelocity);
+
+        linearRateLimiter.setValue(targetLinearVelocity);
+        rotationalRateLimiter.setValue(targetRotationalVelocity);
 
         // Driving the robot using the accelerated values
         setModules(linearRateLimiter.getValue(),rotationalRateLimiter.getValue());

@@ -34,8 +34,8 @@ public final class Constants {
     public static final double ROTATION_INPUT_CURVE_POWER = 2.5;
     public static final double THROTTLE_LINEAR_MIN_SPEED = 2.0; //Meters per second
     public static final double THROTTLE_LINEAR_MAX_SPEED = DriveConstants.LINEAR_MAX_SPEED; //Meters per second
-    public static final double THROTTLE_ROTATIONAL_MIN_SPEED = 2.5; //Meters per second
-    public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; //Meters per second
+    public static final double THROTTLE_ROTATIONAL_MIN_SPEED = 2.5; //Radians per second
+    public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; //Radians per second
 
     public static final double XBOX_CONTROLLER_JOYSTICK_DEADMAND_RADIUS = 0.01;
     public static final double XBOX_CONTROLLER_TARGET_MIN_RADIUS = 1.0; //Meters
@@ -110,8 +110,8 @@ public final class Constants {
     public static final double TURNING_KI = 0;
     public static final double TURNING_KD = 0;
     public static final double TURNING_FF = 0;
-    public static final double TURNING_PID_MIN_OUTPUT = -1;
-    public static final double TURNING_PID_MAX_OUTPUT = 1;
+    public static final double TURNING_PID_MIN_OUTPUT = -1.0;
+    public static final double TURNING_PID_MAX_OUTPUT = 1.0;
 
     public static final IdleMode TURNING_MOTOR_IDLE_MODE = IdleMode.kBrake;
     public static final int TURNING_MOTOR_CURRENT_LIMIT = 20; // amps

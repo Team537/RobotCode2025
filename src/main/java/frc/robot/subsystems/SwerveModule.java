@@ -4,6 +4,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -18,6 +19,9 @@ public class SwerveModule extends SubsystemBase{
     
     SparkMax drivingSparkMax;
     SparkMax turningSparkMax;
+
+    SparkClosedLoopController drivingClosedLoopController;
+    SparkClosedLoopController turningClosedLoopController;
 
     Rotation2d moduleAngularOffset;
 
@@ -36,6 +40,9 @@ public class SwerveModule extends SubsystemBase{
         drivingSparkMax = new SparkMax(drivingCANID, MotorType.kBrushless);
         turningSparkMax = new SparkMax(turningCANID, MotorType.kBrushless);
 
+        drivingClosedLoopController = drivingSparkMax.getClosedLoopController();
+        turningClosedLoopController = turningSparkMax.getClosedLoopController();
+
         //Creating the configuration file for thr driving motor
         SparkMaxConfig drivingConfig = new SparkMaxConfig();
         drivingConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder);
@@ -50,13 +57,15 @@ public class SwerveModule extends SubsystemBase{
         //Creating the configuration file for the turning motor
         SparkMaxConfig turningConfig = new SparkMaxConfig();
         turningConfig.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
-        turningConfig.encoder.positionConversionFactor(DriveConstants.TURNING_ENCODER_POSITION_FACTOR);
-        turningConfig.encoder.velocityConversionFactor(DriveConstants.TURNING_ENCODER_VELOCITY_FACTOR);
-        turningConfig.closedLoop.pidf(DriveConstants.TURNING_KP,DriveConstants.TURNING_KI,DriveConstants.TURNING_KD,DriveConstants.TURNING_FF);
+        turningConfig.absoluteEncoder.positionConversionFactor(DriveConstants.TURNING_ENCODER_POSITION_FACTOR);
+        turningConfig.absoluteEncoder.velocityConversionFactor(DriveConstants.TURNING_ENCODER_VELOCITY_FACTOR);
+        turningConfig.closedLoop.pid(DriveConstants.TURNING_KP,DriveConstants.TURNING_KI,DriveConstants.TURNING_KD);
         turningConfig.closedLoop.outputRange(DriveConstants.TURNING_PID_MIN_OUTPUT, DriveConstants.TURNING_PID_MAX_OUTPUT);
         turningConfig.idleMode(DriveConstants.TURNING_MOTOR_IDLE_MODE);
         turningConfig.smartCurrentLimit(DriveConstants.TURNING_MOTOR_CURRENT_LIMIT);
-        turningConfig.inverted(DriveConstants.TURNING_ENCODER_INVERTED);
+        turningConfig.absoluteEncoder.inverted(DriveConstants.TURNING_ENCODER_INVERTED);
+        turningConfig.closedLoop.positionWrappingEnabled(true);
+        turningConfig.closedLoop.positionWrappingInputRange(DriveConstants.TURNING_ENCODER_POSITION_PID_MIN_INPUT, DriveConstants.TURNING_ENCODER_POSITION_PID_MAX_INPUT);
 
         drivingSparkMax.configure(drivingConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         turningSparkMax.configure(turningConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -68,28 +77,27 @@ public class SwerveModule extends SubsystemBase{
      * @param state the new state to target
      */
     public void setState(SwerveModuleState state) {
+        SwerveModuleState correctedDesiredState = new SwerveModuleState();
+        correctedDesiredState.speedMetersPerSecond = state.speedMetersPerSecond;
+        correctedDesiredState.angle = state.angle.times(1.0);
 
         //optimze the desired state so that the robot will never rotate more than PI/2 radians
-        state.optimize(getPosition().angle);
+        correctedDesiredState.optimize(getPosition().angle);
 
         // Don't change the orientation of the turning wheels if the speed is low
-        if (Math.abs(state.speedMetersPerSecond) < 1e-3) {
-            state.angle = getPosition().angle;
+        if (Math.abs(correctedDesiredState.speedMetersPerSecond) < 1e-3) {
+            correctedDesiredState.angle = getPosition().angle;
         }
-
-        //rotate the state by its angular offset
-        state.angle = state.angle.plus(moduleAngularOffset);
         
         // Setting the references on the PID controllers
-        drivingSparkMax.getClosedLoopController().setReference(state.speedMetersPerSecond, ControlType.kVelocity);
-        turningSparkMax.getClosedLoopController().setReference(state.angle.getRadians(), ControlType.kPosition);
-        
-
+        drivingClosedLoopController.setReference(correctedDesiredState.speedMetersPerSecond, ControlType.kVelocity);
+        turningClosedLoopController.setReference(correctedDesiredState.angle.plus(moduleAngularOffset).getRadians(), ControlType.kPosition);
+            
     }
 
-    /**
-     * gets the module's position
-     * @return the position of the module
+        /**
+         * gets the module's position (relative to the field)
+         * @return the position of the module
      */
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
@@ -99,7 +107,7 @@ public class SwerveModule extends SubsystemBase{
     }
 
     /**
-     * gets the module's state
+     * gets the module's state (relative to the field)
      * @return the state of the module
      */
     public SwerveModuleState getState() {
