@@ -8,12 +8,19 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.test;
 import frc.utils.Alliance;
 import frc.utils.AutonomousRoutine;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -30,12 +37,30 @@ public class RobotContainer {
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
-    private final CommandXboxController driverController = new CommandXboxController(
+    private final CommandXboxController driverController1 = new CommandXboxController(
             OperatorConstants.DRIVER_CONTROLLER_PORT);
+    private final XboxController driverController = new XboxController(0);
+    
+    private final test test = new test();
 
     // Smart Dashboard Inputs
     private final SendableChooser<AutonomousRoutine> autonomousSelector = new SendableChooser<>();
     private final SendableChooser<Alliance> allianceSelector = new SendableChooser<>();
+
+    JoystickButton startButton = new JoystickButton(driverController, Button.kStart.value);
+    JoystickButton backButton = new JoystickButton(driverController, Button.kBack.value);
+    JoystickButton rightStick = new JoystickButton(driverController, Button.kRightStick.value);
+    JoystickButton leftStick = new JoystickButton(driverController, Button.kLeftStick.value);
+    JoystickButton rightBumper = new JoystickButton(driverController, Button.kRightBumper.value);
+    JoystickButton leftBumper = new JoystickButton(driverController, Button.kLeftBumper.value);
+    JoystickButton aButton = new JoystickButton(driverController, Button.kA.value);
+    JoystickButton bButton = new JoystickButton(driverController, Button.kB.value);
+    JoystickButton yButton = new JoystickButton(driverController, Button.kY.value);
+    JoystickButton xButton = new JoystickButton(driverController, Button.kX.value);
+    POVButton dPadUpButton = new POVButton(driverController, 0);
+    POVButton dPadDownButton = new POVButton(driverController, 180);
+    POVButton dPadRightButton = new POVButton(driverController, 90);
+    POVButton dPadLeftButton = new POVButton(driverController, 270);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -47,6 +72,27 @@ public class RobotContainer {
 
         // Configure the trigger bindings
         configureBindings();
+
+        dPadUpButton.onTrue(new StartEndCommand(test::spark1move1, test::spark1stop, test));
+        dPadUpButton.onFalse(new StartEndCommand(test::spark1stop, test::spark1stop, test));
+        dPadDownButton.onTrue(new StartEndCommand(test::spark1move2, test::spark1stop, test));
+        dPadDownButton.onFalse(new StartEndCommand(test::spark1stop, test::spark1stop, test));
+
+        dPadLeftButton.onTrue(new StartEndCommand(test::spark2move1, test::spark2stop, test));
+        dPadLeftButton.onFalse(new StartEndCommand(test::spark2stop, test::spark2stop, test));
+        dPadRightButton.onTrue(new StartEndCommand(test::spark2move2, test::spark2stop, test));
+        dPadRightButton.onFalse(new StartEndCommand(test::spark2stop, test::spark2stop, test));
+
+        aButton.onTrue(new StartEndCommand(test::spark3move1, test::spark3stop, test));
+        aButton.onFalse(new StartEndCommand(test::spark3stop, test::spark3stop, test));
+        bButton.onTrue(new StartEndCommand(test::spark3move2, test::spark3stop, test));
+        bButton.onFalse(new StartEndCommand(test::spark3stop, test::spark3stop, test));
+
+        xButton.onTrue(new StartEndCommand(test::spark4move1, test::spark4stop, test));
+        xButton.onFalse(new StartEndCommand(test::spark4stop, test::spark4stop, test));
+        yButton.onTrue(new StartEndCommand(test::spark4move2, test::spark4stop, test));
+        yButton.onFalse(new StartEndCommand(test::spark4stop, test::spark4stop, test));
+
     }
 
     /**
@@ -71,7 +117,7 @@ public class RobotContainer {
         // Schedule `exampleMethodCommand` when the Xbox controller's B button is
         // pressed,
         // cancelling on release.
-        driverController.b().whileTrue(exampleSubsystem.exampleMethodCommand());
+        driverController1.b().whileTrue(exampleSubsystem.exampleMethodCommand());
     }
 
     /**
