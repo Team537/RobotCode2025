@@ -9,6 +9,8 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.vision.PhotonVisionCamera;
+import frc.robot.subsystems.vision.VisionOdometry;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.utils.Alliance;
 import frc.utils.AutonomousRoutine;
@@ -33,9 +35,12 @@ public class RobotContainer {
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final XboxController xBoxController = new XboxController(OperatorConstants.kDriverControllerPort);
 
-    // The robot's subsystems and commands are defined here...
+    // Subsystems
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
+    private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
+    
+    // Commands
     Command manualDriveCommand = new RunCommand(
             () -> {
                 driveSubsystem.driveFromXBoxController(xBoxController);

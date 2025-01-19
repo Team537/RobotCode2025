@@ -1,6 +1,5 @@
 package frc.robot.subsystems.vision;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
@@ -8,207 +7,79 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
 
+/**
+ * Wraps a single PhotonVision camera + a PhotonPoseEstimator. 
+ * You will call update() each loop and get the latest robot-pose measurement (if any).
+ */
 public class PhotonVisionCamera extends SubsystemBase {
 
-    private PhotonCamera camera;
-    private Transform3d cameraOffset; // The camera's position relative to the robot.
-    private PhotonPipelineResult result;
-    private PhotonPoseEstimator photonPoseEstimator;
-    private List<PhotonPipelineResult> currentPhotonPipelineResults;
-    private Optional<EstimatedRobotPose> estimatedRobotPoseOptional;
+    private final PhotonCamera camera;
+    private final PhotonPoseEstimator photonPoseEstimator;
 
-    /**
-     * Creates a {@code PhotonVisionCamera} with the desired parameters.
-     * 
-     * @param cameraName   The name of the camera you want to create.
-     * @param cameraOffset The camera's position relative to the robot's origin.
-     */
-    public PhotonVisionCamera(String cameraName, Transform3d cameraOffset) {
+    private Optional<EstimatedRobotPose> latestEstimatedPose = Optional.empty();
 
-        // Initialize the PhotonCamera object with the given name.
+    public PhotonVisionCamera(String cameraName, Transform3d robotToCamera) {
         this.camera = new PhotonCamera(cameraName);
 
-        // Set the camera offset.
-        this.cameraOffset = cameraOffset;
-
-        // Initialize the PhotonPoseEstimator for estimating the robot's position.
+        // Construct a PhotonPoseEstimator
         this.photonPoseEstimator = new PhotonPoseEstimator(
-            VisionConstants.APRIL_TAG_FIELD_LAYOUT, 
-            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, 
-            this.cameraOffset
+            VisionConstants.APRIL_TAG_FIELD_LAYOUT,
+            VisionConstants.POSE_STRATEGY,
+            robotToCamera // Usually robotToCamera, not cameraToRobot
         );
-    }
-
-    /**
-     * Take a snapshot of the unprocessed camera feed.
-     * Useful for gathering training data for AI or interesting mid-match photographs.
-     */
-    public void takeInputSnapshot() {
-        this.camera.takeInputSnapshot();
-    }
-
-    /**
-     * Take a snapshot of the processed camera feed.
-     * Useful for gathering interesting mid-match photographs.
-     */
-    public void takeOutputSnapshot() {
-        this.camera.takeOutputSnapshot();
-    }
-
-    /**
-     * Estimates the robot's position on the field using all visible AprilTags.
-     * 
-     * @return An estimate of the robot's position on the field.
-     */
-    public Optional<EstimatedRobotPose> estimateRobotPose() {
-        return this.estimatedRobotPoseOptional;
-    }
-
-    /**
-     * Sets the pipeline that this camera's stream will be processed using.
-     * 
-     * @param pipeline The pipeline number (0-9) to use for processing the image.
-     */
-    public void setPipeline(int pipeline) {
-        this.camera.setPipelineIndex(pipeline);
-    }
-
-    /**
-     * Returns a PhotonTrackedTarget with the desired ID if visible, otherwise null.
-     * 
-     * @param id The ID of the tag to check for visibility.
-     * @return The PhotonTrackedTarget if visible, otherwise null.
-     */
-    public PhotonTrackedTarget getDistanceToTag(int id) {
         
-        // Ensure the camera is on the AprilTag detection pipeline.
-        if (this.camera.getPipelineIndex() != VisionConstants.APRIL_TAG_PIPELINE) {
-            System.err.println("Error: " + this.camera.getName() + " attempted to detect AprilTag using non-AprilTag pipeline. Current pipeline number is " + this.camera.getPipelineIndex() + ".");
-            return null;
-        }
-
-        // Check if there are any targets detected.
-        if (!this.hasTargets()) {
-            return null;
-        }
-
-        // Check if any of the visible targets have the desired ID.
-        List<PhotonTrackedTarget> targets = getTargets();
-        for (PhotonTrackedTarget target : targets) {
-            if (target.getFiducialId() == id) {
-                return target;
-            }
-        }
-
-        // No target with the desired ID is visible.
-        return null;
+        // Fall back to closest to reference pose strategy when we can only see one tag.
+        photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
     }
 
     /**
-     * Returns a list of all targets detected by this camera.
-     * 
-     * @return A list of PhotonTrackedTargets currently detected.
+     * Should be called once per robot loop. 
+     * Provide the current best guess of the robot pose so that the solvePnP can converge better.
      */
-    public List<PhotonTrackedTarget> getTargets() {
-        if (!hasTargets()) {
-            return null;
-        }
-        return result.getTargets();
-    }
+    public void update(Pose2d currentBestGuess) {
 
-    /**
-     * Returns the most prominent target visible by this camera.
-     * 
-     * @return The best target visible, or null if no targets are visible.
-     */
-    public PhotonTrackedTarget getPrimaryTarget() {
-        if (!hasTargets()) {
-            return null;
-        }
-        return result.getBestTarget();
-    }
+        // Update reference pose for better solvePNP
+        photonPoseEstimator.setReferencePose(currentBestGuess);
 
-    /**
-     * Checks if the camera is currently viewing the desired AprilTag.
-     * 
-     * @param id The ID of the AprilTag to check for visibility.
-     * @return True if the AprilTag with the desired ID is visible, otherwise false.
-     */
-    public boolean hasTargetWithId(int id) {
-        if (!hasTargets()) {
-            return false;
-        }
-
-        List<PhotonTrackedTarget> targets = getTargets();
-        for (PhotonTrackedTarget target : targets) {
-            if (target.getFiducialId() == id) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if the camera is detecting any targets.
-     * 
-     * @return True if a target is visible, otherwise false.
-     */
-    public boolean hasTargets() {
-        return this.result.hasTargets();
-    }
-
-    /**
-     * Returns the latency of the pipeline in milliseconds.
-     * 
-     * @return The latency of the pipeline in milliseconds.
-     */
-    public double getLatencyMs() {
-        return this.result.metadata.getLatencyMillis();
-    }
-
-    /**
-     * Returns the name of this {@code PhotonVisionCamera}.
-     * 
-     * @return The name of this camera.
-     */
-    public String getCameraName() {
-        return this.camera.getName();
-    }
-
-    /**
-     * Periodically update the camera's result and estimated robot position.
-     */
-    @Override
-    public void periodic() {
-
-        // Update the camera's result with the most recent data.
-        this.currentPhotonPipelineResults = this.camera.getAllUnreadResults();
-
-        // Get the most recent detection.
-        if (!this.currentPhotonPipelineResults.isEmpty()) {
-            this.result = this.currentPhotonPipelineResults.get(0);
-
-            // Update the estimated robot position.
-            this.estimatedRobotPoseOptional = this.photonPoseEstimator.update(this.result);
-        }
-
-        // Output estimated position for the purposes of debugging.
-        if (this.estimatedRobotPoseOptional.isEmpty()) {
+        // Get the latest pipeline result (no need for getAllUnreadResults).
+        PhotonPipelineResult result = camera.getLatestResult();
+        
+        if (!result.hasTargets()) {
+            // No target, so no pose measurement
+            latestEstimatedPose = Optional.empty();
             return;
         }
 
-        // Display the estimated position for debugging purposes.
-        EstimatedRobotPose robotPose = estimatedRobotPoseOptional.get();
-        SmartDashboard.putNumber("Vision Estimated X: ", robotPose.estimatedPose.getX());
-        SmartDashboard.putNumber("Vision Estimated Y: ", robotPose.estimatedPose.getY());
-        SmartDashboard.putNumber("Vision Estimated Z: ", robotPose.estimatedPose.getZ());
+        // Attempt to get a vision-based global field pose
+        var maybePose = photonPoseEstimator.update(result);
+        if (maybePose.isPresent()) {
+            // Replace its timestamp with the real capture time
+            EstimatedRobotPose camEstimatedPose = maybePose.get();
+            latestEstimatedPose = Optional.of(camEstimatedPose);
+        } else {
+            latestEstimatedPose = Optional.empty();
+        }
+    }
+
+    /**
+     * Returns the latest field-relative pose measurement from this camera, if any.
+     */
+    public Optional<EstimatedRobotPose> getLatestPose() {
+        return latestEstimatedPose;
+    }
+
+    /**
+     * Sets the pipeline that this PhotonVisionCamera will run using.
+     * 
+     * @param pipelineIndex The pipeline that this PhotonVisionCamera will run using.
+     */
+    public void setPipeline(int pipelineIndex) {
+        camera.setPipelineIndex(pipelineIndex);
     }
 }
