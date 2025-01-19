@@ -1,6 +1,9 @@
+import com.github.spotbugs.snom.SpotBugsTask
+
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2025.2.1"
+    id "com.github.spotbugs" version "5.0.14"
 }
 
 java {
@@ -10,7 +13,7 @@ java {
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
 
-// Define my targets (RoboRIO) and artifacts (deployable files)
+// Define targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
 deploy {
     targets {
@@ -49,8 +52,7 @@ wpi.java.debugJni = false
 // Set this to true to enable desktop support.
 def includeDesktopSupport = true
 
-// Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
-// Also defines JUnit 5.
+// Defining dependencies.
 dependencies {
     annotationProcessor wpi.java.deps.wpilibAnnotations()
     implementation wpi.java.deps.wpilib()
@@ -83,9 +85,37 @@ test {
 wpi.sim.addGui().defaultEnabled = true
 wpi.sim.addDriverstation()
 
-// Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
-// in order to make them all available at runtime. Also adding the manifest so WPILib
-// knows where to look for our Robot Class.
+// --- SpotBugs Configuration ---
+spotbugs {
+    toolVersion = '4.7.3'
+    reportLevel = 'high'
+    excludeFilter = file("spotbugs-exclude.xml")
+    effort = 'max'
+    
+    // Setting the report level to "low" or "medium" is not strictly necessary here
+    // because we are filtering out lower-priority issues via the exclude filter.
+    // You can leave reportLevel at its default value.
+    // reportLevel = 'low'
+}
+
+tasks.withType(SpotBugsTask) {
+    
+    // Ensure that failures are not ignored so that the build fails when high issues exist.
+    ignoreFailures = false
+    
+    reports {
+        xml.enabled = false
+        html.enabled = true
+        html.destination = file("$buildDir/reports/spotbugs.html")
+    }
+}
+
+tasks.named("check") {
+    // Make sure our security tasks run as part of the check lifecycle
+    dependsOn 'spotbugsMain'
+}
+
+// --- Jar configuration ---
 jar {
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     from sourceSets.main.allSource

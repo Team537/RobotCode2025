@@ -185,6 +185,20 @@ public class Vector2d {
     }
 
     /**
+     * Override the hashCode method to follow best practices.
+     */
+    @Override
+    public int hashCode() {
+        // Use a common algorithm for doubles
+        int result = 17;
+        long xBits = Double.doubleToLongBits(x);
+        long yBits = Double.doubleToLongBits(y);
+        result = 31 * result + (int)(xBits ^ (xBits >>> 32));
+        result = 31 * result + (int)(yBits ^ (yBits >>> 32));
+        return result;
+    }
+    
+    /**
      * Provides a string representation of the vector
      * 
      * @return a string in the format (x, y)
