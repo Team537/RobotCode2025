@@ -19,9 +19,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Build and Test
-        run: ./gradlew clean build check
-
+      - name: Build with Gradle Wrapper
+        run: ./gradlew build
+        
       - name: Upload SpotBugs Report
         if: always()
         uses: actions/upload-artifact@v3
