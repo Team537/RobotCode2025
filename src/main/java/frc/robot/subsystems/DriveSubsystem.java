@@ -509,7 +509,7 @@ public class DriveSubsystem extends SubsystemBase {
      * Gets the pose of the robot
      * @return the robot's pose
      */
-    public Pose2d getRobotPose() {
+    public synchronized Pose2d getRobotPose() {
         return poseEstimator.getEstimatedPosition();
     }
 
