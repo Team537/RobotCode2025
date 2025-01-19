@@ -9,7 +9,6 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.vision.PhotonVisionCamera;
 import frc.robot.subsystems.vision.VisionOdometry;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.utils.Alliance;
