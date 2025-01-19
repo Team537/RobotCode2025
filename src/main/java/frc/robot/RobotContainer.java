@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
-    private final XboxController xBoxController = new XboxController(OperatorConstants.kDriverControllerPort);
+    private final XboxController xBoxController = new XboxController(OperatorConstants.DRIVER_CONTROLLER_PORT);
 
     // The robot's subsystems and commands are defined here...
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
@@ -44,14 +44,14 @@ public class RobotContainer {
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController driverController = new CommandXboxController(
-            OperatorConstants.kDriverControllerPort);
+            OperatorConstants.DRIVER_CONTROLLER_PORT);
 
     // Smart Dashboard Inputs
     private final SendableChooser<AutonomousRoutine> autonomousSelector = new SendableChooser<>();
     private final SendableChooser<Alliance> allianceSelector = new SendableChooser<>();
 
     /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
+     * Creates a new RobotContainer object and sets up SmartDashboard an the button inputs.
      */
     public RobotContainer() {
 
@@ -63,8 +63,7 @@ public class RobotContainer {
     }
 
     /**
-     * This method sets up the dashboard so that the drivers can configure the
-     * robots settings.
+     * Sets up SmartDashboard so that important settings can be configured and key values can be viewed.
      */
     private void setupSmartDashboard() {
 
@@ -112,7 +111,6 @@ public class RobotContainer {
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
      */
     public Command getAutonomousCommand() {
 
@@ -127,7 +125,7 @@ public class RobotContainer {
     }
 
     /**
-     * Schedules the commands for TeleOp.
+     * Schedules commands used exclusively during TeleOp.
      */
     public void scheduleTeleOp() {
 

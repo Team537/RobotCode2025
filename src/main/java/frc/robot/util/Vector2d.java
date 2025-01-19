@@ -2,6 +2,14 @@ package frc.robot.util;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
+/**
+ * <h2> Vector2d </h2>
+ * The {@code Vector2d} class is a class that represents a 2 dimensional vector. It is used extensively in the 
+ * {@code DriveSubsystem}, where it allows for certain trajectories to be reliably and efficiently targeted.
+ * <hr>
+ * @author Parker Huibregtse
+ * @since v1.1.0
+ */
 public class Vector2d {
 
     // Components of the vector
