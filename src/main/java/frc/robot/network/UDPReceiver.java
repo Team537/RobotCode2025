@@ -16,6 +16,9 @@ import java.util.Map;
  * UDP.
  * This class runs a separate thread to continuously listen for incoming data
  * without blocking the main robot control loop.
+ * 
+ * @author Cameron Myhre
+ * @since v1.2.0
  */
 public class UDPReceiver {
 

@@ -9,6 +9,9 @@ import com.google.gson.Gson;
 /**
  * TCPSender is responsible for establishing a TCP connection to a remote device (e.g., Raspberry Pi)
  * and sending configuration data in JSON format over the network.
+ * 
+ * @author Cameron Myhre
+ * @since v1.2.0
  */
 public class TCPSender {
 
