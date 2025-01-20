@@ -2,6 +2,7 @@ import com.github.spotbugs.snom.SpotBugsTask
 
 plugins {
     id "java"
+    id 'pmd'
     id "edu.wpi.first.GradleRIO" version "2025.2.1"
     id "com.github.spotbugs" version "5.0.14"
 }
@@ -85,11 +86,27 @@ test {
 wpi.sim.addGui().defaultEnabled = true
 wpi.sim.addDriverstation()
 
+// --- PMD Configuration --- 
+pmd {
+    toolVersion = '7.9.0'    // Or any recent version
+    ignoreFailures = true     // Don't fail the build on rule violations
+    ruleSets = []             // Empty to rely on custom file
+    ruleSetFiles = files('config/pmd/pmd-ruleset.xml')
+}
+
+tasks.named('pmdMain') {
+    reports {
+        xml.required.set(true)   // Generates an XML report
+        html.required.set(true)  // Generates an HTML report
+        html.outputLocation.set(file("$buildDir/reports/pmd.html"))
+    }
+}
+
 // --- SpotBugs Configuration ---
 spotbugs {
     toolVersion = '4.7.3'
     reportLevel = 'high'
-    excludeFilter = file("spotbugs-exclude.xml")
+    excludeFilter = file("config/spotbugs/spotbugs-exclude.xml")
     effort = 'max'
     
     // Setting the report level to "low" or "medium" is not strictly necessary here
