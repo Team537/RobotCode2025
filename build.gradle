@@ -96,7 +96,7 @@ pmd {
 
 tasks.named('pmdMain') {
     reports {
-        xml.required.set(true)   // Generates an XML report
+        xml.required.set(false)
         html.required.set(true)  // Generates an HTML report
         html.outputLocation.set(file("$buildDir/reports/pmd.html"))
     }
