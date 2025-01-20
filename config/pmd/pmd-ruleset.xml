@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="FRC Rules"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+    <description>
+        This comprehensive PMD ruleset includes nearly all of the built-in PMD Java rulesets,
+        plus additional FRC-specific XPath rules. It aims to catch common mistakes, enforce
+        good coding style, highlight security concerns, and encourage best practices in FRC robot code.
+        Adjust as necessary to fit your project's needs.
+    </description>
+
+    <!-- =========================================== -->
+    <!--           1) STANDARD PMD RULESETS         -->
+    <!-- =========================================== -->
+
+    <rule ref="category/java/bestpractices.xml"/>
+    <rule ref="category/java/codestyle.xml" >
+        <exclude name="LongVariable" />
+        <exclude name="OnlyOneReturn" />
+        <exclude name="LocalVariableCouldBeFinal " />
+
+    </rule>
+    <rule ref="category/java/design.xml" />
+    <rule ref="category/java/documentation.xml" />
+    <rule ref="category/java/errorprone.xml" />
+    <rule ref="category/java/multithreading.xml" />
+    <rule ref="category/java/performance.xml" />
+    <rule ref="category/java/security.xml" />
+
+    <!-- Additional sets that might be relevant:
+         - rulesets/java/xsl.xml
+         - rulesets/java/regexp.xml
+         - rulesets/java/strictnullchecking.xml 
+       Add them if you need them. -->
+
+    <!-- =========================================== -->
+    <!--        2) CUSTOM FRC-SPECIFIC RULES        -->
+    <!-- =========================================== -->
+
+    <!-- 
+      Below are examples of custom XPath-based rules aimed at common FRC pitfalls.
+      They look for specific code patterns (e.g., creating threads in Robot code, 
+      calling System.exit, or blocking calls in periodic methods).
+      Modify the XPaths or messages to fit your project’s conventions.
+    -->
+
+    <!-- 2.1 - No custom Thread usage in Robot code -->
+    <rule name="NoThreadInRobotCode"
+        message="Avoid creating Threads directly in Robot code..."
+        language="java"
+        minimumLanguageVersion="1.8"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+        <description>
+            Creating new Threads in main FRC robot classes can lead to unsafe concurrency...
+        </description>
+        <priority>2</priority>
+        <properties>
+
+            <!-- Match any allocation of Thread within classes named *Robot* -->
+            <property name="xpath">
+                <value>
+                    //ClassOrInterfaceDeclaration
+                        [contains(@Image, 'Robot')]
+                        //AllocationExpression
+                        [ClassOrInterfaceType/@Image='Thread']
+                </value>
+            </property>
+        </properties>
+    </rule>
+
+    <!-- 2.2 - No blocking calls in periodic methods -->
+    <rule name="NoBlockingCallsInRobotPeriodic"
+        message="Blocking calls (e.g., Thread.sleep) in periodic methods can disrupt the robot control loop."
+        language="java"
+        minimumLanguageVersion="1.8"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+        <description>
+            In FRC, Robot periodic methods (robotPeriodic, teleopPeriodic, autonomousPeriodic, etc.) 
+            should not contain blocking calls, as they can freeze important control loops 
+            and cause lost communications or delayed responses.
+        </description>
+        <priority>2</priority>
+        <properties>
+
+            <property name="xpath">
+                <value>
+                    //MethodDeclaration
+                        [@Image='robotPeriodic' or @Image='teleopPeriodic' or @Image='autonomousPeriodic' or @Image='testPeriodic']
+                        //PrimaryExpression
+                        [PrimaryPrefix/Name/@Image='Thread.sleep' or PrimaryPrefix/Name/@Image='wait']
+                </value>
+            </property>
+        </properties>
+    </rule>
+
+    <!-- 2.3 - Prohibit System.exit calls in main robot code -->
+    <rule name="NoSystemExitInRobotCode"
+        message="Calling System.exit() in FRC code is discouraged, as it can forcibly terminate the Robot JVM."
+        language="java"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+        <description>
+            In FRC, forcibly terminating the JVM can break critical processes and logs. 
+            The driver station and robot code rely on the JVM staying alive.
+        </description>
+        <priority>1</priority>
+        <properties>
+
+            <!-- Look for System.exit calls anywhere in a Robot or Command-based class -->
+            <property name="xpath">
+                <value>
+                    //ClassOrInterfaceDeclaration
+                        [contains(@Image, 'Robot') or contains(@Image, 'Command')]
+                        //PrimaryExpression
+                        [PrimaryPrefix/Name/@Image='System.exit']
+                </value>
+            </property>
+        </properties>
+    </rule>
+
+    <!-- 2.4 - Enforce TimedRobot base class (example check if your code must extend TimedRobot) -->
+    <rule name="EnsureTimedRobotSubclass"
+        message="Main Robot class should extend TimedRobot to ensure correct WPILib lifecycle."
+        language="java"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+        <description>
+            FRC teams often rely on TimedRobot for the standard robot lifecycle. 
+            This rule flags any main Robot class not extending TimedRobot.
+        </description>
+        <priority>3</priority>
+        <properties>
+
+            <property name="xpath">
+                <value>
+                    //ClassOrInterfaceDeclaration
+                        [contains(@Image, 'Robot') 
+                         and not(ClassOrInterfaceBody/ClassOrInterfaceDeclaration
+                          or ExtendsList/ClassOrInterfaceType/@Image='TimedRobot')]
+                </value>
+            </property>
+        </properties>
+    </rule>
+
+    <!-- Add more FRC-specific checks as needed (e.g., requiring usage of CommandScheduler in
+    certain contexts, 
+         avoiding certain WPILib-deprecated classes, etc.) -->
+
+</ruleset>

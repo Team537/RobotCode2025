@@ -27,6 +27,15 @@ jobs:
             - name: Build with Gradle Wrapper
               run: ./gradlew clean build
 
+            - name: Run PMD Analysis
+              run: ./gradlew pmdMain
+
+            - name: Upload PMD Report
+              uses: actions/upload-artifact@v3
+              with:
+                  name: pmd-report
+                  path: build/reports/pmd/
+
             # Run SpotBugs
             - name: Run SpotBugs Analysis
               run: ./gradlew spotbugsMain
