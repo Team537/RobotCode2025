@@ -34,7 +34,7 @@ jobs:
               uses: actions/upload-artifact@v3
               with:
                   name: pmd-report
-                  path: build/reports/pmd/
+                  path: build/reports/pmd.html
 
             # Run SpotBugs
             - name: Run SpotBugs Analysis
@@ -47,13 +47,6 @@ jobs:
               with:
                   name: spotbugs-report
                   path: build/reports/spotbugs.html
-
-              # Initializes CodeQL with dependency caching enabled
-            - name: Initialize CodeQL
-              uses: github/codeql-action/init@v3
-              with:
-                  languages: java
-                  dependency-caching: true
 
     dependency-submission:
         runs-on: ubuntu-latest
