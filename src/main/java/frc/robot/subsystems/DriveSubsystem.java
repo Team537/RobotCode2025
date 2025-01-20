@@ -459,7 +459,7 @@ public class DriveSubsystem extends SubsystemBase {
         rearLeftModule.setState(swerveModuleStates[2]);
         rearRightModule.setState(swerveModuleStates[3]);
 
-        System.out.println(swerveModuleStates[1].toString());
+        //System.out.println(swerveModuleStates[1].toString());
     }
 
     /**

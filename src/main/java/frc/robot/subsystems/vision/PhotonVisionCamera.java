@@ -10,6 +10,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
 
@@ -43,6 +44,9 @@ public class PhotonVisionCamera extends SubsystemBase {
      * Provide the current best guess of the robot pose so that the solvePnP can converge better.
      */
     public void update(Pose2d currentBestGuess) {
+
+        // Verify that data is being output.
+        System.out.println(this.getName() + " is detecting data!");
 
         // Update reference pose for better solvePNP
         photonPoseEstimator.setReferencePose(currentBestGuess);
