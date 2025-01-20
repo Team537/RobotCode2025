@@ -318,28 +318,18 @@ public class DriveSubsystem extends SubsystemBase {
             rotationalVelocity = Math.signum(rotationalVelocity); // Clamp to [-1, 1]
         }
 
-        // --- Manual Translation Targeting ---
-        // Calculate a target offset for translation based on the left stick and right trigger.
-        // The trigger adjusts the radius of the target offset, ranging from minimum to maximum radius.
-        // Activates when the left stick button is pressed.
-        double linearTargetRadius = OperatorConstants.XBOX_CONTROLLER_TARGET_MIN_RADIUS 
-            + controller.getRightTriggerAxis() * (OperatorConstants.XBOX_CONTROLLER_TARGET_MAX_RADIUS 
-            - OperatorConstants.XBOX_CONTROLLER_TARGET_MIN_RADIUS);
-        Translation2d targetTranslationOffset = new Translation2d(
-            controller.getLeftX() * linearTargetRadius, 
-            -controller.getLeftY() * linearTargetRadius
-        );
-        boolean useTargetTranslation = controller.getLeftStickButton();
-
         // --- Manual Rotation Targeting ---
         // Calculate a target offset for rotation based on the right stick vector.
         // Activates rotation targeting if:
+        // - The dpad is pressed
         // - The right stick button is pressed, OR
         // - The right stick's Y-axis exceeds a specific activation zone, OR
         // - Rotation targeting was already active and the right stick magnitude is above the deactivation threshold.
         Vector2d rightStickVector = new Vector2d(controller.getRightX(), -controller.getRightY());
-        Rotation2d targetRotationOffset = rightStickVector.angle();
+        Rotation2d dpadAngle = Rotation2d.fromDegrees(controller.getPOV()).times(-1.0).rotateBy(new Rotation2d(0.5 * Math.PI));
+        Rotation2d targetRotationOffset = controller.getPOV() != -1 ? dpadAngle : rightStickVector.angle();
         if (
+            controller.getPOV() != -1 ||
             controller.getRightStickButton() ||
             Math.abs(controller.getRightY()) > OperatorConstants.XBOX_CONTROLLER_ROTATIONAL_TARGET_ACTIVATION_ZONE || // Activate if pushed enough
             (xboxOrientationOffsetTargetActive && rightStickVector.magnitude() > OperatorConstants.XBOX_CONTROLLER_ROTATIONAL_TARGET_DEACTIVATION_ZONE) // Stay active if above threshold
@@ -354,16 +344,15 @@ public class DriveSubsystem extends SubsystemBase {
         boolean useAbsoluteRotation = controller.getRightStickButton();
 
         // --- Throttle Control ---
-        // Throttle determines the overall speed of the robot, based on the right trigger's position (0 to 1).
-        double throttle = controller.getRightTriggerAxis();
-
+        // Throttle determines the overall speed of the robot, based on the left stick button (0 to 1).
+        double throttle = controller.getLeftStickButton() ? 1.0 : 0.0;
         // --- Call the Manual Drive Method ---
         // Pass all calculated values to the manualDrive method for execution.
         manualDrive(
             linearVelocity,
             rotationalVelocity,
-            targetTranslationOffset,
-            useTargetTranslation,
+            new Translation2d(0.0,0.0),
+            false,
             targetRotationOffset,
             useTargetRotation,
             useAbsoluteRotation,
