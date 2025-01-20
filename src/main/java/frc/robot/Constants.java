@@ -164,7 +164,10 @@ public final class Constants {
 
     // Pipeline settings
     public static final int APRIL_TAG_PIPELINE = 0;
-    public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+    public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+
+    public static final String FRONT_CAMERA_NAME = "Front_Camera";
+    public static final String SLIDE_CAMERA_NAME = "Side_Camera";
 
     public static final PhotonPoseEstimator.PoseStrategy POSE_STRATEGY = 
             PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR; 
