@@ -21,6 +21,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * the data to determine the robot's position on the field, and feeds the
  * results
  * into the pose estimator to improve accuracy.
+ * <hr>
+ * @author Cameron Myhre
+ * @since v1.2.0
  */
 public class VisionOdometry extends SubsystemBase {
 
