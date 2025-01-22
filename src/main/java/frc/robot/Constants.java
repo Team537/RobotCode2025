@@ -4,9 +4,12 @@
 
 package frc.robot;
 
+import org.photonvision.PhotonPoseEstimator;
+
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
@@ -48,8 +51,7 @@ public final class Constants {
         public static final double THROTTLE_LINEAR_MIN_SPEED = 2.0; // Meters per second
         public static final double THROTTLE_LINEAR_MAX_SPEED = DriveConstants.LINEAR_MAX_SPEED; // Meters per second
         public static final double THROTTLE_ROTATIONAL_MIN_SPEED = 2.5; // Radians per second
-        public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; // Radians per                                                                  // second
-
+        public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; // Radians per second.
         public static final double XBOX_CONTROLLER_JOYSTICK_DEADMAND_RADIUS = 0.01;
         public static final double XBOX_CONTROLLER_TARGET_MIN_RADIUS = 1.0; // Meters
         public static final double XBOX_CONTROLLER_TARGET_MAX_RADIUS = 5.0; // Meters
@@ -135,6 +137,7 @@ public final class Constants {
         public static final double TURNING_PID_MAX_OUTPUT = 1.0;
 
         public static final IdleMode TURNING_MOTOR_IDLE_MODE = IdleMode.kBrake;
+
         public static final int TURNING_MOTOR_CURRENT_LIMIT = 20; // Amps
 
         // Gyroscope CAN IDs
@@ -155,6 +158,7 @@ public final class Constants {
         public static final double LINEAR_MAX_ACCELERATION = 5.0; // Meters per second squared
         public static final double ROTATIONAL_MAX_ACCELERATION = 6.4; // Radians per second squared
 
+
         // Maximum delta time for driving, prevents too fast accelerations when lag occurs.
         public static final double MAX_DELTA_TIME_RATE_LIMIT = 0.1; // 1.0; // seconds
 
@@ -171,8 +175,8 @@ public final class Constants {
                 new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
                 new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
                 new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
-    }
-
+      }
+  
     /**
      * <h2> VisionConstants </h2>
      * The {@code VisionConstants} class is a subclass contained within the {@code Constants} class. This subclass
@@ -181,8 +185,20 @@ public final class Constants {
      */
     public static class VisionConstants {
 
+        // Camera Settings
+        public static final String FRONT_CAMERA_NAME = "Front_Camera";
+        public static final String SLIDE_CAMERA_NAME = "Side_Camera";
+
+        public static final Transform3d FRONT_CAMERA_OFFSET = new Transform3d(); // TODO: Fill in actual values.
+        public static final Transform3d SLIDE_CAMERA_OFFSET = new Transform3d(); // TODO: Fill in actual values.
+
         // Pipeline settings
         public static final int APRIL_TAG_PIPELINE = 0;
-        public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField();
+        public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = AprilTagFieldLayout
+                .loadField(AprilTagFields.k2025Reefscape);
+
+        // Odometry Detection Strategy
+        public static final PhotonPoseEstimator.PoseStrategy POSE_STRATEGY = PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
+        public static final PhotonPoseEstimator.PoseStrategy FALLBACK_STRATEGY = PhotonPoseEstimator.PoseStrategy.CLOSEST_TO_REFERENCE_POSE;
     }
 }

@@ -469,7 +469,7 @@ public class DriveSubsystem extends SubsystemBase {
         rearLeftModule.setState(swerveModuleStates[2]);
         rearRightModule.setState(swerveModuleStates[3]);
 
-        System.out.println(swerveModuleStates[1].toString());
+        //System.out.println(swerveModuleStates[1].toString());
     }
 
     /**
@@ -507,10 +507,19 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
+     * Returns this DriveSubsystems SwerveDrivePoseEstimator.
+     * 
+     * @return This DriveSubsystems SwerveDrivePoseEstimator.
+     */
+    public SwerveDrivePoseEstimator getSwerveDrivePoseEstimator() {
+        return poseEstimator;
+    }
+
+    /**
      * Gets the pose of the robot
      * @return the robot's pose
      */
-    public Pose2d getRobotPose() {
+    public synchronized Pose2d getRobotPose() {
         return poseEstimator.getEstimatedPosition();
     }
 
@@ -545,7 +554,7 @@ public class DriveSubsystem extends SubsystemBase {
 
         // Update the robot pose using the module states
         poseEstimator.update(getGyroscopeHeading(), getSwerveModulePositions());
-        
+
         // Accelerates the velocity towards the target
         linearRateLimiter.update(targetLinearVelocity);
         rotationalRateLimiter.update(targetRotationalVelocity);

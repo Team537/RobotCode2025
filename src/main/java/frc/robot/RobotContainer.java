@@ -5,10 +5,14 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.vision.PhotonVisionCamera;
+import frc.robot.subsystems.vision.VisionOdometry;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.utils.Alliance;
 import frc.utils.AutonomousRoutine;
@@ -33,9 +37,12 @@ public class RobotContainer {
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final XboxController xBoxController = new XboxController(OperatorConstants.DRIVER_CONTROLLER_PORT);
 
-    // The robot's subsystems and commands are defined here...
+    // Subsystems
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
+    private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
+
+    // Commands
     Command manualDriveCommand = new RunCommand(
             () -> {
                 driveSubsystem.driveFromXBoxController(xBoxController);
@@ -54,6 +61,10 @@ public class RobotContainer {
      * Creates a new RobotContainer object and sets up SmartDashboard an the button inputs.
      */
     public RobotContainer() {
+        
+        // Add cameras to the VisionOdometry object.
+        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, new Transform3d()));
+        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.SLIDE_CAMERA_NAME, new Transform3d()));
 
         // Setup Dashboard
         setupSmartDashboard();
