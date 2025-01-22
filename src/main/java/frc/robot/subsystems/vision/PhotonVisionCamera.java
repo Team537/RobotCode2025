@@ -54,8 +54,6 @@ public class PhotonVisionCamera extends SubsystemBase {
      * Provide the current best guess of the robot pose so that solvePnP can converge better.
      */
     public void update(Pose2d currentBestGuess) {
-        // Verify that data is being output for testing
-        System.out.println(this.getName() + " is detecting data!");
 
         // Update the reference pose for better solvePNP
         photonPoseEstimator.setReferencePose(currentBestGuess);
