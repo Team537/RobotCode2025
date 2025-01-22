@@ -19,6 +19,16 @@ import frc.robot.util.RateLimiter;
 import frc.robot.util.RateLimiter2d;
 import frc.robot.util.Vector2d;
 
+/**
+ * <h2> DriveSubsystem </h2>
+ * The {@code DriveSubsystem} class is a class that focuses on controlling the robot's drivetrain. It extends SubsystemBase,
+ * and supports several autonomous and teleoperated features, aiding in intelligent navigation and control. It also servers
+ * as the central access point for the robot's position on the field.
+ * <hr>
+ * @author Parker Huibregtse
+ * @since v1.1.0
+ * @see {@link edu.wpi.first.wpilibj2.command.SubsystemBase}
+ */
 public class DriveSubsystem extends SubsystemBase {
 
     // SwerveModule declarations for all four modules of the drivetrain

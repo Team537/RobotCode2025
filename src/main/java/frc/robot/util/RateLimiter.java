@@ -2,6 +2,15 @@ package frc.robot.util;
 
 import edu.wpi.first.math.MathSharedStore;
 
+/**
+ * <h2> RateLimiter </h2>
+ * The {@code RateLimiter} class is used to limit the rate of acceleration when driving the robot.
+ * This ensures that the robot controls smoothly and reliably, and is used extensively in {@code DriveSubsystem}.
+ * <hr>
+ * @author Parker Huibregtse
+ * @since v1.1.0
+ * @see {@link frc.robot.subsystems.DriveSubsystem}
+*/
 public class RateLimiter {
 
     // Value whose rate will be limited
