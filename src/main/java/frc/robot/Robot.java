@@ -17,21 +17,23 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * this project, you must also update the Main.java file in the project.
  */
 public class Robot extends TimedRobot {
-  private Command autonomousCommand;
-  private final RobotContainer robotContainer;
+    private Command autonomousCommand;
+    private final RobotContainer robotContainer;
 
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
-  public Robot() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
-    robotContainer = new RobotContainer();
+    /**
+     * This function is run when the robot is first started up and should be used
+     * for any
+     * initialization code.
+     */
+    public Robot() {
+        // Instantiate our RobotContainer. This will perform all our button bindings,
+        // and put our
+        // autonomous chooser on the dashboard.
+        robotContainer = new RobotContainer();
 
-    // Allow the camera stream to be viewed via the robots network.
-    PortForwarder.add(5800, "photonvision.local", 5800);
-  }
+        // Allow the camera stream to be viewed via the robots network.
+        PortForwarder.add(5800, "photonvision.local", 5800);
+    }
 
     /**
      * This function is called every 20 ms, no matter the mode. Use this for items
@@ -85,6 +87,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+
         // This makes sure that the autonomous stops running when
         // teleop starts running. If you want the autonomous to
         // continue until interrupted by another command, remove
@@ -92,22 +95,22 @@ public class Robot extends TimedRobot {
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
         }
-    }
 
-    robotContainer.scheduleTeleOp();
-  }
+        // Schedule Teleop Commans
+        robotContainer.scheduleTeleOp();
+    }
 
     /** This function is called periodically during operator control. */
     @Override
     public void teleopPeriodic() {
     }
 
-  @Override
-  public void testInit() {
+    @Override
+    public void testInit() {
 
-    // Cancels all running commands at the start of test mode.
-    CommandScheduler.getInstance().cancelAll();
-  }
+        // Cancels all running commands at the start of test mode.
+        CommandScheduler.getInstance().cancelAll();
+    }
 
     /** This function is called periodically during test mode. */
     @Override
