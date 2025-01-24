@@ -1,9 +1,12 @@
 package frc.robot.network;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+
 import com.google.gson.Gson;
 
 /**
@@ -31,7 +34,10 @@ public class TCPSender {
         this.socket = new Socket();
         // Establish a connection with a timeout of 5 seconds
         this.socket.connect(new InetSocketAddress(piIp, piPort), 5000);
-        this.writer = new PrintWriter(socket.getOutputStream(), true); // Auto-flush enabled
+        this.writer = new PrintWriter(
+            new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8),
+            true
+        ); // Auto-flush enabled
     }
 
     /**

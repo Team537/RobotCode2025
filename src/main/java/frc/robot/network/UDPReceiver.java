@@ -2,6 +2,8 @@ package frc.robot.network;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.nio.charset.StandardCharsets;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -52,7 +54,7 @@ public class UDPReceiver {
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                     socket.receive(packet);
 
-                    String jsonString = new String(packet.getData(), 0, packet.getLength());
+                    String jsonString = new String(packet.getData(), 0, packet.getLength(), StandardCharsets.UTF_8);
                     System.out.println("Received JSON: " + jsonString);
 
                     // Update targets in a thread-safe manner
