@@ -5,13 +5,17 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.RaspberryPIConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.network.TCPSender;
+import frc.robot.network.UDPReceiver;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.vision.PhotonVisionCamera;
-import frc.robot.subsystems.vision.VisionOdometry;
+import frc.robot.subsystems.vision.OceanViewManager;
+import frc.robot.subsystems.vision.odometry.PhotonVisionCamera;
+import frc.robot.subsystems.vision.odometry.VisionOdometry;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.utils.Alliance;
@@ -37,10 +41,16 @@ public class RobotContainer {
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final XboxController xBoxController = new XboxController(OperatorConstants.DRIVER_CONTROLLER_PORT);
 
+    // Networking
+    private UDPReceiver udpReceiver;
+    private TCPSender tcpSender;
+
     // Subsystems
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
+    
+    private OceanViewManager oceanViewManager;
 
     // Commands
     Command manualDriveCommand = new RunCommand(
@@ -61,6 +71,20 @@ public class RobotContainer {
      * Creates a new RobotContainer object and sets up SmartDashboard an the button inputs.
      */
     public RobotContainer() {
+        
+        // Setup Networking
+        udpReceiver = new UDPReceiver();
+        
+        // Attempted to create a new TCPSender object.
+        try {
+            tcpSender = new TCPSender(RaspberryPIConstants.PI_IP, RaspberryPIConstants.PORT_NUMBER);
+            System.out.println("Successfully created TCPSender object!");
+        } catch (Exception e) {
+            System.err.println("Failed to construct TCPSender object: " + e.getMessage());
+        }
+
+        // Create a new OceanViewManager object.
+        oceanViewManager = new OceanViewManager(udpReceiver, tcpSender, driveSubsystem::getRobotPose);
         
         // Add cameras to the VisionOdometry object.
         visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, new Transform3d()));

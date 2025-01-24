@@ -1,13 +1,18 @@
 package frc.robot.subsystems.vision;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.RaspberryPIConstants;
 import frc.robot.network.TCPSender;
 import frc.robot.network.UDPReceiver;
 import frc.utils.vision.ScoringLocation;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * <h1>OceanViewManager</h1>
@@ -140,10 +145,15 @@ public class OceanViewManager extends SubsystemBase {
     private final UDPReceiver udpReceiver;
 
     /**
-     * <p>The <strong>TCPSender</strong> for sending data/commands to the Pi, if desired.
-     * Not always used, but included for completeness.</p>
+     * <p>The <strong>TCPSender</strong> for sending data/commands to the Pi, if desired. </p>
      */
     private final TCPSender tcpSender;
+
+    /**
+     *<p> The <strong>supplier method</strong> for getting the robots position. Used
+     * to send the robot's position to the PI for operational use </p>
+     */
+    private final Supplier<Pose2d> poseSupplier;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -152,12 +162,14 @@ public class OceanViewManager extends SubsystemBase {
     /**
      * Constructs a new OceanViewManager with the specified network devices.
      *
-     * @param udpReceiver The UDPReceiver for fetching JSON detection data.
-     * @param tcpSender   (Optional) A TCPSender if you need to send data to the Pi.
+     * @param udpReceiver  The UDPReceiver for fetching JSON detection data.
+     * @param tcpSender    A TCPSender if you need to send data to the Pi.
+     * @param poseSupplier A supplier method that returns the robot's estimated position.
      */
-    public OceanViewManager(UDPReceiver udpReceiver, TCPSender tcpSender) {
-        this.udpReceiver = udpReceiver;
-        this.tcpSender   = tcpSender;
+    public OceanViewManager(UDPReceiver udpReceiver, TCPSender tcpSender, Supplier<Pose2d> poseSupplier) {
+        this.udpReceiver  = udpReceiver;
+        this.tcpSender    = tcpSender;
+        this.poseSupplier = poseSupplier;
     }
 
     // ------------------------------------------------------------------------
@@ -182,6 +194,37 @@ public class OceanViewManager extends SubsystemBase {
             lastProcessedPacket = currentPacket;
             fetchDetectionData();
         }
+
+        // Update the robots position on the PI. If this ends up being too much, we can 
+        // always decrease the time between sends.
+        sendRobotPoseToPi();
+    }
+
+    /**
+     * Packages and sends the robot's current pose to the Raspberry Pi over TCP.
+     */
+    private void sendRobotPoseToPi() {
+        if (tcpSender == null || !tcpSender.isConnected()) {
+            // Attempt to reconnect or log a warning
+            try {
+                tcpSender.reconnect(RaspberryPIConstants.PI_IP, RaspberryPIConstants.PORT_NUMBER); // Replace with actual IP and port
+                System.out.println("[OceanViewManager] Reconnected to Raspberry Pi.");
+            } catch (IOException e) {
+                System.err.println("[OceanViewManager] Failed to reconnect: " + e.getMessage());
+                return;
+            }
+        }
+
+        // Get the current estimated robot pose and format it such that the data is easily manipulated by GSON.
+        Pose2d currentPose = poseSupplier.get();
+        RobotPoseData data = new RobotPoseData(
+            currentPose.getX(),
+            currentPose.getY(),
+            currentPose.getRotation().getRadians(),
+            Timer.getFPGATimestamp()
+        );
+
+        tcpSender.sendConfiguration(data);
     }
 
     // ------------------------------------------------------------------------
