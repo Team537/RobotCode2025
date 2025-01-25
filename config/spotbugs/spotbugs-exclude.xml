@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- Exclude everything at priority 3, 4, and 5 -->
+    <Match>
+        <Bug priority="3"/>
+        <Exclude/>  <!-- This is crucial! -->
+    </Match>
+    <Match>
+        <Bug priority="2"/>
+        <Exclude/>  <!-- This is crucial! -->
+    </Match>
+    <Match>
+        <Bug priority="4"/>
+        <Exclude/>  <!-- This is crucial! -->
+    </Match>
+</FindBugsFilter>

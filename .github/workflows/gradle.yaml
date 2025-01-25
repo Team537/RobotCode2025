@@ -1,0 +1,64 @@
+name: Java CI with Gradle
+
+on:
+    push:
+        branches: ["main", "dev"]
+    pull_request:
+        branches: ["main", "dev"]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up JDK 17
+              uses: actions/setup-java@v4
+              with:
+                  java-version: "17"
+                  distribution: "temurin"
+
+            - name: Setup Gradle
+              uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582
+
+            - name: Build with Gradle Wrapper
+              run: ./gradlew clean build
+
+            - name: Run PMD Analysis
+              run: ./gradlew pmdMain
+
+            - name: Upload PMD Report
+              uses: actions/upload-artifact@v3
+              with:
+                  name: pmd-report
+                  path: build/reports/pmd.html
+
+            # Run SpotBugs
+            - name: Run SpotBugs Analysis
+              run: ./gradlew spotbugsMain
+
+            # Optionally, upload the SpotBugs report as an artifact for later review
+            - name: Upload SpotBugs Report
+              if: always()
+              uses: actions/upload-artifact@v3
+              with:
+                  name: spotbugs-report
+                  path: build/reports/spotbugs.html
+
+    dependency-submission:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+
+        steps:
+            - uses: actions/checkout@v4
+            - name: Set up JDK 17
+              uses: actions/setup-java@v4
+              with:
+                  java-version: "17"
+                  distribution: "temurin"
+            - name: Generate and submit dependency graph
+              uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582
