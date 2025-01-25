@@ -19,6 +19,16 @@ import frc.robot.util.RateLimiter;
 import frc.robot.util.RateLimiter2d;
 import frc.robot.util.Vector2d;
 
+/**
+ * <h2> DriveSubsystem </h2>
+ * The {@code DriveSubsystem} class is a class that focuses on controlling the robot's drivetrain. It extends SubsystemBase,
+ * and supports several autonomous and teleoperated features, aiding in intelligent navigation and control. It also servers
+ * as the central access point for the robot's position on the field.
+ * <hr>
+ * @author Parker Huibregtse
+ * @since v1.1.0
+ * @see {@link edu.wpi.first.wpilibj2.command.SubsystemBase}
+ */
 public class DriveSubsystem extends SubsystemBase {
 
     // SwerveModule declarations for all four modules of the drivetrain
@@ -459,7 +469,7 @@ public class DriveSubsystem extends SubsystemBase {
         rearLeftModule.setState(swerveModuleStates[2]);
         rearRightModule.setState(swerveModuleStates[3]);
 
-        System.out.println(swerveModuleStates[1].toString());
+        //System.out.println(swerveModuleStates[1].toString());
     }
 
     /**
@@ -497,10 +507,19 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
+     * Returns this DriveSubsystems SwerveDrivePoseEstimator.
+     * 
+     * @return This DriveSubsystems SwerveDrivePoseEstimator.
+     */
+    public SwerveDrivePoseEstimator getSwerveDrivePoseEstimator() {
+        return poseEstimator;
+    }
+
+    /**
      * Gets the pose of the robot
      * @return the robot's pose
      */
-    public Pose2d getRobotPose() {
+    public synchronized Pose2d getRobotPose() {
         return poseEstimator.getEstimatedPosition();
     }
 
@@ -535,13 +554,10 @@ public class DriveSubsystem extends SubsystemBase {
 
         // Update the robot pose using the module states
         poseEstimator.update(getGyroscopeHeading(), getSwerveModulePositions());
-        
+
         // Accelerates the velocity towards the target
         linearRateLimiter.update(targetLinearVelocity);
         rotationalRateLimiter.update(targetRotationalVelocity);
-
-        linearRateLimiter.setValue(targetLinearVelocity);
-        rotationalRateLimiter.setValue(targetRotationalVelocity);
 
         // Driving the robot using the accelerated values
         setModules(linearRateLimiter.getValue(), rotationalRateLimiter.getValue());
