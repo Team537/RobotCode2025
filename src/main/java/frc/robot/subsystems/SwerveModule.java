@@ -15,6 +15,16 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 
+/**
+ * <h2> SwerverModule </h2>
+ * The {@code SwerverModule} class focuses on controlling the individual hardware components within each swerve module. 
+ * This class is used in {@code DriveSubsystem} to intelligently manage the robot's movement.
+ * <hr>
+ * @author Parker Huibregtse
+ * @since v1.1.0
+ * @see {@link edu.wpi.first.wpilibj2.command.SubsystemBase}
+ * @see {@link frc.robot.subsystems.DriveSubsystem}
+*/
 public class SwerveModule extends SubsystemBase {
 
     SparkMax drivingSparkMax;

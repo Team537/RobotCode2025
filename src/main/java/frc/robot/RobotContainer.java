@@ -5,10 +5,14 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.vision.PhotonVisionCamera;
+import frc.robot.subsystems.vision.VisionOdometry;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.utils.Alliance;
 import frc.utils.AutonomousRoutine;
@@ -31,11 +35,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
-    private final XboxController xBoxController = new XboxController(OperatorConstants.kDriverControllerPort);
+    private final XboxController xBoxController = new XboxController(OperatorConstants.DRIVER_CONTROLLER_PORT);
 
-    // The robot's subsystems and commands are defined here...
+    // Subsystems
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
+    private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
+
+    // Commands
     Command manualDriveCommand = new RunCommand(
             () -> {
                 driveSubsystem.driveFromXBoxController(xBoxController);
@@ -44,16 +51,20 @@ public class RobotContainer {
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController driverController = new CommandXboxController(
-            OperatorConstants.kDriverControllerPort);
+            OperatorConstants.DRIVER_CONTROLLER_PORT);
 
     // Smart Dashboard Inputs
     private final SendableChooser<AutonomousRoutine> autonomousSelector = new SendableChooser<>();
     private final SendableChooser<Alliance> allianceSelector = new SendableChooser<>();
 
     /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
+     * Creates a new RobotContainer object and sets up SmartDashboard an the button inputs.
      */
     public RobotContainer() {
+        
+        // Add cameras to the VisionOdometry object.
+        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, new Transform3d()));
+        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.SLIDE_CAMERA_NAME, new Transform3d()));
 
         // Setup Dashboard
         setupSmartDashboard();
@@ -63,8 +74,7 @@ public class RobotContainer {
     }
 
     /**
-     * This method sets up the dashboard so that the drivers can configure the
-     * robots settings.
+     * Sets up SmartDashboard so that important settings can be configured and key values can be viewed.
      */
     private void setupSmartDashboard() {
 
@@ -112,7 +122,6 @@ public class RobotContainer {
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
      */
     public Command getAutonomousCommand() {
 
@@ -127,7 +136,7 @@ public class RobotContainer {
     }
 
     /**
-     * Schedules the commands for TeleOp.
+     * Schedules commands used exclusively during TeleOp.
      */
     public void scheduleTeleOp() {
 
