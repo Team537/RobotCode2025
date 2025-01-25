@@ -43,7 +43,6 @@ public class SwerveModule extends SubsystemBase{
         drivingClosedLoopController = drivingSparkMax.getClosedLoopController();
         turningClosedLoopController = turningSparkMax.getClosedLoopController();
 
-        if (drivingSparkMax instanceof Object)
         //Creating the configuration file for thr driving motor
         SparkMaxConfig drivingConfig = new SparkMaxConfig();
         drivingConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder);

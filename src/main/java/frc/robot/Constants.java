@@ -37,7 +37,7 @@ public final class Constants {
     public static final double ROTATION_INPUT_CURVE_POWER = 2.5;
     public static final double THROTTLE_LINEAR_MIN_SPEED = 2.0; //Meters per second
     public static final double THROTTLE_LINEAR_MAX_SPEED = DriveConstants.LINEAR_MAX_SPEED; //Meters per second
-    public static final double THROTTLE_ROTATIONAL_MIN_SPEED = 2.5; //Radians per second
+    public static final double THROTTLE_ROTATIONAL_MIN_SPEED = 7.0; //Radians per second
     public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; //Radians per second
 
     public static final double XBOX_CONTROLLER_JOYSTICK_DEADMAND_RADIUS = 0.01;
@@ -134,9 +134,9 @@ public final class Constants {
 
     // Maxmimum speeds and accelerations for driving
     public static final double LINEAR_MAX_SPEED = 4.8; //Meters per second
-    public static final double ROTATIONAL_MAX_SPEED = 6.0; //Radians per second
-    public static final double LINEAR_MAX_ACCELERATION = 5.0; //Meters per second squared
-    public static final double ROTATIONAL_MAX_ACCELERATION = 6.4; //Radians per second squared
+    public static final double ROTATIONAL_MAX_SPEED = 16.7; //Radians per second
+    public static final double LINEAR_MAX_ACCELERATION = 11.4; //Meters per second squared
+    public static final double ROTATIONAL_MAX_ACCELERATION = 42.0; //Radians per second squared
 
     // Maxmimum delta time for driving, prevents too fast accelerations when lag occurs
     public static final double MAX_DELTA_TIME_RATE_LIMIT = 0.1;//1.0; //seconds
