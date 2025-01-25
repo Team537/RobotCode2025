@@ -4,6 +4,6 @@ public enum NarwhalWristState {
     OUTTAKING,
     INTAKING,
     ALGAE,
-    STOPPED,
+    STOPPED, // power is set to zero
     CUSTOM,
 }

@@ -191,10 +191,12 @@ public final class Constants {
         
         public static final double ROTATIONS_TO_RADIANS = Math.PI * 2; // Wrist target angles (radians) are multiplied by this to get the motor target position
 
-        public static final double POSITION_PID_P = 0.5;
-        public static final double POSITION_PID_I = 0;
-        public static final double POSITION_PID_D = 0.2;
-
+        public static final double POSITION_PID_P = 0.5; // TODO: UPDATE THESE PID VALUES
+        public static final double POSITION_PID_I = 0; // TODO: UPDATE THESE PID VALUES
+        public static final double POSITION_PID_D = 0.2; // TODO: UPDATE THESE PID VALUES
+        
+        public static final double PID_OUTPUT_RANGE_MAX = 0.5; // TODO: UPDATE THESE OUTPUT RANGE VALUES
+        public static final double PID_OUTPUT_RANGE_MIN = 0.5; // TODO: UPDATE THESE OUTPUT RANGE VALUES
         
         public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(-Math.PI / 4); // -pi/4 TODO: update these placeholder values
         public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(2 * Math.PI / 3); // 2pi/3 TODO: update these placeholder values

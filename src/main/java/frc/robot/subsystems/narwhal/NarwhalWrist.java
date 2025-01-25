@@ -75,7 +75,7 @@ public class NarwhalWrist extends SubsystemBase {
     }
 
     /**
-     * Set the wrist motor to the intake angle (defined in constants).
+     * Set the wrist motor to the intake angle (defined in constants) & update status.
      */
     public void goToIntakeAngle() {
         // Inline construction of command goes here.
@@ -85,32 +85,31 @@ public class NarwhalWrist extends SubsystemBase {
     }
 
     /**
-     * Set the intake-outtake motor to the outtake motor percentage (defined in constants).
+     * Set the wrist motor to the outtake angle (defined in constants) & update status.
      */
     public void goToOuttakeAngle() {
-        // Inline construction of command goes here.
-        // Subsystem::RunOnce implicitly requires `this` subsystem.
         setCurrentMotorAngle(Constants.NarwhalConstants.NarwhalWristConstants.OUTTAKE_ANGLE);
         CurrentState = NarwhalWristState.OUTTAKING; // must be after the set function because the set function will default to CUSTOM state
     }
-
+    
+    /**
+     * Set the wrist motor to the algae descore angle (defined in constants) & update status.
+     */
     public void goToAlgaeAngle() {
-        // Inline construction of command goes here.
-        // Subsystem::RunOnce implicitly requires `this` subsystem.
         setCurrentMotorAngle(Constants.NarwhalConstants.NarwhalWristConstants.ALGAE_ANGLE);
         CurrentState = NarwhalWristState.ALGAE; // must be after the set function because the set function will default to CUSTOM state
     }
 
     /**
-     * Set the wrist motor to 0 percentage (assumes idle-mode is breaking).
+     * Set the wrist motor to 0 percent output (assumes idle-mode is breaking).
      */
     public void stop() {
-        wrist.set(0);
+        wrist.set(0); // TODO: test that this works & properly disables the PID
         CurrentState = NarwhalWristState.STOPPED; // must be after the set function because the set function will default to CUSTOM state
     }
 
     /**
-     * Uses a PID to actively hold the current position of the motor.
+     * Uses a PID to actively hold the position of the motor when this function is called.
      */
     public void hold() {
         double current_position = wrist.getAbsoluteEncoder().getPosition();
