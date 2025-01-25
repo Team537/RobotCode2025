@@ -14,8 +14,8 @@ import frc.robot.subsystems.vision.PhotonVisionCamera;
 import frc.robot.subsystems.vision.VisionOdometry;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.utils.Alliance;
-import frc.utils.AutonomousRoutine;
+import frc.utils.Autonomous.Alliance;
+import frc.utils.Autonomous.AutonomousRoutine;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -74,28 +74,6 @@ public class RobotContainer {
     }
 
     /**
-     * Sets up SmartDashboard so that important settings can be configured and key values can be viewed.
-     */
-    private void setupSmartDashboard() {
-
-        // Setup Autonomous Routine Selection
-        autonomousSelector.setDefaultOption("LEFT_HIGH_SCORE", AutonomousRoutine.LEFT_HIGH_SCORE);
-        for (AutonomousRoutine autonomousRoutine : AutonomousRoutine.values()) {
-            autonomousSelector.addOption(autonomousRoutine.toString(), autonomousRoutine);
-        }
-        
-        // Setup Alliance Selection
-        allianceSelector.setDefaultOption("RED", Alliance.RED);
-        for (Alliance alliance : Alliance.values()) {
-            allianceSelector.addOption(alliance.toString(), alliance);
-        }
-
-        // Add the selectors to the dashboard.
-        SmartDashboard.putData(allianceSelector);
-        SmartDashboard.putData(autonomousSelector);
-    }
-
-    /**
      * Use this method to define your trigger->command mappings. Triggers can be
      * created via the
      * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
@@ -118,6 +96,28 @@ public class RobotContainer {
         // Schedule `exampleMethodCommand` when the Xbox controller's B button is
         // pressed, cancelling on release.
         // driverController.b().whileTrue(exampleSubsystem.exampleMethodCommand());
+    }
+
+    /**
+     * This method sets up the dashboard so that the drivers can configure the robots settings.
+     */
+    private void setupSmartDashboard() {
+            
+        // Setup Autonomous Routine Selection
+        autonomousSelector.setDefaultOption("LEFT_HIGH_SCORE", AutonomousRoutine.LEFT_HIGH_SCORE);
+        for (AutonomousRoutine autonomousRoutine : AutonomousRoutine.values()) {
+            autonomousSelector.addOption(autonomousRoutine.toString(), autonomousRoutine);
+        }
+
+        // Setup Alliance Selection
+        allianceSelector.setDefaultOption("RED", Alliance.RED);
+        for (Alliance alliance : Alliance.values()) {
+            allianceSelector.addOption(alliance.toString(), alliance);
+        }
+
+        // Add the selectors to the dashboard.
+        SmartDashboard.putData(autonomousSelector);
+        SmartDashboard.putData(allianceSelector);
     }
 
     /**

@@ -32,10 +32,13 @@ import edu.wpi.first.apriltag.AprilTagFields;
 public final class Constants {
 
     /**
-     * <h2> OperatorConstants </h2>
-     * The {@code OperatorConstants} class is a subclass contained within the {@code Constants} class. This subclass
-     * contains all of the constants relating to how the robot is manually controlled. This includes things like the
-     * maximum boost mode speed, the driver controller port, driver rotational offsets, etc.
+     * <h2>OperatorConstants</h2>
+     * The {@code OperatorConstants} class is a subclass contained within the
+     * {@code Constants} class. This subclass
+     * contains all of the constants relating to how the robot is manually
+     * controlled. This includes things like the
+     * maximum boost mode speed, the driver controller port, driver rotational
+     * offsets, etc.
      */
     public static class OperatorConstants {
         public static final int DRIVER_CONTROLLER_PORT = 0;
@@ -50,19 +53,24 @@ public final class Constants {
         public static final double ROTATION_INPUT_CURVE_POWER = 2.5;
         public static final double THROTTLE_LINEAR_MIN_SPEED = 2.0; // Meters per second
         public static final double THROTTLE_LINEAR_MAX_SPEED = DriveConstants.LINEAR_MAX_SPEED; // Meters per second
-        public static final double THROTTLE_ROTATIONAL_MIN_SPEED = 2.5; // Radians per second
-        public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; // Radians per second.
+        public static final double THROTTLE_ROTATIONAL_MIN_SPEED = 7.0; // Radians per second
+        public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; // Radians per
+                                                                                                        // second
+
         public static final double XBOX_CONTROLLER_JOYSTICK_DEADMAND_RADIUS = 0.01;
         public static final double XBOX_CONTROLLER_TARGET_MIN_RADIUS = 1.0; // Meters
         public static final double XBOX_CONTROLLER_TARGET_MAX_RADIUS = 5.0; // Meters
         public static final double XBOX_CONTROLLER_ROTATIONAL_TARGET_ACTIVATION_ZONE = 0.8;
         public static final double XBOX_CONTROLLER_ROTATIONAL_TARGET_DEACTIVATION_ZONE = 0.7;
+
     }
 
     /**
-     * <h2> DriveConstants </h2>
-     * The {@code DriveConstants} class is a subclass contained within the {@code Constants} class. This subclass
-     * contains all of the constants relating to the robot's drivetrain. This includes things like the turning factor, 
+     * <h2>DriveConstants</h2>
+     * The {@code DriveConstants} class is a subclass contained within the
+     * {@code Constants} class. This subclass
+     * contains all of the constants relating to the robot's drivetrain. This
+     * includes things like the turning factor,
      * maximum drive speed, conversion factors, etc.
      */
     public static class DriveConstants {
@@ -152,14 +160,14 @@ public final class Constants {
         public static final double ROTATIONAL_KI = 0.0;
         public static final double ROTATIONAL_KD = 0.2;
 
-        // Maximum speeds and accelerations for driving
+        // Maxmimum speeds and accelerations for driving
         public static final double LINEAR_MAX_SPEED = 4.8; // Meters per second
-        public static final double ROTATIONAL_MAX_SPEED = 6.0; // Radians per second
-        public static final double LINEAR_MAX_ACCELERATION = 5.0; // Meters per second squared
-        public static final double ROTATIONAL_MAX_ACCELERATION = 6.4; // Radians per second squared
+        public static final double ROTATIONAL_MAX_SPEED = 16.7; // Radians per second
+        public static final double LINEAR_MAX_ACCELERATION = 11.4; // Meters per second squared
+        public static final double ROTATIONAL_MAX_ACCELERATION = 42.0; // Radians per second squared
 
-
-        // Maximum delta time for driving, prevents too fast accelerations when lag occurs.
+        // Maximum delta time for driving, prevents too fast accelerations when lag
+        // occurs.
         public static final double MAX_DELTA_TIME_RATE_LIMIT = 0.1; // 1.0; // seconds
 
         // The drivetrain size and kinematics
@@ -179,35 +187,49 @@ public final class Constants {
 
     /**
      * <h2> NarwhalConstants </h2>
-     * The {@code NarwhalConstants} class is a subclass contained within the {@code Constants} class. This subclass
-     * contains all of the constants relating to the Narwhal Upper Assembly subsystem code. This contains values such as PID constants,
-     * CAN loop IDs, set positions, etc.
+     * The {@code NarwhalConstants} class is a subclass contained within the
+     * {@code Constants} class. This subclass contains all of the constants relating to 
+     * the Narwhal's mechanisms. This contains values like motor IDs, PID coefficients, etc.
      */
     public static class NarwhalConstants {
-      public static class NarwhalWristConstants {
-        public static final int WRIST_MOTOR_CAN_ID = 8;
-        public static final int WRIST_MOTOR_CURRENT_LIMIT = 20;
-        public static final double WRIST_OFFSET = 0.0; // offset will be calculated as if unflipped, and no conversion factor.
-        
-        public static final double ROTATIONS_TO_RADIANS = Math.PI * 2; // Wrist target angles (radians) are multiplied by this to get the motor target position
+        public static class NarwhalIntakeOuttakeConstants {
+            public static final int INTAKE_OUTTAKE_MOTOR_CAN_ID = 12; // TODO: Replace this placeholder with the actual
+                                                                      // id
+            public static final int INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT = 20;
+            public static final double INTAKE_MOTOR_PERCENTAGE = 0.35; // between -1.0 and 1.0
+            public static final double OUTTAKE_MOTOR_PERCENTAGE = -0.35; // between -1.0 and 1.0
 
-        public static final double POSITION_PID_P = 0.5; // TODO: UPDATE THESE PID VALUES
-        public static final double POSITION_PID_I = 0; // TODO: UPDATE THESE PID VALUES
-        public static final double POSITION_PID_D = 0.2; // TODO: UPDATE THESE PID VALUES
+            public static final double POSITION_PID_P = 0.7;
+            public static final double POSITION_PID_I = 0;
+            public static final double POSITION_PID_D = 0.2;
+        }
         
-        public static final double PID_OUTPUT_RANGE_MAX = 0.5; // TODO: UPDATE THESE OUTPUT RANGE VALUES
-        public static final double PID_OUTPUT_RANGE_MIN = 0.5; // TODO: UPDATE THESE OUTPUT RANGE VALUES
-        
-        public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(-Math.PI / 4); // -pi/4 TODO: update these placeholder values
-        public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(2 * Math.PI / 3); // 2pi/3 TODO: update these placeholder values
-        public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(Math.PI / 2); // pi/2 TODO: update these placeholder values
-      }
+        public static class NarwhalWristConstants {
+          public static final int WRIST_MOTOR_CAN_ID = 8;
+          public static final int WRIST_MOTOR_CURRENT_LIMIT = 20;
+          public static final double WRIST_OFFSET = 0.0; // offset will be calculated as if unflipped, and no conversion factor.
+
+          public static final double ROTATIONS_TO_RADIANS = Math.PI * 2; // Wrist target angles (radians) are multiplied by this to get the motor target position
+
+          public static final double POSITION_PID_P = 0.5; // TODO: UPDATE THESE PID VALUES
+          public static final double POSITION_PID_I = 0; // TODO: UPDATE THESE PID VALUES
+          public static final double POSITION_PID_D = 0.2; // TODO: UPDATE THESE PID VALUES
+
+          public static final double PID_OUTPUT_RANGE_MAX = 0.5; // TODO: UPDATE THESE OUTPUT RANGE VALUES
+          public static final double PID_OUTPUT_RANGE_MIN = 0.5; // TODO: UPDATE THESE OUTPUT RANGE VALUES
+
+          public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(-Math.PI / 4); // -pi/4 TODO: update these placeholder values
+          public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(2 * Math.PI / 3); // 2pi/3 TODO: update these placeholder values
+          public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(Math.PI / 2); // pi/2 TODO: update these placeholder values
+        }
     }
 
     /**
-     * <h2> VisionConstants </h2>
-     * The {@code VisionConstants} class is a subclass contained within the {@code Constants} class. This subclass
-     * contains all of the constants relating to the robot's vision solution. This contains values such as the PI's IP,
+     * <h2>VisionConstants</h2>
+     * The {@code VisionConstants} class is a subclass contained within the
+     * {@code Constants} class. This subclass
+     * contains all of the constants relating to the robot's vision solution. This
+     * contains values such as the PI's IP,
      * camera names, AprilTag field layout, etc.
      */
     public static class VisionConstants {

@@ -559,9 +559,6 @@ public class DriveSubsystem extends SubsystemBase {
         linearRateLimiter.update(targetLinearVelocity);
         rotationalRateLimiter.update(targetRotationalVelocity);
 
-        linearRateLimiter.setValue(targetLinearVelocity);
-        rotationalRateLimiter.setValue(targetRotationalVelocity);
-
         // Driving the robot using the accelerated values
         setModules(linearRateLimiter.getValue(), rotationalRateLimiter.getValue());
     }
