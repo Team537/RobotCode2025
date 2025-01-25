@@ -177,6 +177,19 @@ public final class Constants {
                 new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
       }
   
+    public static class NarwhalConstants {
+      public static class NarwhalIntakeOuttakeConstants {
+        public static final int INTAKE_OUTTAKE_MOTOR_CAN_ID = 12; // TODO: Replace this placeholder with the actual id
+        public static final int INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT = 20;
+        public static final double INTAKE_MOTOR_PERCENTAGE = 0.35; // between -1.0 and 1.0
+        public static final double OUTTAKE_MOTOR_PERCENTAGE = -0.35; // between -1.0 and 1.0
+
+        public static final double POSITION_PID_P = 0.7;
+        public static final double POSITION_PID_I = 0;
+        public static final double POSITION_PID_D = 0.2;
+      }
+    }
+  
     /**
      * <h2> VisionConstants </h2>
      * The {@code VisionConstants} class is a subclass contained within the {@code Constants} class. This subclass
