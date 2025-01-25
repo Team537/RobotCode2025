@@ -184,14 +184,21 @@ public final class Constants {
      * CAN loop IDs, set positions, etc.
      */
     public static class NarwhalConstants {
-      public static class NarwhalWrist {
+      public static class NarwhalWristConstants {
         public static final int WRIST_MOTOR_CAN_ID = 8;
         public static final int WRIST_MOTOR_CURRENT_LIMIT = 20;
-        public static final double WRIST_MOTOR_ENCODER_TO_ABSOLUTE_ENCODER_GEAR_RATIO = 45.0;
+        public static final double WRIST_OFFSET = 0.0; // offset will be calculated as if unflipped, and no conversion factor.
+        
+        public static final double ROTATIONS_TO_RADIANS = Math.PI * 2; // Wrist target angles (radians) are multiplied by this to get the motor target position
 
-        public static final double POSITION_PID_P = 0.7;
+        public static final double POSITION_PID_P = 0.5;
         public static final double POSITION_PID_I = 0;
         public static final double POSITION_PID_D = 0.2;
+
+        
+        public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(-Math.PI / 4); // -pi/4 TODO: update these placeholder values
+        public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(2 * Math.PI / 3); // 2pi/3 TODO: update these placeholder values
+        public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(Math.PI / 2); // pi/2 TODO: update these placeholder values
       }
     }
 
