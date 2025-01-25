@@ -30,16 +30,16 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
         intakeOuttakeMotorSparkMaxConfig = new SparkMaxConfig();
         intakeOuttakeMotorSparkMaxConfig
             .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(Constants.NarwhalConstants.NarwhalIntakeOuttake.INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT);
+            .smartCurrentLimit(Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants.INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT);
         intakeOuttakeMotorSparkMaxConfig.closedLoop
                 .pid(
-                    Constants.NarwhalConstants.NarwhalIntakeOuttake.POSITION_PID_P, 
-                    Constants.NarwhalConstants.NarwhalIntakeOuttake.POSITION_PID_I, 
-                    Constants.NarwhalConstants.NarwhalIntakeOuttake.POSITION_PID_D
+                    Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants.POSITION_PID_P, 
+                    Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants.POSITION_PID_I, 
+                    Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants.POSITION_PID_D
                 )
                 .positionWrappingEnabled(true);
         
-        intakeOuttakeMotorSparkMax = new SparkMax(Constants.NarwhalConstants.NarwhalIntakeOuttake.INTAKE_OUTTAKE_MOTOR_CAN_ID, MotorType.kBrushless);
+        intakeOuttakeMotorSparkMax = new SparkMax(Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants.INTAKE_OUTTAKE_MOTOR_CAN_ID, MotorType.kBrushless);
         intakeOuttakeMotorSparkMax.configure(intakeOuttakeMotorSparkMaxConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
         intakeOuttakeMotorPIDController = intakeOuttakeMotorSparkMax.getClosedLoopController();
@@ -62,7 +62,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
     public void intake() {
         // Inline construction of command goes here.
         // Subsystem::RunOnce implicitly requires `this` subsystem.
-        setIntakeOuttakeMotorPercent(Constants.NarwhalConstants.NarwhalIntakeOuttake.INTAKE_MOTOR_PERCENTAGE);
+        setIntakeOuttakeMotorPercent(Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants.INTAKE_MOTOR_PERCENTAGE);
 
         CurrentState = NarwhalIntakeOuttakeState.INTAKING; // must be after the set function because the set function will default to CUSTOM state
     }
@@ -73,7 +73,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
     public void outtake() {
         // Inline construction of command goes here.
         // Subsystem::RunOnce implicitly requires `this` subsystem.
-        setIntakeOuttakeMotorPercent(Constants.NarwhalConstants.NarwhalIntakeOuttake.OUTTAKE_MOTOR_PERCENTAGE);
+        setIntakeOuttakeMotorPercent(Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants.OUTTAKE_MOTOR_PERCENTAGE);
         CurrentState = NarwhalIntakeOuttakeState.OUTTAKING; // must be after the set function because the set function will default to CUSTOM state
     }
 
@@ -100,9 +100,53 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
     public void periodic() {
         // This method will be called once per scheduler run
     }
+    // // for simming
+    // double last_called = 0;
+    // int stage = 0;
+    // double init = -1.0;
 
     @Override
     public void simulationPeriodic() {
-        // This method will be called once per scheduler run during simulation
+        // // for simulation sorry the code is terrible
+        // if (init == -1.0) init = System.currentTimeMillis()/1000;
+
+        // if(System.currentTimeMillis()/1000 - last_called > 0.2){
+        //     last_called = System.currentTimeMillis()/1000;
+        // }
+        // else return;
+
+        // // This method will be called once per scheduler run during simulation
+        // System.out.println(CurrentState.toString());
+        
+        // if(System.currentTimeMillis()/1000 - init > 5.0 && stage == 0){
+        //     stage++;
+        //     intake();
+        //     init = System.currentTimeMillis()/1000;
+        // }
+        // if(System.currentTimeMillis()/1000 - init > 5.0 && stage == 1){
+        //     stage++;
+        //     stop();
+        //     init = System.currentTimeMillis()/1000;
+        // }
+        // if(System.currentTimeMillis()/1000 - init > 5.0 && stage == 2){
+        //     stage++;
+        //     outtake();
+        //     init = System.currentTimeMillis()/1000;
+        // }
+        // if(System.currentTimeMillis()/1000 - init > 5.0 && stage == 3){
+        //     stage++;
+        //     hold();
+        //     init = System.currentTimeMillis()/1000;
+        // }
+        // if(System.currentTimeMillis()/1000 - init > 5.0 && stage == 4){
+        //     stage++;
+        //     setIntakeOuttakeMotorPercent(1.2);
+        //     init = System.currentTimeMillis()/1000;
+        // }
+        // if(System.currentTimeMillis()/1000 - init > 5.0 && stage == 5){
+        //     stage++;
+        //     setIntakeOuttakeMotorPercent(-1.2);
+        //     init = System.currentTimeMillis()/1000;
+        // }
     }
 }
