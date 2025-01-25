@@ -157,7 +157,19 @@ public final class Constants {
     );
 
   }
-
+  public static class NarwhalConstants {
+    public static class NarwhalIntakeOuttake {
+      public static final int INTAKE_OUTTAKE_MOTOR_CAN_ID = 8;
+      public static final int INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT = 20;
+      public static final int INTAKE_MOTOR_PERCENTAGE = 35;
+      public static final int OUTTAKE_MOTOR_PERCENTAGE = -35;
+      
+      public static final double POSITION_PID_P = 0.7;
+      public static final double POSITION_PID_I = 0;
+      public static final double POSITION_PID_D = 0.2;
+    }
+  }
+  
   public static class VisionConstants {
 
     // Pipeline settings
