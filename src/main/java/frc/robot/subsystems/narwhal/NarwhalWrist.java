@@ -21,8 +21,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-
-
+/**
+ * <h2> NarwhalWrist </h2>
+ * The {@code NarwhalWrist} class is a class that represents the Narwhal's wrist mechanism.
+ * It allows for game elements to be rotated around the wrist's base, fueling complex movement and design.
+ * <hr>
+ * @author Patrick Wang
+ * @since v1.2.0
+ */
 public class NarwhalWrist extends SubsystemBase {
     public NarwhalWristState CurrentState;
     

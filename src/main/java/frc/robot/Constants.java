@@ -18,27 +18,20 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide
- * numerical or boolean
- * constants. This class should not be used for any other purpose. All constants
- * should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
- *
+ * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean constants. 
+ * This class should not be used for any other purpose. All constants should be declared globally (i.e. public static). 
+ * Do not put anything functional in this class.
  * <p>
  * It is advised to statically import this class (or one of its inner classes)
- * wherever the
- * constants are needed, to reduce verbosity.
+ * wherever the constants are needed, to reduce verbosity.
  */
 public final class Constants {
 
     /**
      * <h2>OperatorConstants</h2>
-     * The {@code OperatorConstants} class is a subclass contained within the
-     * {@code Constants} class. This subclass
-     * contains all of the constants relating to how the robot is manually
-     * controlled. This includes things like the
-     * maximum boost mode speed, the driver controller port, driver rotational
-     * offsets, etc.
+     * The {@code OperatorConstants} class is a subclass contained within the {@code Constants} class. 
+     * This subclass contains all of the constants relating to how the robot is manually controlled. 
+     * This includes things like the maximum boost mode speed, the driver controller port, driver rotational offsets, etc.
      */
     public static class OperatorConstants {
         public static final int DRIVER_CONTROLLER_PORT = 0;
@@ -56,7 +49,6 @@ public final class Constants {
         public static final double THROTTLE_ROTATIONAL_MIN_SPEED = 7.0; // Radians per second
         public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; // Radians per
                                                                                                         // second
-
         public static final double XBOX_CONTROLLER_JOYSTICK_DEADMAND_RADIUS = 0.01;
         public static final double XBOX_CONTROLLER_TARGET_MIN_RADIUS = 1.0; // Meters
         public static final double XBOX_CONTROLLER_TARGET_MAX_RADIUS = 5.0; // Meters
@@ -67,11 +59,9 @@ public final class Constants {
 
     /**
      * <h2>DriveConstants</h2>
-     * The {@code DriveConstants} class is a subclass contained within the
-     * {@code Constants} class. This subclass
-     * contains all of the constants relating to the robot's drivetrain. This
-     * includes things like the turning factor,
-     * maximum drive speed, conversion factors, etc.
+     * The {@code DriveConstants} class is a subclass contained within the @code Constants} class. This subclass
+     * contains all of the constants relating to the robot's drivetrain. 
+     * This includes things like the turning factor, maximum drive speed, conversion factors, etc.
      */
     public static class DriveConstants {
 
@@ -187,9 +177,9 @@ public final class Constants {
 
     /**
      * <h2> NarwhalConstants </h2>
-     * The {@code NarwhalConstants} class is a subclass contained within the
-     * {@code Constants} class. This subclass contains all of the constants relating to 
-     * the Narwhal's mechanisms. This contains values like motor IDs, PID coefficients, etc.
+     * The {@code NarwhalConstants} class is a subclass contained within the {@code Constants} class.
+     * This subclass contains all of the constants relating to  the Narwhal's mechanisms. 
+     * This contains values like motor IDs, PID coefficients, etc.
      */
     public static class NarwhalConstants {
         public static class NarwhalIntakeOuttakeConstants {
@@ -226,11 +216,9 @@ public final class Constants {
 
     /**
      * <h2>VisionConstants</h2>
-     * The {@code VisionConstants} class is a subclass contained within the
-     * {@code Constants} class. This subclass
-     * contains all of the constants relating to the robot's vision solution. This
-     * contains values such as the PI's IP,
-     * camera names, AprilTag field layout, etc.
+     * The {@code VisionConstants} class is a subclass contained within the {@code Constants} class. 
+     * This subclass contains all of the constants relating to the robot's vision solution. 
+     * This contains values such as the PI's IP, camera names, AprilTag field layout, etc.
      */
     public static class VisionConstants {
 
