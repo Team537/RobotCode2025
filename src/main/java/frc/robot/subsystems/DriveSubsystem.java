@@ -19,6 +19,16 @@ import frc.robot.util.RateLimiter;
 import frc.robot.util.RateLimiter2d;
 import frc.robot.util.Vector2d;
 
+/**
+ * <h2> DriveSubsystem </h2>
+ * The {@code DriveSubsystem} class is a class that focuses on controlling the robot's drivetrain. It extends SubsystemBase,
+ * and supports several autonomous and teleoperated features, aiding in intelligent navigation and control. It also servers
+ * as the central access point for the robot's position on the field.
+ * <hr>
+ * @author Parker Huibregtse
+ * @since v1.1.0
+ * @see {@link edu.wpi.first.wpilibj2.command.SubsystemBase}
+ */
 public class DriveSubsystem extends SubsystemBase {
 
     // SwerveModule declarations for all four modules of the drivetrain
@@ -106,7 +116,6 @@ public class DriveSubsystem extends SubsystemBase {
 
         // Enabling continuos movement on the thetaController, allowing it to go around the circle
         thetaController.enableContinuousInput(-Math.PI,Math.PI);
-
     }
 
     /**
@@ -148,11 +157,9 @@ public class DriveSubsystem extends SubsystemBase {
         double boundedRotationalVelocity = Math.min(Math.max(rotationalVelocity, -DriveConstants.ROTATIONAL_MAX_SPEED),
                 DriveConstants.ROTATIONAL_MAX_SPEED);
 
-
         // Adjusting the target values to set the velocity
         targetLinearVelocity = boundedLinearVelocity;
         targetRotationalVelocity = boundedRotationalVelocity;
-
     }
 
     /**
@@ -266,6 +273,7 @@ public class DriveSubsystem extends SubsystemBase {
                 finalRotationalVelocity = rotationalVelocity * rotationalThrottleMultiplier;
             }
         } else {
+
             // Target rotation is active
             targetRotationOffset.rotateBy(driverRotationalOffset.times(-1.0)); // Adjust for driver orientation
 
@@ -461,7 +469,7 @@ public class DriveSubsystem extends SubsystemBase {
         rearLeftModule.setState(swerveModuleStates[2]);
         rearRightModule.setState(swerveModuleStates[3]);
 
-        System.out.println(swerveModuleStates[1].toString());
+        //System.out.println(swerveModuleStates[1].toString());
     }
 
     /**
@@ -499,10 +507,19 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
+     * Returns this DriveSubsystems SwerveDrivePoseEstimator.
+     * 
+     * @return This DriveSubsystems SwerveDrivePoseEstimator.
+     */
+    public SwerveDrivePoseEstimator getSwerveDrivePoseEstimator() {
+        return poseEstimator;
+    }
+
+    /**
      * Gets the pose of the robot
      * @return the robot's pose
      */
-    public Pose2d getRobotPose() {
+    public synchronized Pose2d getRobotPose() {
         return poseEstimator.getEstimatedPosition();
     }
 
@@ -537,7 +554,7 @@ public class DriveSubsystem extends SubsystemBase {
 
         // Update the robot pose using the module states
         poseEstimator.update(getGyroscopeHeading(), getSwerveModulePositions());
-        
+
         // Accelerates the velocity towards the target
         linearRateLimiter.update(targetLinearVelocity);
         rotationalRateLimiter.update(targetRotationalVelocity);

@@ -2,6 +2,14 @@ package frc.robot.util;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
+/**
+ * <h2> Vector2d </h2>
+ * The {@code Vector2d} class is a class that represents a 2 dimensional vector. It is used extensively in the 
+ * {@code DriveSubsystem}, where it allows for certain trajectories to be reliably and efficiently targeted.
+ * <hr>
+ * @author Parker Huibregtse
+ * @since v1.1.0
+ */
 public class Vector2d {
 
     // Components of the vector
@@ -185,6 +193,20 @@ public class Vector2d {
     }
 
     /**
+     * Override the hashCode method to follow best practices.
+     */
+    @Override
+    public int hashCode() {
+        // Use a common algorithm for doubles
+        int result = 17;
+        long xBits = Double.doubleToLongBits(x);
+        long yBits = Double.doubleToLongBits(y);
+        result = 31 * result + (int)(xBits ^ (xBits >>> 32));
+        result = 31 * result + (int)(yBits ^ (yBits >>> 32));
+        return result;
+    }
+    
+    /**
      * Provides a string representation of the vector
      * 
      * @return a string in the format (x, y)
@@ -193,5 +215,4 @@ public class Vector2d {
     public String toString() {
         return String.format("(%.2f, %.2f)", x, y);
     }
-
 }
