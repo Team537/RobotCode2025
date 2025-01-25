@@ -176,7 +176,25 @@ public final class Constants {
                 new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
                 new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
       }
-  
+
+    /**
+     * <h2> NarwhalConstants </h2>
+     * The {@code NarwhalConstants} class is a subclass contained within the {@code Constants} class. This subclass
+     * contains all of the constants relating to the Narwhal Upper Assembly subsystem code. This contains values such as PID constants,
+     * CAN loop IDs, set positions, etc.
+     */
+    public static class NarwhalConstants {
+      public static class NarwhalWrist {
+        public static final int WRIST_MOTOR_CAN_ID = 8;
+        public static final int WRIST_MOTOR_CURRENT_LIMIT = 20;
+        public static final double WRIST_MOTOR_ENCODER_TO_ABSOLUTE_ENCODER_GEAR_RATIO = 45.0;
+
+        public static final double POSITION_PID_P = 0.7;
+        public static final double POSITION_PID_I = 0;
+        public static final double POSITION_PID_D = 0.2;
+      }
+    }
+
     /**
      * <h2> VisionConstants </h2>
      * The {@code VisionConstants} class is a subclass contained within the {@code Constants} class. This subclass
