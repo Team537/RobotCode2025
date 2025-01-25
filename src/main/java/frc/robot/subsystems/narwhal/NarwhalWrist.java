@@ -30,7 +30,7 @@ import frc.robot.Constants;
  * @since v1.2.0
  */
 public class NarwhalWrist extends SubsystemBase {
-    public NarwhalWristState CurrentState;
+    public NarwhalWristState currentState;
     
     private final SparkMax wrist;
     private final SparkMaxConfig wristConfig;
@@ -67,7 +67,7 @@ public class NarwhalWrist extends SubsystemBase {
         wrist.configure(wristConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         wristMotorPIDController = wrist.getClosedLoopController();
-        CurrentState = NarwhalWristState.STOPPED;
+        currentState = NarwhalWristState.STOPPED;
     }
 
     /**
@@ -77,7 +77,7 @@ public class NarwhalWrist extends SubsystemBase {
     public void setCurrentMotorAngle(Rotation2d targetAngle){
         double targetAngleRadians = targetAngle.getRadians();
         wristMotorPIDController.setReference(targetAngleRadians, ControlType.kPosition);
-        CurrentState = NarwhalWristState.CUSTOM;
+        currentState = NarwhalWristState.CUSTOM;
     }
 
     /**
@@ -87,7 +87,7 @@ public class NarwhalWrist extends SubsystemBase {
         // Inline construction of command goes here.
         // Subsystem::RunOnce implicitly requires `this` subsystem.
         setCurrentMotorAngle(Constants.NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE);
-        CurrentState = NarwhalWristState.INTAKING; // must be after the set function because the set function will default to CUSTOM state
+        currentState = NarwhalWristState.INTAKING; // must be after the set function because the set function will default to CUSTOM state
     }
 
     /**
@@ -95,7 +95,7 @@ public class NarwhalWrist extends SubsystemBase {
      */
     public void goToOuttakeAngle() {
         setCurrentMotorAngle(Constants.NarwhalConstants.NarwhalWristConstants.OUTTAKE_ANGLE);
-        CurrentState = NarwhalWristState.OUTTAKING; // must be after the set function because the set function will default to CUSTOM state
+        currentState = NarwhalWristState.OUTTAKING; // must be after the set function because the set function will default to CUSTOM state
     }
     
     /**
@@ -103,7 +103,7 @@ public class NarwhalWrist extends SubsystemBase {
      */
     public void goToAlgaeAngle() {
         setCurrentMotorAngle(Constants.NarwhalConstants.NarwhalWristConstants.ALGAE_ANGLE);
-        CurrentState = NarwhalWristState.ALGAE; // must be after the set function because the set function will default to CUSTOM state
+        currentState = NarwhalWristState.ALGAE; // must be after the set function because the set function will default to CUSTOM state
     }
 
     /**
@@ -111,7 +111,7 @@ public class NarwhalWrist extends SubsystemBase {
      */
     public void stop() {
         wrist.set(0); // TODO: test that this works & properly disables the PID
-        CurrentState = NarwhalWristState.STOPPED; // must be after the set function because the set function will default to CUSTOM state
+        currentState = NarwhalWristState.STOPPED; // must be after the set function because the set function will default to CUSTOM state
     }
 
     /**
@@ -120,7 +120,7 @@ public class NarwhalWrist extends SubsystemBase {
     public void hold() {
         double current_position = wrist.getAbsoluteEncoder().getPosition();
         setCurrentMotorAngle(Rotation2d.fromRadians(current_position));
-        CurrentState = NarwhalWristState.CUSTOM; // redundant but helps with readability
+        currentState = NarwhalWristState.CUSTOM; // redundant but helps with readability
     }
 
     public Rotation2d getCurrentAngle() {
