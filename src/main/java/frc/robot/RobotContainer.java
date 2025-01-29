@@ -9,6 +9,7 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.squid.SquidManipulator;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.utils.Alliance;
 import frc.utils.AutonomousRoutine;
@@ -36,6 +37,7 @@ public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
+    private SquidManipulator squidManipulator = new SquidManipulator();
     Command manualDriveCommand = new RunCommand(
             () -> {
                 driveSubsystem.driveFromXBoxController(xBoxController);
@@ -131,5 +133,11 @@ public class RobotContainer {
 
         // The Drive Command
         driveSubsystem.setDefaultCommand(manualDriveCommand);
+        squidManipulator.setDefaultCommand(
+            new RunCommand(
+                () -> {squidManipulator.manipulateFromXBoxController(xBoxController);},
+                squidManipulator
+            )
+        );
     }
 }
