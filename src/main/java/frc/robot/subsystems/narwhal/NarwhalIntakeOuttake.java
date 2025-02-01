@@ -104,7 +104,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
         else if (xboxController.getXButton()){
             outtake();
         }
-        else if (xboxController.getBackButton() || xboxController.getYButton() || xboxController.getBButton() || xboxController.getYButton()){
+        else if (xboxController.getBackButton() || xboxController.getYButton() || xboxController.getBButton() || xboxController.getAButton()){
             hold();
         }
     }
