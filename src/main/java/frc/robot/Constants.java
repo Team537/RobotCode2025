@@ -228,7 +228,7 @@ public final class Constants {
             public static final int KI = 0;
             public static final int KD = 0;
 
-            public static final double PID_MIN_OUTPUT = 1.0;
+            public static final double PID_MIN_OUTPUT = -1.0;
             public static final double PID_MAX_OUTPUT = 1.0;
 
             public static final double WHEEL_RADIUS = 0.038;
@@ -251,6 +251,42 @@ public final class Constants {
             public static final double L_THREE_BOTTOM_ROLLER_RATIO = 0.95;
             public static final double L_FOUR_BOTTOM_ROLLER_RATIO = 0.6;
             
+        }
+
+        public static class SquidClimberConstants {
+
+            //IDs
+            public static final int CLIMB_MOTOR_CAN_ID = 15;
+
+            //Behavior Constants
+            public static final boolean MOTOR_INVERTED =  false;
+            public static final int MOTOR_CURRENT_LIMIT = 50;
+            public static final IdleMode  IDLE_MODE = IdleMode.kBrake;
+
+            //Gearing Constants
+            public static final double SPOOL_RADIUS = 0.009526; // Meters
+            public static final double SPOOL_CIRCUMFERENCE = 2.0 * Math.PI * SPOOL_RADIUS; //Meters
+            public static final double MOTOR_REDUCTION = 125.0;
+            public static final double ENCODER_FACTOR = SPOOL_CIRCUMFERENCE / MOTOR_REDUCTION;
+
+            //PID Values
+            public static final int KP = 1;
+            public static final int KI = 0;
+            public static final int KD = 0;
+
+            public static final double PID_MIN_OUTPUT = -1.0;
+            public static final double PID_MAX_OUTPUT = 1.0;
+
+            /**
+             * The spool length of the down position, in meters. The further the distance, the more spool is pulled back.
+             */
+            public static final double DOWN_POSITION = 0.0; //Meters
+
+            /**
+             * The spool length of the climbed position, in meters. The further the distance, the more spool is pulled back.
+             */
+            public static final double CLIMBED_POSITION = 0.203; //Meters
+
         }
 
     }
