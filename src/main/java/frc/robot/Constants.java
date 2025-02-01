@@ -185,7 +185,7 @@ public final class Constants {
      */
     public static class NarwhalConstants {
       public static class NarwhalWristConstants {
-        public static final int WRIST_MOTOR_CAN_ID = 8;
+        public static final int WRIST_MOTOR_CAN_ID = 11;
         public static final int WRIST_MOTOR_CURRENT_LIMIT = 20;
         public static final double WRIST_OFFSET = 0.0; // offset will be calculated as if unflipped, and no conversion factor.
         

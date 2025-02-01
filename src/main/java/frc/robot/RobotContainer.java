@@ -12,6 +12,8 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.vision.PhotonVisionCamera;
 import frc.robot.subsystems.vision.VisionOdometry;
+import frc.robot.subsystems.narwhal.NarwhalWrist;
+
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.utils.Alliance;
@@ -41,6 +43,7 @@ public class RobotContainer {
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
+    private NarwhalWrist narwhalWrist = new NarwhalWrist();
 
     // Commands
     Command manualDriveCommand = new RunCommand(
@@ -48,7 +51,7 @@ public class RobotContainer {
                 driveSubsystem.driveFromXBoxController(xBoxController);
             },
             driveSubsystem);
-
+    
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController driverController = new CommandXboxController(
             OperatorConstants.DRIVER_CONTROLLER_PORT);
@@ -142,5 +145,12 @@ public class RobotContainer {
 
         // The Drive Command
         driveSubsystem.setDefaultCommand(manualDriveCommand);
+        narwhalWrist.setDefaultCommand(
+            new RunCommand(
+            () -> {
+                narwhalWrist.runXBoxController(xBoxController);
+            },
+            narwhalWrist)
+        );
     }
 }

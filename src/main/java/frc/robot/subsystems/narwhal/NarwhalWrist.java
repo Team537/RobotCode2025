@@ -17,6 +17,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -26,7 +28,9 @@ import frc.robot.Constants;
 public class NarwhalWrist extends SubsystemBase {
     public NarwhalWristState CurrentState;
     
+    /** Absolute Encoder will run on Radians :) */
     private final SparkMax wrist;
+
     private final SparkMaxConfig wristConfig;
     private final SparkClosedLoopController wristMotorPIDController;
     
@@ -117,13 +121,29 @@ public class NarwhalWrist extends SubsystemBase {
         CurrentState = NarwhalWristState.CUSTOM; // redundant but helps with readability
     }
 
+    /**
+     * Returns the encoder position in Rotation2d.
+     */
     public Rotation2d getCurrentAngle() {
         return Rotation2d.fromRadians(wrist.getAbsoluteEncoder().getPosition());
+    }
+
+    public void runXBoxController(XboxController xBoxController){
+        if(xBoxController.getRightBumperButton()){
+            goToIntakeAngle();
+        }
+        else if(xBoxController.getLeftBumperButtonPressed()){
+            goToAlgaeAngle();
+        }
+        else if(xBoxController.getBackButton() || xBoxController.getAButton() || xBoxController.getBButton() || xBoxController.getYButton()){
+            goToOuttakeAngle();
+        }
     }
     
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+        
     }
 
     @Override
