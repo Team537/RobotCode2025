@@ -5,14 +5,18 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.squid.SquidManipulator;
+import frc.robot.subsystems.vision.PhotonVisionCamera;
+import frc.robot.subsystems.vision.VisionOdometry;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.utils.Alliance;
-import frc.utils.AutonomousRoutine;
+import frc.utils.Autonomous.Alliance;
+import frc.utils.Autonomous.AutonomousRoutine;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,22 +26,22 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
+ * Command-based is a "declarative" paradigm, very little robot logic should actually be handled 
+ * in the {@link Robot} periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final XboxController xBoxController = new XboxController(OperatorConstants.DRIVER_CONTROLLER_PORT);
 
-    // The robot's subsystems and commands are defined here...
+    // Subsystems
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
     private SquidManipulator squidManipulator = new SquidManipulator();
+    private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
+
+    // Commands
     Command manualDriveCommand = new RunCommand(
             () -> {
                 driveSubsystem.driveFromXBoxController(xBoxController);
@@ -56,34 +60,16 @@ public class RobotContainer {
      * Creates a new RobotContainer object and sets up SmartDashboard an the button inputs.
      */
     public RobotContainer() {
+        
+        // Add cameras to the VisionOdometry object.
+        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, new Transform3d()));
+        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.SLIDE_CAMERA_NAME, new Transform3d()));
 
         // Setup Dashboard
         setupSmartDashboard();
 
         // Configure the trigger bindings
         configureBindings();
-    }
-
-    /**
-     * Sets up SmartDashboard so that important settings can be configured and key values can be viewed.
-     */
-    private void setupSmartDashboard() {
-
-        // Setup Autonomous Routine Selection
-        autonomousSelector.setDefaultOption("LEFT_HIGH_SCORE", AutonomousRoutine.LEFT_HIGH_SCORE);
-        for (AutonomousRoutine autonomousRoutine : AutonomousRoutine.values()) {
-            autonomousSelector.addOption(autonomousRoutine.toString(), autonomousRoutine);
-        }
-        
-        // Setup Alliance Selection
-        allianceSelector.setDefaultOption("RED", Alliance.RED);
-        for (Alliance alliance : Alliance.values()) {
-            allianceSelector.addOption(alliance.toString(), alliance);
-        }
-
-        // Add the selectors to the dashboard.
-        SmartDashboard.putData(allianceSelector);
-        SmartDashboard.putData(autonomousSelector);
     }
 
     /**
@@ -109,6 +95,28 @@ public class RobotContainer {
         // Schedule `exampleMethodCommand` when the Xbox controller's B button is
         // pressed, cancelling on release.
         // driverController.b().whileTrue(exampleSubsystem.exampleMethodCommand());
+    }
+
+    /**
+     * This method sets up the dashboard so that the drivers can configure the robots settings.
+     */
+    private void setupSmartDashboard() {
+            
+        // Setup Autonomous Routine Selection
+        autonomousSelector.setDefaultOption("LEFT_HIGH_SCORE", AutonomousRoutine.LEFT_HIGH_SCORE);
+        for (AutonomousRoutine autonomousRoutine : AutonomousRoutine.values()) {
+            autonomousSelector.addOption(autonomousRoutine.toString(), autonomousRoutine);
+        }
+
+        // Setup Alliance Selection
+        allianceSelector.setDefaultOption("RED", Alliance.RED);
+        for (Alliance alliance : Alliance.values()) {
+            allianceSelector.addOption(alliance.toString(), alliance);
+        }
+
+        // Add the selectors to the dashboard.
+        SmartDashboard.putData(autonomousSelector);
+        SmartDashboard.putData(allianceSelector);
     }
 
     /**

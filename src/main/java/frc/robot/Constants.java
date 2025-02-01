@@ -5,9 +5,11 @@
 package frc.robot;
 
 import com.revrobotics.spark.config.SparkMaxConfig;
+import org.photonvision.PhotonPoseEstimator;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
@@ -16,24 +18,20 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide
- * numerical or boolean
- * constants. This class should not be used for any other purpose. All constants
- * should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
- *
+ * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean constants. 
+ * This class should not be used for any other purpose. All constants should be declared globally (i.e. public static). 
+ * Do not put anything functional in this class.
  * <p>
  * It is advised to statically import this class (or one of its inner classes)
- * wherever the
- * constants are needed, to reduce verbosity.
+ * wherever the constants are needed, to reduce verbosity.
  */
 public final class Constants {
 
     /**
-     * <h2> OperatorConstants </h2>
-     * The {@code OperatorConstants} class is a subclass contained within the {@code Constants} class. This subclass
-     * contains all of the constants relating to how the robot is manually controlled. This includes things like the
-     * maximum boost mode speed, the driver controller port, driver rotational offsets, etc.
+     * <h2>OperatorConstants</h2>
+     * The {@code OperatorConstants} class is a subclass contained within the {@code Constants} class. 
+     * This subclass contains all of the constants relating to how the robot is manually controlled. 
+     * This includes things like the maximum boost mode speed, the driver controller port, driver rotational offsets, etc.
      */
     public static class OperatorConstants {
         public static final int DRIVER_CONTROLLER_PORT = 0;
@@ -48,21 +46,22 @@ public final class Constants {
         public static final double ROTATION_INPUT_CURVE_POWER = 2.5;
         public static final double THROTTLE_LINEAR_MIN_SPEED = 2.0; // Meters per second
         public static final double THROTTLE_LINEAR_MAX_SPEED = DriveConstants.LINEAR_MAX_SPEED; // Meters per second
-        public static final double THROTTLE_ROTATIONAL_MIN_SPEED = 2.5; // Radians per second
-        public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; // Radians per                                                                  // second
-
+        public static final double THROTTLE_ROTATIONAL_MIN_SPEED = 7.0; // Radians per second
+        public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; // Radians per
+                                                                                                        // second
         public static final double XBOX_CONTROLLER_JOYSTICK_DEADMAND_RADIUS = 0.01;
         public static final double XBOX_CONTROLLER_TARGET_MIN_RADIUS = 1.0; // Meters
         public static final double XBOX_CONTROLLER_TARGET_MAX_RADIUS = 5.0; // Meters
         public static final double XBOX_CONTROLLER_ROTATIONAL_TARGET_ACTIVATION_ZONE = 0.8;
         public static final double XBOX_CONTROLLER_ROTATIONAL_TARGET_DEACTIVATION_ZONE = 0.7;
+
     }
 
     /**
-     * <h2> DriveConstants </h2>
-     * The {@code DriveConstants} class is a subclass contained within the {@code Constants} class. This subclass
-     * contains all of the constants relating to the robot's drivetrain. This includes things like the turning factor, 
-     * maximum drive speed, conversion factors, etc.
+     * <h2>DriveConstants</h2>
+     * The {@code DriveConstants} class is a subclass contained within the @code Constants} class. This subclass
+     * contains all of the constants relating to the robot's drivetrain. 
+     * This includes things like the turning factor, maximum drive speed, conversion factors, etc.
      */
     public static class DriveConstants {
 
@@ -136,6 +135,7 @@ public final class Constants {
         public static final double TURNING_PID_MAX_OUTPUT = 1.0;
 
         public static final IdleMode TURNING_MOTOR_IDLE_MODE = IdleMode.kBrake;
+
         public static final int TURNING_MOTOR_CURRENT_LIMIT = 20; // Amps
 
         // Gyroscope CAN IDs
@@ -150,13 +150,14 @@ public final class Constants {
         public static final double ROTATIONAL_KI = 0.0;
         public static final double ROTATIONAL_KD = 0.2;
 
-        // Maximum speeds and accelerations for driving
+        // Maxmimum speeds and accelerations for driving
         public static final double LINEAR_MAX_SPEED = 4.8; // Meters per second
-        public static final double ROTATIONAL_MAX_SPEED = 6.0; // Radians per second
-        public static final double LINEAR_MAX_ACCELERATION = 5.0; // Meters per second squared
-        public static final double ROTATIONAL_MAX_ACCELERATION = 6.4; // Radians per second squared
+        public static final double ROTATIONAL_MAX_SPEED = 16.7; // Radians per second
+        public static final double LINEAR_MAX_ACCELERATION = 11.4; // Meters per second squared
+        public static final double ROTATIONAL_MAX_ACCELERATION = 42.0; // Radians per second squared
 
-        // Maximum delta time for driving, prevents too fast accelerations when lag occurs.
+        // Maximum delta time for driving, prevents too fast accelerations when lag
+        // occurs.
         public static final double MAX_DELTA_TIME_RATE_LIMIT = 0.1; // 1.0; // seconds
 
         // The drivetrain size and kinematics
@@ -172,6 +173,45 @@ public final class Constants {
                 new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
                 new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
                 new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
+      }
+
+    /**
+     * <h2> NarwhalConstants </h2>
+     * The {@code NarwhalConstants} class is a subclass contained within the {@code Constants} class.
+     * This subclass contains all of the constants relating to  the Narwhal's mechanisms. 
+     * This contains values like motor IDs, PID coefficients, etc.
+     */
+    public static class NarwhalConstants {
+        public static class NarwhalIntakeOuttakeConstants {
+            public static final int INTAKE_OUTTAKE_MOTOR_CAN_ID = 12; // TODO: Replace this placeholder with the actual
+                                                                      // id
+            public static final int INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT = 20;
+            public static final double INTAKE_MOTOR_PERCENTAGE = 0.35; // between -1.0 and 1.0
+            public static final double OUTTAKE_MOTOR_PERCENTAGE = -0.35; // between -1.0 and 1.0
+
+            public static final double POSITION_PID_P = 0.7;
+            public static final double POSITION_PID_I = 0;
+            public static final double POSITION_PID_D = 0.2;
+        }
+        
+        public static class NarwhalWristConstants {
+          public static final int WRIST_MOTOR_CAN_ID = 8;
+          public static final int WRIST_MOTOR_CURRENT_LIMIT = 20;
+          public static final double WRIST_OFFSET = 0.0; // offset will be calculated as if unflipped, and no conversion factor.
+
+          public static final double ROTATIONS_TO_RADIANS = Math.PI * 2; // Wrist target angles (radians) are multiplied by this to get the motor target position
+
+          public static final double POSITION_PID_P = 0.5; // TODO: UPDATE THESE PID VALUES
+          public static final double POSITION_PID_I = 0; // TODO: UPDATE THESE PID VALUES
+          public static final double POSITION_PID_D = 0.2; // TODO: UPDATE THESE PID VALUES
+
+          public static final double PID_OUTPUT_RANGE_MAX = 0.5; // TODO: UPDATE THESE OUTPUT RANGE VALUES
+          public static final double PID_OUTPUT_RANGE_MIN = 0.5; // TODO: UPDATE THESE OUTPUT RANGE VALUES
+
+          public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(-Math.PI / 4); // -pi/4 TODO: update these placeholder values
+          public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(2 * Math.PI / 3); // 2pi/3 TODO: update these placeholder values
+          public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(Math.PI / 2); // pi/2 TODO: update these placeholder values
+        }
     }
 
     public static class SquidConstants {
@@ -216,15 +256,27 @@ public final class Constants {
     }
 
     /**
-     * <h2> VisionConstants </h2>
-     * The {@code VisionConstants} class is a subclass contained within the {@code Constants} class. This subclass
-     * contains all of the constants relating to the robot's vision solution. This contains values such as the PI's IP,
-     * camera names, AprilTag field layout, etc.
+     * <h2>VisionConstants</h2>
+     * The {@code VisionConstants} class is a subclass contained within the {@code Constants} class. 
+     * This subclass contains all of the constants relating to the robot's vision solution. 
+     * This contains values such as the PI's IP, camera names, AprilTag field layout, etc.
      */
     public static class VisionConstants {
 
+        // Camera Settings
+        public static final String FRONT_CAMERA_NAME = "Front_Camera";
+        public static final String SLIDE_CAMERA_NAME = "Side_Camera";
+
+        public static final Transform3d FRONT_CAMERA_OFFSET = new Transform3d(); // TODO: Fill in actual values.
+        public static final Transform3d SLIDE_CAMERA_OFFSET = new Transform3d(); // TODO: Fill in actual values.
+
         // Pipeline settings
         public static final int APRIL_TAG_PIPELINE = 0;
-        public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField();
+        public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = AprilTagFieldLayout
+                .loadField(AprilTagFields.k2025Reefscape);
+
+        // Odometry Detection Strategy
+        public static final PhotonPoseEstimator.PoseStrategy POSE_STRATEGY = PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
+        public static final PhotonPoseEstimator.PoseStrategy FALLBACK_STRATEGY = PhotonPoseEstimator.PoseStrategy.CLOSEST_TO_REFERENCE_POSE;
     }
 }
