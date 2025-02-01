@@ -10,6 +10,7 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.squid.SquidManipulator;
 import frc.robot.subsystems.vision.PhotonVisionCamera;
 import frc.robot.subsystems.vision.VisionOdometry;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -37,6 +38,7 @@ public class RobotContainer {
     // Subsystems
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
+    private SquidManipulator squidManipulator = new SquidManipulator();
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
 
     // Commands
@@ -139,5 +141,6 @@ public class RobotContainer {
 
         // The Drive Command
         driveSubsystem.setDefaultCommand(manualDriveCommand);
+        
     }
 }
