@@ -133,11 +133,6 @@ public class RobotContainer {
 
         // The Drive Command
         driveSubsystem.setDefaultCommand(manualDriveCommand);
-        squidManipulator.setDefaultCommand(
-            new RunCommand(
-                () -> {squidManipulator.manipulateFromXBoxController(xBoxController);},
-                squidManipulator
-            )
-        );
+        
     }
 }

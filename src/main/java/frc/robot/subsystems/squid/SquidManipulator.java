@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SquidConstants.SquidManipulatorConstants;
@@ -32,6 +33,8 @@ public class SquidManipulator extends SubsystemBase {
     // Configs for the motors
     SparkMaxConfig manipulatorTopConfig = new SparkMaxConfig();
     SparkMaxConfig manipulatorBottomConfig = new SparkMaxConfig();
+
+    DigitalInput coralSensor = new DigitalInput(SquidManipulatorConstants.CORAL_SENSOR_ID);
 
     public SquidManipulator() {
         manipulatorTopConfig
@@ -142,24 +145,19 @@ public class SquidManipulator extends SubsystemBase {
     }
 
     /**
-     * manipulates using the controller
-     * @param controller the controller which will be read from
+     * returns the current scoring position of the robot
+     * @return
      */
-    public void manipulateFromXBoxController(XboxController controller) {
-        if (controller.getXButton() == controller.getRightBumperButton()) {
-            //if both buttons are or aren't pressed, stop the intake
-            holdManipulator();
-        } else {
-            if (controller.getXButton()) {
-                if (intaking) { 
-                    outtakeFullSpeed(); //intake without a differential
-                } else {
-                    outtakeAngled(scoringPosition); //outtake with a differential
-                }
-            } else {
-                reverseFullSpeed(); //reversing to unjam coral
-            }
-        }
+    public ScoringPosition getScoringPosition() {
+        return scoringPosition;
+    }
+
+    /**
+     * senses the coral
+     * @return whether or not the coral was sensed
+     */
+    public boolean senseCoral() {
+        return coralSensor.get();
     }
 
 }

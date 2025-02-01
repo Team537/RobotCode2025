@@ -182,6 +182,8 @@ public final class Constants {
             public static final int TOP_MOTOR_CAN_ID = 11;
             public static final int BOTTOM_MOTOR_CAN_ID = 12;
 
+            public static final int CORAL_SENSOR_ID = 0;
+
             public static final int KP = 1;
             public static final int KI = 0;
             public static final int KD = 0;
