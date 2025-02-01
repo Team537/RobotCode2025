@@ -13,6 +13,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -94,6 +95,18 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
         intakeOuttakeMotorPIDController.setReference(current_position, ControlType.kPosition);
 
         CurrentState = NarwhalIntakeOuttakeState.ACTIVE_HOLDING; // must be after the stop function because the set function will default to CUSTOM state
+    }
+
+    public void runXBoxController(XboxController xboxController){
+        if(xboxController.getRightBumperButton()){
+            intake();
+        }
+        else if (xboxController.getXButton()){
+            outtake();
+        }
+        else if (xboxController.getBackButton() || xboxController.getYButton() || xboxController.getBButton() || xboxController.getYButton()){
+            hold();
+        }
     }
     
     @Override

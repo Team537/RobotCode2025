@@ -10,6 +10,7 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.narwhal.NarwhalIntakeOuttake;
 import frc.robot.subsystems.vision.PhotonVisionCamera;
 import frc.robot.subsystems.vision.VisionOdometry;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -41,6 +42,7 @@ public class RobotContainer {
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
+    private NarwhalIntakeOuttake intakeOuttake = new NarwhalIntakeOuttake();
 
     // Commands
     Command manualDriveCommand = new RunCommand(
@@ -139,8 +141,14 @@ public class RobotContainer {
      * Schedules commands used exclusively during TeleOp.
      */
     public void scheduleTeleOp() {
-
         // The Drive Command
         driveSubsystem.setDefaultCommand(manualDriveCommand);
+        intakeOuttake.setDefaultCommand(
+            new RunCommand(
+            () -> {
+                intakeOuttake.runXBoxController(xBoxController);
+            },
+            intakeOuttake)
+        );
     }
 }
