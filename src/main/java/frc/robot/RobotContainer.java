@@ -8,8 +8,11 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.squid.ManualSquidClimberCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.squid.SquidClimber;
+import frc.robot.subsystems.squid.SquidManipulator;
 import frc.robot.subsystems.vision.PhotonVisionCamera;
 import frc.robot.subsystems.vision.VisionOdometry;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -37,6 +40,8 @@ public class RobotContainer {
     // Subsystems
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
+    private SquidManipulator squidManipulator = new SquidManipulator();
+    private SquidClimber squidClimber = new SquidClimber();
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
 
     // Commands
@@ -45,10 +50,6 @@ public class RobotContainer {
                 driveSubsystem.driveFromXBoxController(xBoxController);
             },
             driveSubsystem);
-
-    // Replace with CommandPS4Controller or CommandJoystick if needed
-    private final CommandXboxController driverController = new CommandXboxController(
-            OperatorConstants.DRIVER_CONTROLLER_PORT);
 
     // Smart Dashboard Inputs
     private final SendableChooser<AutonomousRoutine> autonomousSelector = new SendableChooser<>();
@@ -139,5 +140,6 @@ public class RobotContainer {
 
         // The Drive Command
         driveSubsystem.setDefaultCommand(manualDriveCommand);
+        
     }
 }
