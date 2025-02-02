@@ -9,13 +9,24 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SquidConstants.SquidManipulatorConstants;
 
+/**
+ * The {@code SquidManipulator} subsystem controls the manipulator mechanism that handles game elements.
+ * <p>
+ * It utilizes two SparkMax motor controllers (one for the top roller and one for the bottom roller)
+ * along with a sensor to detect the presence of game elements (coral).
+ * </p>
+ */
 public class SquidManipulator extends SubsystemBase {
 
-    //TODO: Remove this and replace with real enum
+    /**
+     * Enum representing various scoring positions for the manipulator.
+     * <p>
+     * TODO: Replace with a proper enum if needed.
+     * </p>
+     */
     public enum ScoringPosition {
         L1,
         L2,
@@ -26,21 +37,26 @@ public class SquidManipulator extends SubsystemBase {
     private ScoringPosition scoringPosition = ScoringPosition.L4;
     private boolean intaking = false;
 
-    // Defining the motors
-    SparkMax manipulatorTopMotor = new SparkMax(SquidManipulatorConstants.TOP_MOTOR_CAN_ID,MotorType.kBrushless);
-    SparkMax manipulatorBottomMotor = new SparkMax(SquidManipulatorConstants.BOTTOM_MOTOR_CAN_ID,MotorType.kBrushless);
+    // Motor controllers for the manipulator wheels.
+    private final SparkMax manipulatorTopMotor = new SparkMax(SquidManipulatorConstants.TOP_MOTOR_CAN_ID, MotorType.kBrushless);
+    private final SparkMax manipulatorBottomMotor = new SparkMax(SquidManipulatorConstants.BOTTOM_MOTOR_CAN_ID, MotorType.kBrushless);
 
-    // Configs for the motors
-    SparkMaxConfig manipulatorTopConfig = new SparkMaxConfig();
-    SparkMaxConfig manipulatorBottomConfig = new SparkMaxConfig();
+    // Configurations for the motors.
+    private final SparkMaxConfig manipulatorTopConfig = new SparkMaxConfig();
+    private final SparkMaxConfig manipulatorBottomConfig = new SparkMaxConfig();
 
-    DigitalInput coralSensor = new DigitalInput(SquidManipulatorConstants.CORAL_SENSOR_ID);
+    // Digital sensor for detecting coral.
+    private final DigitalInput coralSensor = new DigitalInput(SquidManipulatorConstants.CORAL_SENSOR_ID);
 
+    /**
+     * Constructs a new {@code SquidManipulator} and configures the motor controllers.
+     */
     public SquidManipulator() {
+        // Configure top manipulator motor
         manipulatorTopConfig
             .closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .pid(SquidManipulatorConstants.KP,SquidManipulatorConstants.KI,SquidManipulatorConstants.KD)
+                .pid(SquidManipulatorConstants.KP, SquidManipulatorConstants.KI, SquidManipulatorConstants.KD)
                 .outputRange(SquidManipulatorConstants.PID_MIN_OUTPUT, SquidManipulatorConstants.PID_MAX_OUTPUT);
         manipulatorTopConfig
             .encoder
@@ -50,10 +66,11 @@ public class SquidManipulator extends SubsystemBase {
         manipulatorTopConfig.idleMode(SquidManipulatorConstants.IDLE_MODE);
         manipulatorTopConfig.inverted(SquidManipulatorConstants.TOP_MOTOR_INVERTED);
 
+        // Configure bottom manipulator motor
         manipulatorBottomConfig
             .closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .pid(SquidManipulatorConstants.KP,SquidManipulatorConstants.KI,SquidManipulatorConstants.KD)
+                .pid(SquidManipulatorConstants.KP, SquidManipulatorConstants.KI, SquidManipulatorConstants.KD)
                 .outputRange(SquidManipulatorConstants.PID_MIN_OUTPUT, SquidManipulatorConstants.PID_MAX_OUTPUT);
         manipulatorBottomConfig
             .encoder
@@ -63,15 +80,16 @@ public class SquidManipulator extends SubsystemBase {
         manipulatorBottomConfig.idleMode(SquidManipulatorConstants.IDLE_MODE);
         manipulatorBottomConfig.inverted(SquidManipulatorConstants.BOTTOM_MOTOR_INVERTED);
 
-        manipulatorTopMotor.configure(manipulatorTopConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
-        manipulatorBottomMotor.configure(manipulatorBottomConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
-
+        // Apply configurations to both motors
+        manipulatorTopMotor.configure(manipulatorTopConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        manipulatorBottomMotor.configure(manipulatorBottomConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     /**
-     * sets the velocities of the individual manipulator wheels
-     * @param topVelocity the velocity of the top manipulator (positive is out) in meters/sec
-     * @param bottomVelocity the velocity of the bottom manipulator (positive is out) in meters/sec
+     * Sets the velocities for both the top and bottom manipulator rollers.
+     *
+     * @param topVelocity    The desired velocity for the top roller in meters per second (positive value outputs game element).
+     * @param bottomVelocity The desired velocity for the bottom roller in meters per second (positive value outputs game element).
      */
     public void setManipulatorVelocities(double topVelocity, double bottomVelocity) {
         manipulatorTopMotor.getClosedLoopController().setReference(topVelocity, ControlType.kVelocity);
@@ -79,26 +97,26 @@ public class SquidManipulator extends SubsystemBase {
     }
 
     /**
-     * Outtake full speed
+     * Runs the manipulator at full outtake speed.
      */
     public void outtakeFullSpeed() {
         setManipulatorVelocities(SquidManipulatorConstants.MANIPULATOR_MAX_SPEED, SquidManipulatorConstants.MANIPULATOR_MAX_SPEED);
     }
 
     /**
-     * Reverse full speed
+     * Reverses the manipulator at full speed.
      */
     public void reverseFullSpeed() {
         setManipulatorVelocities(-SquidManipulatorConstants.MANIPULATOR_MAX_SPEED, -SquidManipulatorConstants.MANIPULATOR_MAX_SPEED);
     }
 
     /**
-     * Outtakes the coral at an angle
-     * @param scoringPosition The scoring position (determines the angle which will be outtaked)
+     * Outtakes the game element (coral) at an angle determined by the given scoring position.
+     *
+     * @param scoringPosition The scoring position that determines the outtake angle.
      */
     public void outtakeAngled(ScoringPosition scoringPosition) {
-
-        //set different bottom ratios depending on the height
+        // Set bottom roller ratio based on scoring position.
         double bottomRollerRatio;
         switch (scoringPosition) {
             case L1:
@@ -118,46 +136,48 @@ public class SquidManipulator extends SubsystemBase {
         }
 
         setManipulatorVelocities(SquidManipulatorConstants.MANIPULATOR_MAX_SPEED, bottomRollerRatio * SquidManipulatorConstants.MANIPULATOR_MAX_SPEED);
-
     }
 
     /**
-     * stops the manipulator to hold the coral inside of it
+     * Stops the manipulator rollers to hold the game element in place.
      */
     public void holdManipulator() {
         setManipulatorVelocities(0.0, 0.0);
     }
 
     /**
-     * sets the scroing position
-     * @param scoringPosition the scoring position that will be set
+     * Sets the scoring position for the manipulator.
+     *
+     * @param scoringPosition The desired scoring position.
      */
     public void setScoringPosition(ScoringPosition scoringPosition) {
         this.scoringPosition = scoringPosition;
     }
-    
+
     /**
-     * sets whether the robot is in intaking mode or not
-     * @param intaking the mode (true if it is intaking)
+     * Sets whether the manipulator is in intaking mode.
+     *
+     * @param intaking {@code true} if the manipulator should intake game elements; {@code false} otherwise.
      */
     public void setIntaking(boolean intaking) {
         this.intaking = intaking;
     }
 
     /**
-     * returns the current scoring position of the robot
-     * @return
+     * Gets the current scoring position of the manipulator.
+     *
+     * @return The current {@link ScoringPosition}.
      */
     public ScoringPosition getScoringPosition() {
         return scoringPosition;
     }
 
     /**
-     * senses the coral
-     * @return whether or not the coral was sensed
+     * Checks if the coral (game element) is detected by the sensor.
+     *
+     * @return {@code true} if the coral is sensed; {@code false} otherwise.
      */
     public boolean senseCoral() {
         return coralSensor.get();
     }
-
 }
