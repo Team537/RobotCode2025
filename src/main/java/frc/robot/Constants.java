@@ -6,6 +6,7 @@ package frc.robot;
 
 import org.photonvision.PhotonPoseEstimator;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,7 +14,8 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
-
+import frc.robot.util.DrivingMotor;
+import frc.robot.util.TurningMotor;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 
@@ -63,117 +65,145 @@ public final class Constants {
      * contains all of the constants relating to the robot's drivetrain. 
      * This includes things like the turning factor, maximum drive speed, conversion factors, etc.
      */
-    public static class DriveConstants {
-
-        // Controller Constants
-        public static final double LINEAR_INPUT_CURVE_POWER = 2.5;
-        public static final double ROTATION_INPUT_CURVE_POWER = 2.5;
-        public static final double TURNING_FACTOR = 2.0 * Math.PI;
-
-        // Angular offsets of the modules relative to the chassis in radians
+    public final class DriveConstants {
+    
+        // Angular Offsets for Swerve Modules
         public static final Rotation2d FRONT_LEFT_MODULE_ANGULAR_OFFSET = new Rotation2d(-0.5 * Math.PI);
         public static final Rotation2d REAR_LEFT_MODULE_ANGULAR_OFFSET = new Rotation2d(Math.PI);
         public static final Rotation2d FRONT_RIGHT_MODULE_ANGULAR_OFFSET = new Rotation2d(0);
         public static final Rotation2d REAR_RIGHT_MODULE_ANGULAR_OFFSET = new Rotation2d(Math.PI / 2);
-
-        // SPARK MAX CAN IDs
-
-        // Drive Motor IDs
+    
+        // SPARK MAX CAN IDs for Driving Motors
         public static final int FRONT_LEFT_DRIVING_MOTOR_CAN_ID = 2;
         public static final int REAR_LEFT_DRIVING_MOTOR_CAN_ID = 1;
         public static final int FRONT_RIGHT_DRIVING_MOTOR_CAN_ID = 7;
         public static final int REAR_RIGHT_DRIVING_MOTOR_CAN_ID = 8;
-
-        // Calculations required for driving motor conversion factors and feed forward
-        public static final double DRIVING_MOTOR_FREE_SPEED = 94.6; // Revolutions per second
-        public static final double WHEEL_DIAMETER = 0.06677; // Meters
-        public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI; // Meters
-        // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15
-        // teeth on the bevel pinion
-        public static final double DRIVING_MOTOR_REDUCTION = 4.714;
-        public static final double DRIVE_WHEEL_FREE_SPEED = (DRIVING_MOTOR_FREE_SPEED * WHEEL_CIRCUMFERENCE)
-                / DRIVING_MOTOR_REDUCTION; // Meters / Second
-
-        public static final double DRIVING_ENCODER_POSITION_FACTOR = (WHEEL_DIAMETER * Math.PI)
-                / DRIVING_MOTOR_REDUCTION; // meters
-        public static final double DRIVING_ENCODER_VELOCITY_FACTOR = ((WHEEL_DIAMETER * Math.PI)
-                / DRIVING_MOTOR_REDUCTION) / 60.0; // meters per second
-
-        public static final boolean DRIVING_ENCODER_INVERTED = false;
-
-        // PIDs for the Driving Motor
-        public static final double DRIVING_KP = 0.04;
-        public static final double DRIVING_KI = 0;
-        public static final double DRIVING_KD = 0;
-        public static final double DRIVING_FF = 1 / DRIVE_WHEEL_FREE_SPEED;
-        public static final double DRIVING_PID_MIN_OUTPUT = -1;
-        public static final double DRIVING_PID_MAX_OUTPUT = 1;
-
-        public static final IdleMode DRIVING_MOTOR_IDLE_MODE = IdleMode.kBrake;
-        public static final int DRIVING_MOTOR_CURRENT_LIMIT = 50; // amps
-
-        // Turning Motor IDs
+    
+        // SPARK MAX CAN IDs for Turning Motors
         public static final int FRONT_LEFT_TURNING_MOTOR_CAN_ID = 3;
         public static final int REAR_LEFT_TURNING_MOTOR_CAN_ID = 10;
         public static final int FRONT_RIGHT_TURNING_MOTOR_CAN_ID = 6;
         public static final int REAR_RIGHT_TURNING_MOTOR_CAN_ID = 9;
-
-        public static final double TURNING_ENCODER_POSITION_FACTOR = (2 * Math.PI); // radians
-        public static final double TURNING_ENCODER_VELOCITY_FACTOR = (2 * Math.PI) / 60.0; // radians per second
-
-        public static final double TURNING_ENCODER_POSITION_PID_MIN_INPUT = 0; // radians
-        public static final double TURNING_ENCODER_POSITION_PID_MAX_INPUT = TURNING_ENCODER_POSITION_FACTOR; // radians
-
-        public static final boolean TURNING_ENCODER_INVERTED = true;
-
-        // PIDs for the turning Motor
-        public static final double TURNING_KP = 1;
-        public static final double TURNING_KI = 0;
-        public static final double TURNING_KD = 0;
-        public static final double TURNING_FF = 0;
-        public static final double TURNING_PID_MIN_OUTPUT = -1.0;
-        public static final double TURNING_PID_MAX_OUTPUT = 1.0;
-
-        public static final IdleMode TURNING_MOTOR_IDLE_MODE = IdleMode.kBrake;
-
-        public static final int TURNING_MOTOR_CURRENT_LIMIT = 20; // Amps
-
-        // Gyroscope CAN IDs
+    
+        // Gyroscope CAN ID
         public static final int GYROSCOPE_DEVICE_ID = 42;
-
-        // Drive PID Controller Coefficients
-        public static final double LINEAR_KP = 1.0;
-        public static final double LINEAR_KI = 0.0;
-        public static final double LINEAR_KD = 0.0;
-
-        public static final double ROTATIONAL_KP = 0.5;
-        public static final double ROTATIONAL_KI = 0.0;
-        public static final double ROTATIONAL_KD = 0.2;
-
-        // Maxmimum speeds and accelerations for driving
-        public static final double LINEAR_MAX_SPEED = 4.8; // Meters per second
-        public static final double ROTATIONAL_MAX_SPEED = 16.7; // Radians per second
-        public static final double LINEAR_MAX_ACCELERATION = 11.4; // Meters per second squared
-        public static final double ROTATIONAL_MAX_ACCELERATION = 42.0; // Radians per second squared
-
-        // Maximum delta time for driving, prevents too fast accelerations when lag
-        // occurs.
-        public static final double MAX_DELTA_TIME_RATE_LIMIT = 0.1; // 1.0; // seconds
-
-        // The drivetrain size and kinematics
-
-        // Distance between centers of right and left wheels on robot
+    
+        // Drivetrain Dimensions
         public static final double TRACK_WIDTH = Units.inchesToMeters(16);
-
-        // Distance between front and back wheels on robot
         public static final double WHEEL_BASE = Units.inchesToMeters(16);
-
+        
         public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
                 new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
                 new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
                 new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
                 new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
-      }
+
+        public static final double WHEEL_RADIUS = 0.0381; // Meters
+        public static final double WHEEL_CIRCUMFERENCE = WHEEL_RADIUS * 2.0 * Math.PI; // Meters
+    
+        // Motion Constraints
+        public static final double LINEAR_MAX_SPEED = 4.8; // m/s
+        public static final double ROTATIONAL_MAX_SPEED = 16.7; // rad/s
+        public static final double LINEAR_MAX_ACCELERATION = 11.4; // m/s²
+        public static final double ROTATIONAL_MAX_ACCELERATION = 42.0; // rad/s²
+        public static final double MAX_DELTA_TIME_RATE_LIMIT = 0.1; // Prevents excessive acceleration due to lag
+        
+        // Drive PID Controller Coefficients
+        public static final double LINEAR_KP = 1.0;
+        public static final double LINEAR_KI = 0.0;
+        public static final double LINEAR_KD = 0.0;
+        
+        public static final double ROTATIONAL_KP = 0.5;
+        public static final double ROTATIONAL_KI = 0.0;
+        public static final double ROTATIONAL_KD = 0.2;
+        
+        // Default motor values
+        public static final DrivingMotor DEFAULT_DRIVING_MOTOR = DrivingMotor.NEO;
+        public static final TurningMotor DEFAULT_TURNING_MOTOR = TurningMotor.NEO_550;
+    
+        /** ---------------------------------- DRIVING CONSTANTS ---------------------------------- */
+        public static final class NeoDriving {
+            public static final double FREE_SPEED = 594.389; // Rad/s
+            public static final double MOTOR_REDUCTION = 4.714;
+            public static final double DRIVE_WHEEL_FREE_SPEED = (FREE_SPEED * WHEEL_RADIUS) / MOTOR_REDUCTION;
+    
+            public static final double ENCODER_POSITION_FACTOR = WHEEL_CIRCUMFERENCE / MOTOR_REDUCTION;
+            public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0;
+    
+            public static final double KP = 0.04;
+            public static final double KI = 0;
+            public static final double KD = 0;
+            public static final double FF = 1 / DRIVE_WHEEL_FREE_SPEED;
+            public static final double PID_MIN_OUTPUT = -1;
+            public static final double PID_MAX_OUTPUT = 1;
+    
+            public static final IdleMode IDLE_MODE = IdleMode.kBrake;
+            public static final int CURRENT_LIMIT = 50; // Amps
+        }
+    
+        public static final class KrakenX60Driving {
+            public static final double FREE_SPEED = 628.319; // Rad/s
+            public static final double MOTOR_REDUCTION = 4.714;
+            public static final double DRIVE_WHEEL_FREE_SPEED = (FREE_SPEED * WHEEL_RADIUS) / MOTOR_REDUCTION;
+    
+            public static final double SENSOR_TO_MECHANISM_RATIO = WHEEL_CIRCUMFERENCE / MOTOR_REDUCTION;
+    
+            public static final double KP = 0.12;
+            public static final double KI = 0;
+            public static final double KD = 0.01;
+            public static final double FF = 1 / DRIVE_WHEEL_FREE_SPEED;
+            public static final double PID_MIN_OUTPUT = -1;
+            public static final double PID_MAX_OUTPUT = 1;
+    
+            public static final NeutralModeValue NEUTRAL_MODE = NeutralModeValue.Brake;
+            public static final boolean CURRENT_LIMIT_ENABLED = true;
+            public static final int CURRENT_LIMIT = 75; // Amps
+            public static final int CURRENT_LOWER_LIMIT = 25;
+            public static final double CURRENT_LOWER_TIME = 0.5;
+        }
+    
+        public static final class KrakenX60FOCDriving {
+            public static final double FREE_SPEED = 607.375; // Example value
+            public static final double MOTOR_REDUCTION = 4.714; // Example value
+            public static final double DRIVE_WHEEL_FREE_SPEED = (FREE_SPEED * WHEEL_RADIUS) / MOTOR_REDUCTION;
+    
+            public static final double SENSOR_TO_MECHANISM_RATIO = WHEEL_CIRCUMFERENCE / MOTOR_REDUCTION;
+    
+            public static final double KP = 0.12;
+            public static final double KI = 0;
+            public static final double KD = 0.01;
+            public static final double FF = 1 / DRIVE_WHEEL_FREE_SPEED;
+            public static final double PID_MIN_OUTPUT = -1;
+            public static final double PID_MAX_OUTPUT = 1;
+    
+            public static final NeutralModeValue NEUTRAL_MODE = NeutralModeValue.Brake;
+            public static final boolean CURRENT_LIMIT_ENABLED = true;
+            public static final int CURRENT_LIMIT = 75; // Amps
+            public static final int CURRENT_LOWER_LIMIT = 25;
+            public static final double CURRENT_LOWER_TIME = 0.5;
+        }
+    
+        /** ---------------------------------- TURNING CONSTANTS ---------------------------------- */
+        public static final class Neo550Turning {
+            public static final double ENCODER_POSITION_FACTOR = (2 * Math.PI); // Radians
+            public static final double ENCODER_VELOCITY_FACTOR = (2 * Math.PI) / 60.0; // Rad/s
+            public static final double POSITION_PID_MIN_INPUT = 0.0;
+            public static final double POSITION_PID_MAX_INPUT = ENCODER_POSITION_FACTOR;
+    
+            public static final boolean ENCODER_INVERTED = true;
+    
+            public static final double KP = 1.0;
+            public static final double KI = 0.0;
+            public static final double KD = 0.0;
+            public static final double FF = 0.0;
+            public static final double PID_MIN_OUTPUT = -1.0;
+            public static final double PID_MAX_OUTPUT = 1.0;
+    
+            public static final IdleMode IDLE_MODE = IdleMode.kBrake;
+            public static final int CURRENT_LIMIT = 20; // Amps
+        }
+    }
+    
 
     /**
      * <h2> NarwhalConstants </h2>
