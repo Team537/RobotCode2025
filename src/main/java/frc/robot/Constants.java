@@ -75,12 +75,12 @@ public final class Constants {
     
         // SPARK MAX CAN IDs for Driving Motors
         public static final int FRONT_LEFT_DRIVING_MOTOR_CAN_ID = 2;
-        public static final int REAR_LEFT_DRIVING_MOTOR_CAN_ID = 1;
+        public static final int REAR_LEFT_DRIVING_MOTOR_CAN_ID = 3; //TODO: replace with 1
         public static final int FRONT_RIGHT_DRIVING_MOTOR_CAN_ID = 7;
         public static final int REAR_RIGHT_DRIVING_MOTOR_CAN_ID = 8;
     
         // SPARK MAX CAN IDs for Turning Motors
-        public static final int FRONT_LEFT_TURNING_MOTOR_CAN_ID = 3;
+        public static final int FRONT_LEFT_TURNING_MOTOR_CAN_ID = 1; //TODO: replace with 3
         public static final int REAR_LEFT_TURNING_MOTOR_CAN_ID = 10;
         public static final int FRONT_RIGHT_TURNING_MOTOR_CAN_ID = 6;
         public static final int REAR_RIGHT_TURNING_MOTOR_CAN_ID = 9;
@@ -118,7 +118,7 @@ public final class Constants {
         public static final double ROTATIONAL_KD = 0.2;
         
         // Default motor values
-        public static final DrivingMotor DEFAULT_DRIVING_MOTOR = DrivingMotor.NEO;
+        public static final DrivingMotor DEFAULT_DRIVING_MOTOR = DrivingMotor.KRAKEN_X60;
         public static final TurningMotor DEFAULT_TURNING_MOTOR = TurningMotor.NEO_550;
     
         /** ---------------------------------- DRIVING CONSTANTS ---------------------------------- */
@@ -146,11 +146,11 @@ public final class Constants {
             public static final double MOTOR_REDUCTION = 4.714;
             public static final double DRIVE_WHEEL_FREE_SPEED = (FREE_SPEED * WHEEL_RADIUS) / MOTOR_REDUCTION;
     
-            public static final double SENSOR_TO_MECHANISM_RATIO = WHEEL_CIRCUMFERENCE / MOTOR_REDUCTION;
+            public static final double SENSOR_TO_MECHANISM_RATIO = MOTOR_REDUCTION / WHEEL_CIRCUMFERENCE;
     
-            public static final double KP = 0.12;
+            public static final double KP = 0.01;
             public static final double KI = 0;
-            public static final double KD = 0.01;
+            public static final double KD = 0.0;
             public static final double FF = 1 / DRIVE_WHEEL_FREE_SPEED;
             public static final double PID_MIN_OUTPUT = -1;
             public static final double PID_MAX_OUTPUT = 1;
@@ -167,11 +167,11 @@ public final class Constants {
             public static final double MOTOR_REDUCTION = 4.714; // Example value
             public static final double DRIVE_WHEEL_FREE_SPEED = (FREE_SPEED * WHEEL_RADIUS) / MOTOR_REDUCTION;
     
-            public static final double SENSOR_TO_MECHANISM_RATIO = WHEEL_CIRCUMFERENCE / MOTOR_REDUCTION;
+            public static final double SENSOR_TO_MECHANISM_RATIO = MOTOR_REDUCTION / WHEEL_CIRCUMFERENCE;
     
-            public static final double KP = 0.12;
+            public static final double KP = 0.04;
             public static final double KI = 0;
-            public static final double KD = 0.01;
+            public static final double KD = 0.0;
             public static final double FF = 1 / DRIVE_WHEEL_FREE_SPEED;
             public static final double PID_MIN_OUTPUT = -1;
             public static final double PID_MAX_OUTPUT = 1;

@@ -111,6 +111,9 @@ public class SwerveModule extends SubsystemBase {
                 drivingNeo.getClosedLoopController().setReference(velocity, ControlType.kVelocity);
                 break;
             case KRAKEN_X60:
+                if (drivingCANID == 2) {
+                   System.out.println(drivingKrakenX60.getVelocity().getValueAsDouble());
+                }
                 drivingKrakenX60.setControl(velocityRequest);
                 break;
             case KRAKEN_X60_FOC:
@@ -128,7 +131,7 @@ public class SwerveModule extends SubsystemBase {
         Rotation2d rawAngle;
         switch (activeTurningMotor) {
             case NEO_550:
-                rawAngle = new Rotation2d(turningNeo550.getEncoder().getPosition());
+                rawAngle = new Rotation2d(turningNeo550.getAbsoluteEncoder().getPosition());
                 break;
             default:
                 rawAngle = new Rotation2d();
@@ -249,7 +252,7 @@ public class SwerveModule extends SubsystemBase {
         switch (activeTurningMotor) {
 
             case NEO_550:
-                drivingNeo.disable();
+                turningNeo550.disable();
                 break;
 
         }
