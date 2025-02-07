@@ -105,18 +105,21 @@ public class SwerveModule extends SubsystemBase {
      * @param velocity the desired velocity, in meters per second
      */
     private void setDrivingVelocity(double velocity) {
-        VelocityVoltage velocityRequest = new VelocityVoltage(velocity); // Used if TalonFX are being used
+        VelocityVoltage velocityRequest; // Used if TalonFX are being used
         switch (activeDrivingMotor) {
             case NEO:
                 drivingNeo.getClosedLoopController().setReference(velocity, ControlType.kVelocity);
                 break;
             case KRAKEN_X60:
+                velocityRequest = new VelocityVoltage(velocity);
                 if (drivingCANID == 2) {
+                    System.out.println(velocity);
                    System.out.println(drivingKrakenX60.getVelocity().getValueAsDouble());
                 }
                 drivingKrakenX60.setControl(velocityRequest);
                 break;
             case KRAKEN_X60_FOC:
+                velocityRequest = new VelocityVoltage(velocity);
                 velocityRequest.EnableFOC = true;
                 drivingKrakenX60FOC.setControl(velocityRequest);
                 break;

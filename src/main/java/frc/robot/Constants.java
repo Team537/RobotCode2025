@@ -148,10 +148,12 @@ public final class Constants {
     
             public static final double SENSOR_TO_MECHANISM_RATIO = MOTOR_REDUCTION / WHEEL_CIRCUMFERENCE;
     
-            public static final double KP = 0.01;
-            public static final double KI = 0;
-            public static final double KD = 0.0;
-            public static final double FF = 1 / DRIVE_WHEEL_FREE_SPEED;
+            public static final double KP = 1.0;
+            public static final double KI = 1.0;
+            public static final double KD = 0.01;
+            public static final double KV = 2.36;
+            public static final double KA = 0.18;
+
             public static final double PID_MIN_OUTPUT = -1;
             public static final double PID_MAX_OUTPUT = 1;
     
@@ -169,10 +171,12 @@ public final class Constants {
     
             public static final double SENSOR_TO_MECHANISM_RATIO = MOTOR_REDUCTION / WHEEL_CIRCUMFERENCE;
     
-            public static final double KP = 0.04;
-            public static final double KI = 0;
-            public static final double KD = 0.0;
-            public static final double FF = 1 / DRIVE_WHEEL_FREE_SPEED;
+            public static final double KP = 1.0;
+            public static final double KI = 1.0;
+            public static final double KD = 0.01;
+            public static final double KV = 2.44;
+            public static final double KA = 0.13;
+
             public static final double PID_MIN_OUTPUT = -1;
             public static final double PID_MAX_OUTPUT = 1;
     
