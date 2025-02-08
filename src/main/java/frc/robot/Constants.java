@@ -4,8 +4,8 @@
 
 package frc.robot;
 
+import com.revrobotics.spark.config.SparkMaxConfig;
 import org.photonvision.PhotonPoseEstimator;
-
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
@@ -246,6 +246,83 @@ public final class Constants {
           public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(2 * Math.PI / 3); // 2pi/3 TODO: update these placeholder values
           public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(Math.PI / 2); // pi/2 TODO: update these placeholder values
         }
+    }
+
+    public static class SquidConstants {
+        
+        public static class SquidManipulatorConstants {
+
+            //TODO: Put actual IDs in
+            public static final int TOP_MOTOR_CAN_ID = 11;
+            public static final int BOTTOM_MOTOR_CAN_ID = 12;
+
+            public static final int CORAL_SENSOR_ID = 0;
+
+            public static final int KP = 1;
+            public static final int KI = 0;
+            public static final int KD = 0;
+
+            public static final double PID_MIN_OUTPUT = -1.0;
+            public static final double PID_MAX_OUTPUT = 1.0;
+
+            public static final double WHEEL_RADIUS = 0.038;
+            public static final double WHEEL_CIRCUMFERENCE = 2.0 * Math.PI * WHEEL_RADIUS; //Meters
+            public static final double MOTOR_REDUCTION = 5.0;
+            public static final double ENCODER_FACTOR = WHEEL_CIRCUMFERENCE / MOTOR_REDUCTION;
+            public static final double MANIPULATOR_MOTOR_FREE_SPEED = 1151.917; //Radians / second
+
+            public static final double MANIPULATOR_MAX_SPEED = (MANIPULATOR_MOTOR_FREE_SPEED * WHEEL_RADIUS) / MOTOR_REDUCTION;
+
+            public static final boolean TOP_MOTOR_INVERTED = true;
+            public static final boolean BOTTOM_MOTOR_INVERTED = false;
+
+            public static final int MOTOR_CURRENT_LIMIT = 20; // Amps
+            public static final IdleMode IDLE_MODE = IdleMode.kBrake;
+
+            //TODO: Add the actual values
+            public static final double L_ONE_BOTTOM_ROLLER_RATIO = 1.0;
+            public static final double L_TWO_BOTTOM_ROLLER_RATIO = 0.95;
+            public static final double L_THREE_BOTTOM_ROLLER_RATIO = 0.95;
+            public static final double L_FOUR_BOTTOM_ROLLER_RATIO = 0.6;
+            
+        }
+
+        public static class SquidClimberConstants {
+
+            //IDs
+            public static final int CLIMB_MOTOR_CAN_ID = 15;
+
+            //Behavior Constants
+            public static final boolean MOTOR_INVERTED =  false;
+            public static final int MOTOR_CURRENT_LIMIT = 50;
+            public static final IdleMode  IDLE_MODE = IdleMode.kBrake;
+
+            //Gearing Constants
+            public static final double SPOOL_RADIUS = 0.009526; // Meters
+            public static final double SPOOL_CIRCUMFERENCE = 2.0 * Math.PI * SPOOL_RADIUS; //Meters
+            public static final double MOTOR_REDUCTION = 125.0;
+            public static final double ENCODER_FACTOR = SPOOL_CIRCUMFERENCE / MOTOR_REDUCTION;
+
+            //PID Values
+            public static final int KP = 1;
+            public static final int KI = 0;
+            public static final int KD = 0;
+
+            public static final double PID_MIN_OUTPUT = -1.0;
+            public static final double PID_MAX_OUTPUT = 1.0;
+
+            /**
+             * The spool length of the down position, in meters. The further the distance, the more spool is pulled back.
+             */
+            public static final double DOWN_POSITION = 0.0; //Meters
+
+            /**
+             * The spool length of the climbed position, in meters. The further the distance, the more spool is pulled back.
+             */
+            public static final double CLIMBED_POSITION = 0.203; //Meters
+
+        }
+
     }
 
     /**
