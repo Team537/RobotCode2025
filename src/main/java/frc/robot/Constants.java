@@ -6,6 +6,8 @@ package frc.robot;
 
 import com.revrobotics.spark.config.SparkMaxConfig;
 import org.photonvision.PhotonPoseEstimator;
+
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -211,6 +213,22 @@ public final class Constants {
           public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(-Math.PI / 4); // -pi/4 TODO: update these placeholder values
           public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(2 * Math.PI / 3); // 2pi/3 TODO: update these placeholder values
           public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(Math.PI / 2); // pi/2 TODO: update these placeholder values
+        }
+
+        public static class NarwhalClimberConstants {
+            public static final int CLIMBER_CAN_ID = 19;
+            
+            public static final double GEAR_REDUCTION = 125;
+            public static final InvertedValue INVERTED = InvertedValue.CounterClockwise_Positive;
+
+            public static final double PID_FEEDFORWARD_S = 0;
+            public static final double PID_FEEDFORWARD_V = 0;
+            public static final double PID_FEEDFORWARD_P = 0;
+            public static final double PID_FEEDFORWARD_I = 0;
+            public static final double PID_FEEDFORWARD_D = 0;
+
+            public static final Rotation2d DEPLOYED_ANGLE = Rotation2d.fromDegrees(90);
+            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(60);
         }
     }
 
