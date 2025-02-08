@@ -75,12 +75,12 @@ public final class Constants {
     
         // SPARK MAX CAN IDs for Driving Motors
         public static final int FRONT_LEFT_DRIVING_MOTOR_CAN_ID = 2;
-        public static final int REAR_LEFT_DRIVING_MOTOR_CAN_ID = 3; //TODO: replace with 1
+        public static final int REAR_LEFT_DRIVING_MOTOR_CAN_ID = 1;
         public static final int FRONT_RIGHT_DRIVING_MOTOR_CAN_ID = 7;
         public static final int REAR_RIGHT_DRIVING_MOTOR_CAN_ID = 8;
     
         // SPARK MAX CAN IDs for Turning Motors
-        public static final int FRONT_LEFT_TURNING_MOTOR_CAN_ID = 1; //TODO: replace with 3
+        public static final int FRONT_LEFT_TURNING_MOTOR_CAN_ID = 3;
         public static final int REAR_LEFT_TURNING_MOTOR_CAN_ID = 10;
         public static final int FRONT_RIGHT_TURNING_MOTOR_CAN_ID = 6;
         public static final int REAR_RIGHT_TURNING_MOTOR_CAN_ID = 9;
