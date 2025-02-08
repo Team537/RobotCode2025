@@ -13,9 +13,10 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
+import frc.robot.Constants.Defaults;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.util.DrivingMotor;
-import frc.robot.util.TurningMotor;
+import frc.robot.util.DrivingMotorType;
+import frc.robot.util.TurningMotorType;
 
 /**
  * <h2> SwerverModule </h2>
@@ -42,8 +43,8 @@ public class SwerveModule extends SubsystemBase {
     int drivingCANID;
     int turningCANID;
 
-    DrivingMotor activeDrivingMotor = DriveConstants.DEFAULT_DRIVING_MOTOR;
-    TurningMotor activeTurningMotor = DriveConstants.DEFAULT_TURNING_MOTOR;
+    DrivingMotorType activeDrivingMotor = Defaults.DEFAULT_DRIVING_MOTOR;
+    TurningMotorType activeTurningMotor = Defaults.DEFAULT_TURNING_MOTOR;
 
     /**
      * Creates a swerve module
@@ -128,7 +129,7 @@ public class SwerveModule extends SubsystemBase {
         Rotation2d rawAngle;
         switch (activeTurningMotor) {
             case NEO_550:
-                rawAngle = new Rotation2d(turningNeo550.getEncoder().getPosition());
+                rawAngle = new Rotation2d(turningNeo550.getAbsoluteEncoder().getPosition());
                 break;
             default:
                 rawAngle = new Rotation2d();
@@ -199,7 +200,7 @@ public class SwerveModule extends SubsystemBase {
      * activates the driving motor
      * @param drivingMotor the motor type to activate
      */
-    private void activateDrivingMotor(DrivingMotor drivingMotor) {
+    private void activateDrivingMotor(DrivingMotorType drivingMotor) {
 
         //Setting up the motors
         switch (drivingMotor) {
@@ -230,7 +231,7 @@ public class SwerveModule extends SubsystemBase {
      * sets the driving motor type
      * @param drivingMotor the type of driving motor
      */
-    public void setDrivingMotor(DrivingMotor drivingMotor) {
+    public void setDrivingMotor(DrivingMotorType drivingMotor) {
         
         //Disabling the current active motor
         disableActiveDrivingMotor();
@@ -260,7 +261,7 @@ public class SwerveModule extends SubsystemBase {
      * activates the turning motor
      * @param turningMotor the turning motor type to activate
      */
-    private void activateTurningMotor(TurningMotor turningMotor) {
+    private void activateTurningMotor(TurningMotorType turningMotor) {
         
         //Setting up the motors
         switch (turningMotor) {
@@ -278,7 +279,7 @@ public class SwerveModule extends SubsystemBase {
      * sets the turning motor type
      * @param turningMotor the type of turning motor
      */
-    public void setTurningMotor(TurningMotor turningMotor) {
+    public void setTurningMotor(TurningMotorType turningMotor) {
         
         //Disabling the current active motor
         disableActiveTurningMotor();

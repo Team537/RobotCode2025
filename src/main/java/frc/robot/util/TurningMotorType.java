@@ -1,5 +1,5 @@
 package frc.robot.util;
 
-public enum TurningMotor {
+public enum TurningMotorType {
     NEO_550,
 }

@@ -14,8 +14,9 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
-import frc.robot.util.DrivingMotor;
-import frc.robot.util.TurningMotor;
+import frc.robot.util.DrivingMotorType;
+import frc.robot.util.TurningMotorType;
+import frc.robot.util.UpperAssemblyType;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 
@@ -29,6 +30,15 @@ import edu.wpi.first.apriltag.AprilTagFields;
  */
 public final class Constants {
 
+    public static class Defaults {
+
+        // Default motor values
+        public static final DrivingMotorType DEFAULT_DRIVING_MOTOR = DrivingMotorType.NEO;
+        public static final TurningMotorType DEFAULT_TURNING_MOTOR = TurningMotorType.NEO_550;
+        public static final UpperAssemblyType DEFAULT_UPPER_ASSEMBLY = UpperAssemblyType.NONE;
+
+    }
+
     /**
      * <h2>OperatorConstants</h2>
      * The {@code OperatorConstants} class is a subclass contained within the {@code Constants} class. 
@@ -36,6 +46,7 @@ public final class Constants {
      * This includes things like the maximum boost mode speed, the driver controller port, driver rotational offsets, etc.
      */
     public static class OperatorConstants {
+
         public static final int DRIVER_CONTROLLER_PORT = 0;
 
         // Position offsets, used to determine the orientation of the driver
@@ -66,6 +77,14 @@ public final class Constants {
      * This includes things like the turning factor, maximum drive speed, conversion factors, etc.
      */
     public final class DriveConstants {
+
+        // Robot Features
+        public static final double DRIVETRAIN_MASS = 39.5; //Kg
+        public static final double DRIVETRAIN_MOI = 1.227; //Kg meters
+        public static final double GRAVITY_ACCELERATION = 9.81; // Meters / sec^2
+
+        public static final double TRANSLATION_THRESHOLD = 0.05; // Meters
+        public static final double ROTATION_THRESHOLD = 0.08; // Radians
     
         // Angular Offsets for Swerve Modules
         public static final Rotation2d FRONT_LEFT_MODULE_ANGULAR_OFFSET = new Rotation2d(-0.5 * Math.PI);
@@ -98,8 +117,27 @@ public final class Constants {
                 new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
                 new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
 
+        // Define module locations relative to the robot's center
+        public static final Translation2d FRONT_LEFT_POSITION = 
+            new Translation2d(WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0);
+        public static final Translation2d FRONT_RIGHT_POSITION = 
+            new Translation2d(WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0);
+        public static final Translation2d BACK_LEFT_POSITION = 
+            new Translation2d(-WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0);
+        public static final Translation2d BACK_RIGHT_POSITION = 
+            new Translation2d(-WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0);
+
+        // Alternatively, you can define an array containing all four positions:
+        public static final Translation2d[] MODULE_POSITIONS = {
+            FRONT_LEFT_POSITION,
+            FRONT_RIGHT_POSITION,
+            BACK_LEFT_POSITION,
+            BACK_RIGHT_POSITION,
+        };
+
         public static final double WHEEL_RADIUS = 0.0381; // Meters
         public static final double WHEEL_CIRCUMFERENCE = WHEEL_RADIUS * 2.0 * Math.PI; // Meters
+        public static final double WHEEL_COEFFICIENT_FRICTION = 1.0;
     
         // Motion Constraints
         public static final double LINEAR_MAX_SPEED = 4.8; // m/s
@@ -116,10 +154,6 @@ public final class Constants {
         public static final double ROTATIONAL_KP = 0.5;
         public static final double ROTATIONAL_KI = 0.0;
         public static final double ROTATIONAL_KD = 0.2;
-        
-        // Default motor values
-        public static final DrivingMotor DEFAULT_DRIVING_MOTOR = DrivingMotor.NEO;
-        public static final TurningMotor DEFAULT_TURNING_MOTOR = TurningMotor.NEO_550;
     
         /** ---------------------------------- DRIVING CONSTANTS ---------------------------------- */
         public static final class NeoDriving {
@@ -185,6 +219,12 @@ public final class Constants {
     
         /** ---------------------------------- TURNING CONSTANTS ---------------------------------- */
         public static final class Neo550Turning {
+
+            public static final double FREE_SPEED = 1151.917; // Rad/s
+
+            public static final double MOTOR_REDUCTION = 46.42;
+            public static final double MAX_TURNING_SPEED = FREE_SPEED / MOTOR_REDUCTION;
+
             public static final double ENCODER_POSITION_FACTOR = (2 * Math.PI); // Radians
             public static final double ENCODER_VELOCITY_FACTOR = (2 * Math.PI) / 60.0; // Rad/s
             public static final double POSITION_PID_MIN_INPUT = 0.0;
@@ -204,6 +244,10 @@ public final class Constants {
         }
     }
     
+    public static class SquidConstants {
+        public static final double UPPER_ASSEMBLY_MASS = 0.0;
+        public static final double UPPER_ASSEMBLY_MOI = 0.0; //Kg m^2
+    }
 
     /**
      * <h2> NarwhalConstants </h2>
@@ -212,6 +256,10 @@ public final class Constants {
      * This contains values like motor IDs, PID coefficients, etc.
      */
     public static class NarwhalConstants {
+
+        public static final double UPPER_ASSEMBLY_MASS = 0.0; //Kg
+        public static final double UPPER_ASSEMBLY_MOI = 0.0; //Kg m^2
+
         public static class NarwhalIntakeOuttakeConstants {
             public static final int INTAKE_OUTTAKE_MOTOR_CAN_ID = 12; // TODO: Replace this placeholder with the actual
                                                                       // id
