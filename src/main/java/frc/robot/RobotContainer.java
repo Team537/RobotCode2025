@@ -8,6 +8,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.XboxParkerManualDriveCommand;
 import frc.robot.commands.squid.ManualSquidClimberCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
@@ -45,11 +46,7 @@ public class RobotContainer {
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
 
     // Commands
-    Command manualDriveCommand = new RunCommand(
-            () -> {
-                driveSubsystem.driveFromXBoxController(xBoxController);
-            },
-            driveSubsystem);
+    Command manualDriveCommand = new XboxParkerManualDriveCommand(driveSubsystem, xBoxController);
 
     // Smart Dashboard Inputs
     private final SendableChooser<AutonomousRoutine> autonomousSelector = new SendableChooser<>();
