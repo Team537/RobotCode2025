@@ -202,8 +202,10 @@ public final class Constants {
         public static final PhotonPoseEstimator.PoseStrategy FALLBACK_STRATEGY = PhotonPoseEstimator.PoseStrategy.CLOSEST_TO_REFERENCE_POSE;
     }
 
-    public static class RaspberryPIConstants {
+    public static class OceanViewConstants {
         public static final String PI_IP = "0.0.0.0";
-        public static final int PORT_NUMBER = 537;
+        public static final int DASHBOARD_PORT_NUMBER = 537;
+        public static final int UDP_PORT_NUMBER = 537;
+        public static final int TCP_PORT_NUMBER = 537;
     }
 }

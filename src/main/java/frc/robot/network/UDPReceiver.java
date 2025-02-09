@@ -7,8 +7,6 @@ import java.nio.charset.StandardCharsets;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import frc.robot.Constants.RaspberryPIConstants;
-
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
@@ -24,12 +22,22 @@ import java.util.Map;
  */
 public class UDPReceiver {
 
-    private volatile Map<String, Object> targets; // Use volatile for visibility across threads
     private final Gson gson = new Gson(); // Reuse Gson instance for efficiency
-    private final Type targetType = new TypeToken<List<Map<String, Object>>>() {}.getType(); // Reuse type for deserialization
+    private final Type targetType = new TypeToken<Map<String, Object>>() {}.getType();
+    private volatile Map<String, Object> targets;
 
     // Storage
+    private int portNumber;
     private int previousPacketNumber = 0;
+
+    /**
+     * Create a new UDPReceiver object to receive data from  the given port.
+     * 
+     * @param portNumber The port number data will be received from.
+     */
+    public UDPReceiver(int portNumber) {
+        this.portNumber = portNumber;
+    }
 
     /**
      * Parses and updates the list of targets from a received JSON string.
@@ -46,8 +54,8 @@ public class UDPReceiver {
      */
     public void start() {
         new Thread(() -> {
-            try (DatagramSocket socket = new DatagramSocket(RaspberryPIConstants.PORT_NUMBER)) {
-                byte[] buffer = new byte[1024];
+            try (DatagramSocket socket = new DatagramSocket(this.portNumber)) {
+                byte[] buffer = new byte[4096];
                 System.out.println("Waiting for UDP data...");
 
                 while (true) {
@@ -113,7 +121,7 @@ public class UDPReceiver {
 
             // Safely parse the packet_number field
             try {
-                return (Integer) packetNumber;
+                return ((Number) packetNumber).intValue();
             } catch (ClassCastException e) {
                 System.err.println("Error parsing packet_number: " + e.getMessage());
             }

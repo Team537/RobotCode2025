@@ -4,8 +4,8 @@
 
 package frc.robot;
 
+import frc.robot.Constants.OceanViewConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.Constants.RaspberryPIConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
@@ -73,11 +73,11 @@ public class RobotContainer {
     public RobotContainer() {
         
         // Setup Networking
-        udpReceiver = new UDPReceiver();
+        udpReceiver = new UDPReceiver(OceanViewConstants.UDP_PORT_NUMBER);
         
         // Attempted to create a new TCPSender object.
         try {
-            tcpSender = new TCPSender(RaspberryPIConstants.PI_IP, RaspberryPIConstants.PORT_NUMBER);
+            tcpSender = new TCPSender(OceanViewConstants.PI_IP, OceanViewConstants.TCP_PORT_NUMBER);
             System.out.println("Successfully created TCPSender object!");
         } catch (Exception e) {
             System.err.println("Failed to construct TCPSender object: " + e.getMessage());

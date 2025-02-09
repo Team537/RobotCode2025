@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.RaspberryPIConstants;
+import frc.robot.Constants.OceanViewConstants;
 import frc.robot.network.TCPSender;
 import frc.robot.network.UDPReceiver;
 import frc.utils.vision.ScoringLocation;
@@ -207,7 +207,7 @@ public class OceanViewManager extends SubsystemBase {
         if (tcpSender == null || !tcpSender.isConnected()) {
             // Attempt to reconnect or log a warning
             try {
-                tcpSender.reconnect(RaspberryPIConstants.PI_IP, RaspberryPIConstants.PORT_NUMBER); // Replace with actual IP and port
+                tcpSender.reconnect(OceanViewConstants.PI_IP, OceanViewConstants.TCP_PORT_NUMBER); // Replace with actual IP and port
                 System.out.println("[OceanViewManager] Reconnected to Raspberry Pi.");
             } catch (IOException e) {
                 System.err.println("[OceanViewManager] Failed to reconnect: " + e.getMessage());
