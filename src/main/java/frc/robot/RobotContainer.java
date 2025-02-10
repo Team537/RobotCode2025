@@ -12,10 +12,13 @@ import frc.robot.commands.XboxParkerManualDriveCommand;
 import frc.robot.commands.squid.ManualSquidClimberCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.UpperAssembly;
 import frc.robot.subsystems.squid.SquidClimber;
 import frc.robot.subsystems.squid.SquidManipulator;
 import frc.robot.subsystems.vision.PhotonVisionCamera;
 import frc.robot.subsystems.vision.VisionOdometry;
+import frc.robot.util.UpperAssemblyFactory;
+import frc.robot.util.UpperAssemblyType;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.utils.Autonomous.Alliance;
@@ -41,6 +44,7 @@ public class RobotContainer {
     // Subsystems
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
+    private UpperAssembly upperAssembly = UpperAssemblyFactory.createUpperAssembly(Constants.UpperAssemblyConstants.DEFAULT_UPPER_ASSEMBLY);
     private SquidManipulator squidManipulator = new SquidManipulator();
     private SquidClimber squidClimber = new SquidClimber();
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
@@ -131,12 +135,22 @@ public class RobotContainer {
     }
 
     /**
+     * sets the upper assembly to the given type
+     * @param upperAssemblyType the type of upper assembly to set to
+     */
+    public void setUpperAssembly(UpperAssemblyType upperAssemblyType) {
+        upperAssembly.disable();
+        upperAssembly = UpperAssemblyFactory.createUpperAssembly(upperAssemblyType);
+    }
+
+    /**
      * Schedules commands used exclusively during TeleOp.
      */
     public void scheduleTeleOp() {
 
         // The Drive Command
         driveSubsystem.setDefaultCommand(manualDriveCommand);
+        upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
         
     }
 }
