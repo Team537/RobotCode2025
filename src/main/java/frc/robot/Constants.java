@@ -189,7 +189,7 @@ public final class Constants {
         public static final int WRIST_MOTOR_CURRENT_LIMIT = 20;
         public static final double WRIST_OFFSET = 0.0; // offset will be calculated as if unflipped, and no conversion factor.
         
-        public static final double ROTATIONS_TO_RADIANS = Math.PI * 2; // Wrist target angles (radians) are multiplied by this to get the motor target position
+        public static final double MOTOR_ROTATIONS_TO_WORLD_RADIANS = 45 * Math.PI * 2; // Wrist target angles (radians) are multiplied by this to get the motor target position
 
         public static final double POSITION_PID_P = 0.5; // TODO: UPDATE THESE PID VALUES
         public static final double POSITION_PID_I = 0; // TODO: UPDATE THESE PID VALUES

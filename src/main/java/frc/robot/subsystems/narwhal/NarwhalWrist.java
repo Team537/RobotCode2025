@@ -40,8 +40,7 @@ public class NarwhalWrist extends SubsystemBase {
         // general configs
         wristConfig 
             .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(Constants.NarwhalConstants.NarwhalWristConstants.WRIST_MOTOR_CURRENT_LIMIT)
-            .inverted(true);
+            .smartCurrentLimit(Constants.NarwhalConstants.NarwhalWristConstants.WRIST_MOTOR_CURRENT_LIMIT);
         // configs for the PID
         wristConfig.closedLoop 
             .pid(
@@ -49,17 +48,13 @@ public class NarwhalWrist extends SubsystemBase {
                 Constants.NarwhalConstants.NarwhalWristConstants.POSITION_PID_I, 
                 Constants.NarwhalConstants.NarwhalWristConstants.POSITION_PID_D
             )
-            .outputRange(-1, 1)
+            .outputRange(-0.5, 0.5)
             .feedbackSensor(FeedbackSensor.kAbsoluteEncoder); // uses external encoder
         // configs for the encoder
         // NOTE FOR THE ENCODER: WHEN VIEWED FROM THE RIGHT, THE ANGLE OF THE WRIST IS BASED ON A UNIT CIRCLE WITH 0 DEGREES POINTING STRAIGHT UP
-        wristConfig.absoluteEncoder
-            .inverted(false)
-            .positionConversionFactor(Constants.NarwhalConstants.NarwhalWristConstants.ROTATIONS_TO_RADIANS)
-            .velocityConversionFactor(Constants.NarwhalConstants.NarwhalWristConstants.ROTATIONS_TO_RADIANS/60.0) // dividing by 60 accounts for RPM to Radians/Sec
-            .zeroOffset(Constants.NarwhalConstants.NarwhalWristConstants.WRIST_OFFSET) // Down position should be "0" here, and -PI rads for zero centered
-            .zeroCentered(true);
-
+        wristConfig.encoder
+            .positionConversionFactor(Constants.NarwhalConstants.NarwhalWristConstants.MOTOR_ROTATIONS_TO_WORLD_RADIANS)
+            .velocityConversionFactor(Constants.NarwhalConstants.NarwhalWristConstants.MOTOR_ROTATIONS_TO_WORLD_RADIANS/60.0); // dividing by 60 accounts for RPM to Radians/Sec
         // creating the spark max controller
         wrist = new SparkMax(Constants.NarwhalConstants.NarwhalWristConstants.WRIST_MOTOR_CAN_ID, MotorType.kBrushless);
         wrist.configure(wristConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
