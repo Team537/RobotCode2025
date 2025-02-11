@@ -13,31 +13,36 @@ public class NarwhalUpperAssembly implements UpperAssembly {
     
     public Command getCoralIntakeCommand(Supplier<Pose2d> robotPoseSupplier) {
         return new RunCommand(
-            () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/}
+            () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
+            this
         );
     }
 
     public Command getCoralScoreCommand(ScoringHeight scoringHeight, Supplier<Pose2d> robotPoseSupplier) {
         return new RunCommand(
-            () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/}
+            () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
+            this
         );
     }
 
     public Command getRemoveAlgaeCommand(Supplier<Pose2d> robotPoseSupplier) {
         return new RunCommand(
-            () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/}
+            () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
+            this
         );
     }
 
     public Command getClimbCommand(Supplier<Pose2d> robotPoseSupplier) {
         return new RunCommand(
-            () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/}
+            () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
+            this
         );
     }
 
     public Command getManualCommand(XboxController controller) {
         return new RunCommand(
-            () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/}
+            () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
+            this
         );
     }
 
