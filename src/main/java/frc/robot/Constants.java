@@ -181,10 +181,10 @@ public final class Constants {
   
     public static class NarwhalConstants {
         public static class NarwhalElevatorConstants {
-                public static final int ELEVATOR_LEAD_MOTOR_CAN_ID = 12; // TODO: Replace this placeholder with the actual id
+                public static final int ELEVATOR_LEAD_MOTOR_CAN_ID = 13; // TODO: Replace this placeholder with the actual id
                 public static final int ELEVATOR_LEAD_MOTOR_CURRENT_LIMIT = 40;
 
-                public static final int ELEVATOR_FOLLOWER_CAN_ID = 13;
+                public static final int ELEVATOR_FOLLOWER_CAN_ID = 14;
                 public static final int ELEVATOR_FOLLOWER_MOTOR_CURRENT_LIMIT = ELEVATOR_LEAD_MOTOR_CURRENT_LIMIT;
                 
                 // Calculating the ratio of rotations to distance
@@ -205,7 +205,7 @@ public final class Constants {
                 public static final double L1_METERS = 0.2;
                 public static final double L2_METERS = 0.4;
                 public static final double L3_METERS = 0.8;
-                public static final double L4_METERS = 1.0;
+                public static final double L4_METERS = 1.2;
                 public static final double INTAKE_HEIGHT_METERS = 0.55;
         }
 

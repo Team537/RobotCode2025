@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.NarwhalConstants.NarwhalElevatorConstants;
-
+import edu.wpi.first.wpilibj.XboxController;
 
 
 public class NarwhalElevator extends SubsystemBase {
@@ -39,7 +39,6 @@ public class NarwhalElevator extends SubsystemBase {
             .idleMode(IdleMode.kBrake)
             .smartCurrentLimit(NarwhalElevatorConstants.ELEVATOR_LEAD_MOTOR_CURRENT_LIMIT);
         leadElevatorConfig.encoder // encoder configs
-            .inverted(false)
             .positionConversionFactor(NarwhalElevatorConstants.ROTATIONS_TO_METERS)
             .velocityConversionFactor(NarwhalElevatorConstants.ROTATIONS_TO_METERS/60.0); // dividing by 60 accounts for RPM to Radians/Sec
         leadElevatorConfig.closedLoop // pid configs
@@ -121,5 +120,23 @@ public class NarwhalElevator extends SubsystemBase {
     public void L4(){
         setHeight(NarwhalElevatorConstants.L4_METERS);
         currentState = NarwhalElevatorState.L4;
+    }
+
+    public void runXBoxController(XboxController xboxController){
+        if(xboxController.getRightBumperButton()){
+            intake();
+        }
+        else if(xboxController.getBackButton()){
+            L1();
+        }
+        else if(xboxController.getYButton()){
+            L4();
+        }
+        else if(xboxController.getBButton()){
+            L3();
+        }
+        else if(xboxController.getAButton()){
+            L2();
+        }
     }
 }
