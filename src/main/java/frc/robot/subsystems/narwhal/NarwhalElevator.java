@@ -5,13 +5,16 @@
 package frc.robot.subsystems.narwhal;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -29,19 +32,21 @@ public class NarwhalElevator extends SubsystemBase {
     private final SparkMaxConfig leadElevatorConfig;
     private final SparkClosedLoopController leadElevatorPID;
 
-    private final SparkMax followerElevator;
-    private final SparkMaxConfig followerElevatorConfig;
+    // private final SparkMax followerElevator;
+    // private final SparkMaxConfig followerElevatorConfig;
 
     public NarwhalElevator(){
         // lead
         leadElevatorConfig = new SparkMaxConfig();
         leadElevatorConfig // general configs
             .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(NarwhalElevatorConstants.ELEVATOR_LEAD_MOTOR_CURRENT_LIMIT);
+            .smartCurrentLimit(NarwhalElevatorConstants.ELEVATOR_LEAD_MOTOR_CURRENT_LIMIT)
+            .inverted(true);
         leadElevatorConfig.encoder // encoder configs
             .positionConversionFactor(NarwhalElevatorConstants.ROTATIONS_TO_METERS)
             .velocityConversionFactor(NarwhalElevatorConstants.ROTATIONS_TO_METERS/60.0); // dividing by 60 accounts for RPM to Radians/Sec
-        leadElevatorConfig.closedLoop // pid configs
+        leadElevatorConfig.closedLoop // pid 
+            .outputRange(-0.5, 0.5)
             .pid(
                 NarwhalElevatorConstants.ELEVATOR_HEIGHT_PID_P,
                 NarwhalElevatorConstants.ELEVATOR_HEIGHT_PID_I,
@@ -52,17 +57,6 @@ public class NarwhalElevator extends SubsystemBase {
         leadElevator.configure(leadElevatorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         leadElevatorPID = leadElevator.getClosedLoopController();
-        
-        // follower
-        followerElevatorConfig = new SparkMaxConfig();
-        followerElevatorConfig
-            .idleMode(IdleMode.kBrake)
-            .follow(NarwhalElevatorConstants.ELEVATOR_LEAD_MOTOR_CAN_ID)
-            .smartCurrentLimit(NarwhalElevatorConstants.ELEVATOR_FOLLOWER_MOTOR_CURRENT_LIMIT);
-
-        followerElevator = new SparkMax(NarwhalElevatorConstants.ELEVATOR_FOLLOWER_CAN_ID, MotorType.kBrushless);
-        followerElevator.configure(followerElevatorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
         currentState = NarwhalElevatorState.BOTTOM;
     }
 

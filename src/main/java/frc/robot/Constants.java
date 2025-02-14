@@ -188,15 +188,15 @@ public final class Constants {
                 public static final int ELEVATOR_FOLLOWER_MOTOR_CURRENT_LIMIT = ELEVATOR_LEAD_MOTOR_CURRENT_LIMIT;
                 
                 // Calculating the ratio of rotations to distance
-                private static final double RADIUS_OF_GEAR_METERS = 0.05; // measured to be 0.034925, but test hight value first for saftey
-                private static final double GEAR_REDUCTION = 9.0;
+                private static final double RADIUS_OF_GEAR_METERS = 0.065; // measured to be 0.034925, but test hight value first for saftey
+                private static final double GEAR_REDUCTION = 60.0;
                 private static final double OUTPUT_ROTATIONS_TO_METERS = RADIUS_OF_GEAR_METERS * 2 * Math.PI;
                 public static final double ROTATIONS_TO_METERS = OUTPUT_ROTATIONS_TO_METERS / GEAR_REDUCTION;
 
                 // pid AHHAHAHHAHA
-                public static final double ELEVATOR_HEIGHT_PID_P = 0.85;
+                public static final double ELEVATOR_HEIGHT_PID_P = 2.5;
                 public static final double ELEVATOR_HEIGHT_PID_I = 0;
-                public static final double ELEVATOR_HEIGHT_PID_D = 0.2;
+                public static final double ELEVATOR_HEIGHT_PID_D = 0.3;
 
                 // Height set positions. Based on how much to extend to
                 public static final double HEIGHT_OFF_THE_FLOOR_METERS = 1; // Distance from the zero position of the elevator and the floor
