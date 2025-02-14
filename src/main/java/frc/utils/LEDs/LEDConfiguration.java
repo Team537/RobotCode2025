@@ -11,9 +11,9 @@ public enum LEDConfiguration {
     PROGRAM_STOP (LEDPattern.solid(new Color(237, 28, 35))),
     MANUEL_VICTORY_DANCE(LEDPattern.rainbow(0, 255).blink(Seconds.of(0.45))),
     AUTO_CORAL_SCORE(LEDPattern.gradient(GradientType.kContinuous, new Color(255, 79, 120), new Color(51, 177, 255), new Color(255, 129, 51))), // #ff8133 #33b1ff #ff4f78
-    AUTO_ALGAE_REMOVAL(LEDPattern.gradient(GradientType.kDiscontinuous, new Color(181, 223, 166), new Color(71, 109, 59))),
-    AUTO_SCORING_FAIL(LEDPattern.solid(new Color(131, 8, 9)).blink(Seconds.of(0.5))),
-    AUTO_CORAL_GRAB(LEDPattern.solid(new Color(247, 183, 192)).breathe(Seconds.of(1)));
+    AUTO_ALGAE_REMOVAL(LEDPattern.gradient(GradientType.kDiscontinuous, new Color(181, 223, 166), new Color(71, 109, 59))), // #b5dfa6 #476d3b
+    AUTO_SCORING_FAIL(LEDPattern.solid(new Color(131, 8, 9)).blink(Seconds.of(0.5))), // #830809
+    AUTO_CORAL_GRAB(LEDPattern.solid(new Color(247, 183, 192)).breathe(Seconds.of(1))); // #f7b7c0
 
     private final LEDPattern LED_PATTERN;
 

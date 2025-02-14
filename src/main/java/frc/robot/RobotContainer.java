@@ -8,9 +8,13 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.XboxParkerManualDriveCommand;
+import frc.robot.commands.squid.ManualSquidClimberCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.narwhal.NarwhalElevator;
+import frc.robot.subsystems.squid.SquidClimber;
+import frc.robot.subsystems.squid.SquidManipulator;
 import frc.robot.subsystems.vision.PhotonVisionCamera;
 import frc.robot.subsystems.vision.VisionOdometry;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -26,12 +30,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
+ * Command-based is a "declarative" paradigm, very little robot logic should actually be handled 
+ * in the {@link Robot} periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
 
@@ -41,19 +42,13 @@ public class RobotContainer {
     // Subsystems
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
+    private SquidManipulator squidManipulator = new SquidManipulator();
+    private SquidClimber squidClimber = new SquidClimber();
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
     private NarwhalElevator narwhalElevator = new NarwhalElevator(); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
 
     // Commands
-    Command manualDriveCommand = new RunCommand(
-            () -> {
-                driveSubsystem.driveFromXBoxController(xBoxController);
-            },
-            driveSubsystem);
-
-    // Replace with CommandPS4Controller or CommandJoystick if needed
-    private final CommandXboxController driverController = new CommandXboxController(
-            OperatorConstants.DRIVER_CONTROLLER_PORT);
+    Command manualDriveCommand = new XboxParkerManualDriveCommand(driveSubsystem, xBoxController);
 
     // Smart Dashboard Inputs
     private final SendableChooser<AutonomousRoutine> autonomousSelector = new SendableChooser<>();
