@@ -219,13 +219,10 @@ public final class Constants {
             public static final int CLIMBER_CAN_ID = 19;
             
             public static final double GEAR_REDUCTION = 125;
-            public static final InvertedValue INVERTED = InvertedValue.CounterClockwise_Positive;
-
-            public static final double PID_FEEDFORWARD_S = 0;
-            public static final double PID_FEEDFORWARD_V = 0;
-            public static final double PID_FEEDFORWARD_P = 0;
-            public static final double PID_FEEDFORWARD_I = 0;
-            public static final double PID_FEEDFORWARD_D = 0;
+            
+            public static final double PID_P = 0;
+            public static final double PID_I = 0;
+            public static final double PID_D = 0;
 
             public static final Rotation2d DEPLOYED_ANGLE = Rotation2d.fromDegrees(90);
             public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(60);

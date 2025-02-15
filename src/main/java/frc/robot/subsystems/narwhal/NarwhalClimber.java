@@ -8,6 +8,12 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,28 +31,31 @@ import frc.robot.Constants.NarwhalConstants.NarwhalClimberConstants;
 public class NarwhalClimber extends SubsystemBase {
     public NarwhalClimberState currentState;
     
-    private final TalonFX climber;
-    private final PositionVoltage climberRequest;
+    private final SparkMax climber;
+    private final SparkMaxConfig climberConfig;
+    private final SparkClosedLoopController climberPID;
     
     public NarwhalClimber() {
         // a whole lotta stuff for the spark max config
-        climber = new TalonFX(NarwhalClimberConstants.CLIMBER_CAN_ID, "rio");
-
         // Motor configs
-        TalonFXConfiguration climberConfig = new TalonFXConfiguration();
+        climberConfig = new SparkMaxConfig();
         // General Configs
-        climberConfig.Feedback.SensorToMechanismRatio = NarwhalClimberConstants.GEAR_REDUCTION;
-        climberConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        climberConfig.MotorOutput.Inverted = NarwhalClimberConstants.INVERTED;
-        // PID Configs
-        climberConfig.Slot0.kS = NarwhalClimberConstants.PID_FEEDFORWARD_S;
-        climberConfig.Slot0.kV = NarwhalClimberConstants.PID_FEEDFORWARD_V;
-        climberConfig.Slot0.kP = NarwhalClimberConstants.PID_FEEDFORWARD_P;
-        climberConfig.Slot0.kI = NarwhalClimberConstants.PID_FEEDFORWARD_I;
-        climberConfig.Slot0.kD = NarwhalClimberConstants.PID_FEEDFORWARD_D;
-        climber.getConfigurator().apply(climberConfig);
+        climberConfig
+            .smartCurrentLimit(40)
+            .idleMode(IdleMode.kBrake)
+            .inverted(false);
+        climberConfig.encoder
+            .positionConversionFactor(NarwhalClimberConstants.GEAR_REDUCTION);
+        climberConfig.closedLoop
+            .outputRange(-0.5, 0.5)
+            .pid(
+                NarwhalClimberConstants.PID_P,
+                NarwhalClimberConstants.PID_I,
+                NarwhalClimberConstants.PID_D);
         
-        climberRequest = new PositionVoltage(0).withSlot(0);
+        climber = new SparkMax(NarwhalClimberConstants.CLIMBER_CAN_ID, MotorType.kBrushless);
+
+        climberPID = climber.getClosedLoopController();
         currentState = NarwhalClimberState.STARTING;
     }
 
@@ -56,8 +65,7 @@ public class NarwhalClimber extends SubsystemBase {
      */
     public void setCurrentMotorAngle(Rotation2d targetAngle){
         double targetAngleRotations = targetAngle.getRotations();
-        climberRequest.Position = targetAngleRotations / NarwhalClimberConstants.GEAR_REDUCTION;
-        climber.setControl(climberRequest);
+        climberPID.setReference(targetAngleRotations / NarwhalClimberConstants.GEAR_REDUCTION, ControlType.kPosition);
         currentState = NarwhalClimberState.CUSTOM;
     }
 
