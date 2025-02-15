@@ -15,6 +15,7 @@ public class    NarwhalUpperAssembly implements UpperAssembly {
     NarwhalWrist narwhalWrist = new NarwhalWrist();
     NarwhalIntakeOuttake narwhalIntakeOuttake = new NarwhalIntakeOuttake();
     NarwhalElevator narwhalElevator = new NarwhalElevator();
+    NarwhalClimber narwhalClimber = new NarwhalClimber();
     
     public Command getCoralIntakeCommand(Supplier<Pose2d> robotPoseSupplier) {
         return new RunCommand(
@@ -60,6 +61,11 @@ public class    NarwhalUpperAssembly implements UpperAssembly {
                     narwhalElevator.runXBoxController(controller);
                 },
                 narwhalElevator
+            ),
+            new RunCommand(() -> {
+                    narwhalClimber.runXBoxController(controller);
+                },
+                narwhalClimber
             )
         );
         manualCommand.addRequirements(this);

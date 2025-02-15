@@ -11,5 +11,6 @@ public enum NarwhalClimberState {
     STARTING,
     DEPLOYING,
     CLIMBING,
-    CUSTOM, // power is set to zero
+    CUSTOM, 
+    HOLDING, // power is set to zero
 }

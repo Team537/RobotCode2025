@@ -97,6 +97,26 @@ public class NarwhalWrist extends SubsystemBase {
         currentState = NarwhalWristState.OUTTAKING; // must be after the set function because the set function will default to CUSTOM state
     }
     
+    public void L1(){
+        setCurrentMotorAngle(Constants.NarwhalConstants.NarwhalWristConstants.L1_OUTTAKE_ANGLE);
+        currentState = NarwhalWristState.L1; // must be after the set function because the set function will default to CUSTOM state
+    }
+    
+    public void L2(){
+        setCurrentMotorAngle(Constants.NarwhalConstants.NarwhalWristConstants.L2_OUTTAKE_ANGLE);
+        currentState = NarwhalWristState.L2; // must be after the set function because the set function will default to CUSTOM state
+    }
+
+    public void L3(){
+        setCurrentMotorAngle(Constants.NarwhalConstants.NarwhalWristConstants.L3_OUTTAKE_ANGLE);
+        currentState = NarwhalWristState.L3; // must be after the set function because the set function will default to CUSTOM state
+    }
+
+    public void L4(){
+        setCurrentMotorAngle(Constants.NarwhalConstants.NarwhalWristConstants.L4_OUTTAKE_ANGLE);
+        currentState = NarwhalWristState.L4; // must be after the set function because the set function will default to CUSTOM state
+    }
+
     /**
      * Set the wrist motor to the algae descore angle (defined in constants) & update status.
      */

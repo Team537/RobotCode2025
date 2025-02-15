@@ -122,7 +122,7 @@ public final class Constants {
         public static final double ROTATIONAL_KD = 0.2;
         
         // Default motor values
-        public static final DrivingMotor DEFAULT_DRIVING_MOTOR = DrivingMotor.KRAKEN_X60;
+        public static final DrivingMotor DEFAULT_DRIVING_MOTOR = DrivingMotor.NEO;
         public static final TurningMotor DEFAULT_TURNING_MOTOR = TurningMotor.NEO_550;
     
         /** ---------------------------------- DRIVING CONSTANTS ---------------------------------- */
@@ -229,18 +229,14 @@ public final class Constants {
             public static final int INTAKE_OUTTAKE_MOTOR_CAN_ID = 12; // TODO: Replace this placeholder with the actual
                                                                       // id
             public static final int INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT = 20;
-            public static final double INTAKE_MOTOR_RPM = 300; // between -1.0 and 1.0
-            public static final double OUTTAKE_MOTOR_RPM = -300; // between -1.0 and 1.0
-            public static final double PID_MAX_OUTPUT = 0.6;
-            public static final double PID_MIN_OUTPUT = -0.6;
+            public static final double INTAKE_MOTOR_PERCENT = 0.3; // between -1.0 and 1.0
+            public static final double OUTTAKE_MOTOR_PERCENT = -0.9; // how many rotations the outtake motor needs to make to outtake
+            public static final double PID_MAX_OUTPUT = 0.7;
+            public static final double PID_MIN_OUTPUT = -0.7;
 
-            public static final double POSITION_PID_P = 0.7;
+            public static final double POSITION_PID_P = 0.9;
             public static final double POSITION_PID_I = 0;
-            public static final double POSITION_PID_D = 0.4;
-
-            public static final double VELOCITY_PID_P = 0.3;
-            public static final double VELOCITY_PID_I = 0;
-            public static final double VELOCITY_PID_D = 0.1;
+            public static final double POSITION_PID_D = 0.3;
         }
         
         public static class NarwhalWristConstants {
@@ -259,7 +255,11 @@ public final class Constants {
           public static final double PID_OUTPUT_RANGE_MIN = -0.3; // TODO: UPDATE THESE OUTPUT RANGE VALUES
 
           public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4); // -pi/4 TODO: update these placeholder values
-          public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(5 * Math.PI/4); // 2pi/3 TODO: update these placeholder values
+          public static final Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.2 * Math.PI);
+          public static final Rotation2d L2_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
+          public static final Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
+          public static final Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.0 * Math.PI);
+          public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI); // 2pi/3 TODO: update these placeholder values
           public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(3 * Math.PI / 2); // pi/2 TODO: update these placeholder values
         }
         
@@ -287,24 +287,27 @@ public final class Constants {
             public static final double HEIGHT_OFF_THE_FLOOR_METERS = 1; // Distance from the zero position of the elevator and the floor
             public static final double MIN_HEIGHT_METERS = 0.0; // probably should leave at 0.0.
             public static final double MAX_HEIGHT_METERS = 2.1336;
-            public static final double L1_METERS = 0.2;
-            public static final double L2_METERS = 0.4;
-            public static final double L3_METERS = 0.8;
-            public static final double L4_METERS = 1.2;
+            public static final double L1_METERS = 0.05;
+            public static final double L2_METERS = 0.15;
+            public static final double L3_METERS = 0.6;
+            public static final double L4_METERS = 1.7;
             public static final double INTAKE_HEIGHT_METERS = 0.05;
         }
 
         public static class NarwhalClimberConstants {
-            public static final int CLIMBER_CAN_ID = 19;
+            public static final int CLIMBER_CAN_ID = 15;
             
-            public static final double GEAR_REDUCTION = 125;
+            public static final double GEAR_REDUCTION = 125.0;
+            public static final double PULLY_REDUCTION = 10.0;
+            public static final double CLIMBER_ANGLE_TO_MOTOR_ANGLE = GEAR_REDUCTION * PULLY_REDUCTION;
             
-            public static final double PID_P = 0;
+            public static final double PID_P = 5;
             public static final double PID_I = 0;
-            public static final double PID_D = 0;
+            public static final double PID_D = 0.1;
+            public static final double PID_F = 1.9;
 
-            public static final Rotation2d DEPLOYED_ANGLE = Rotation2d.fromDegrees(90);
-            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(60);
+            public static final Rotation2d DEPLOYED_ANGLE = Rotation2d.fromDegrees(30);
+            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(0);
         }
     }
 
