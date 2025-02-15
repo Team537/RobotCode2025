@@ -15,7 +15,7 @@ package frc.utils.Autonomous;
  * @since v1.0.0
  * @see {@link frc.robot.RobotContainer}
  */
-public enum AutonomousRoutine {
+public enum  {
     LEFT_HIGH_SCORE,
     RIGHT_HIGH_SCORE,
     CENTER_HIGH_SCORE;
