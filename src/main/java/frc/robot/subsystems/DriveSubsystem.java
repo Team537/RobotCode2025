@@ -6,10 +6,12 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
@@ -20,6 +22,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -126,6 +129,8 @@ public class DriveSubsystem extends SubsystemBase {
     private SwerveSetpoint setpoint = new SwerveSetpoint(commandedVelocities, getSwerveModuleStates(), null);
     private DeltaTime setpointDeltaTime = new DeltaTime();
 
+    private DeltaTime testTime = new DeltaTime();
+
     //////////////////////////////////////////////////////////////////////////////
     // Motor and Assembly Configuration
     //////////////////////////////////////////////////////////////////////////////
@@ -160,6 +165,10 @@ public class DriveSubsystem extends SubsystemBase {
 
         // Update all configuration settings (motor types, module configurations, etc.).
         setConfigs();
+
+        Pathfinding.ensureInitialized();
+        PathfindingCommand.warmupCommand();
+
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -311,7 +320,7 @@ public class DriveSubsystem extends SubsystemBase {
      */
     private void setModules(ChassisSpeeds targetVelocities) {
         // Generate a new setpoint from the previous one.
-        setpoint = setpointGenerator.generateSetpoint(setpoint, targetVelocities, setpointDeltaTime.getDeltaTime());
+        setpoint = setpointGenerator.generateSetpoint(setpoint, ChassisSpeeds.fromFieldRelativeSpeeds(targetVelocities, getRobotPose().getRotation()), setpointDeltaTime.getDeltaTime());
 
         // Update the record of commanded velocities.
         commandedVelocities = ChassisSpeeds.fromRobotRelativeSpeeds(
@@ -611,5 +620,11 @@ public class DriveSubsystem extends SubsystemBase {
         pathfindingObstaclesSuppliers.forEach(supplier -> pathfindingObstacles.addAll(supplier.get()));
         translatedPathfindingObstacles = translatePathfindingObstacles(pathfindingObstacles);
         Pathfinding.setDynamicObstacles(translatedPathfindingObstacles, getRobotPose().getTranslation());
+    }
+
+    public void simulationPeriodic() {
+        double time = testTime.getDeltaTime();
+        System.out.println(commandedVelocities.vxMetersPerSecond);
+        poseEstimator.resetPose(getRobotPose().plus(new Transform2d(commandedVelocities.vxMetersPerSecond * time, commandedVelocities.vyMetersPerSecond * time, new Rotation2d(commandedVelocities.omegaRadiansPerSecond * time))));
     }
 }

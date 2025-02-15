@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autos;
@@ -13,7 +14,14 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.vision.PhotonVisionCamera;
 import frc.robot.subsystems.vision.VisionOdometry;
+import frc.robot.util.Obstacle;
+
+import java.util.List;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.utils.Autonomous.Alliance;
 import frc.utils.Autonomous.AutonomousRoutine;
@@ -135,7 +143,13 @@ public class RobotContainer {
     public void scheduleTeleOp() {
 
         // The Drive Command
-        driveSubsystem.setDefaultCommand(manualDriveCommand);
+        driveSubsystem.setRobotPose(new Pose2d(1.0,4.000,new Rotation2d(0.0)));
+        Obstacle testObstacle = new Obstacle(new Translation2d(5.000,1.000),2.0);
+        Obstacle testObstacle2 = new Obstacle(new Translation2d(5.000,7.000),2.0);
+        driveSubsystem.addPathfindingObstaclesSupplier(() -> {
+            return List.of(testObstacle);
+        });
+        driveSubsystem.setDefaultCommand(driveSubsystem.getPathfindingCommand(new Pose2d(10.000,4.000,new Rotation2d(2.0))));
         
     }
 }
