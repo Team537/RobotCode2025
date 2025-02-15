@@ -12,8 +12,6 @@ import frc.robot.commands.XboxParkerManualDriveCommand;
 import frc.robot.commands.squid.ManualSquidClimberCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
-import frc.utils.Alliance;
-import frc.utils.AutonomousRoutine;
 import frc.utils.UpperSubstructure;
 import frc.utils.DrivingMotor;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
