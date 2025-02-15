@@ -12,6 +12,7 @@ import frc.robot.commands.XboxParkerManualDriveCommand;
 import frc.robot.commands.squid.ManualSquidClimberCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.narwhal.NarwhalElevator;
 import frc.robot.subsystems.UpperAssembly;
 import frc.robot.subsystems.squid.SquidClimber;
 import frc.robot.subsystems.squid.SquidManipulator;
@@ -48,6 +49,7 @@ public class RobotContainer {
     private SquidManipulator squidManipulator = new SquidManipulator();
     private SquidClimber squidClimber = new SquidClimber();
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
+    private NarwhalElevator narwhalElevator = new NarwhalElevator(); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
 
     // Commands
     Command manualDriveCommand = new XboxParkerManualDriveCommand(driveSubsystem, xBoxController);
@@ -151,6 +153,5 @@ public class RobotContainer {
         // The Drive Command
         driveSubsystem.setDefaultCommand(manualDriveCommand);
         upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
-        
     }
 }
