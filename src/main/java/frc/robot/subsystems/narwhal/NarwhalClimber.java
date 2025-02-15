@@ -74,9 +74,6 @@ public class NarwhalClimber extends SubsystemBase {
         double targetAngleRotations = targetAngle.getRotations();
         climberPID.setReference(targetAngleRotations, ControlType.kPosition);
         currentState = NarwhalClimberState.CUSTOM;
-        System.out.print("SETTING ANGLE TO: ");
-        System.out.print(climber.getEncoder().getPosition());
-        System.out.println(targetAngleRotations);
     }
 
     /**
@@ -115,8 +112,7 @@ public class NarwhalClimber extends SubsystemBase {
     
     @Override
     public void periodic() {
-        System.out.print("CURRENT CLIMBING STATE: ");
-        System.out.println(currentState);
+
     }
 
     @Override

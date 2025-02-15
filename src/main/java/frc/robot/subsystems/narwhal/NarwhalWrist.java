@@ -153,8 +153,14 @@ public class NarwhalWrist extends SubsystemBase {
         else if(xBoxController.getLeftBumperButtonPressed()){
             goToAlgaeAngle();
         }
-        else if(xBoxController.getBackButton() || xBoxController.getAButton() || xBoxController.getBButton() || xBoxController.getYButton()){
-            goToOuttakeAngle();
+        else if(xBoxController.getBackButton()){
+            L1();
+        } else if(xBoxController.getAButton()){
+            L2();
+        } else if(xBoxController.getBButton()){
+            L3();
+        } else if(xBoxController.getYButton()){
+            L4();
         }
     }
     

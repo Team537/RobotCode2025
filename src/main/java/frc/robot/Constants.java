@@ -230,7 +230,7 @@ public final class Constants {
                                                                       // id
             public static final int INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT = 20;
             public static final double INTAKE_MOTOR_PERCENT = 0.3; // between -1.0 and 1.0
-            public static final double OUTTAKE_MOTOR_PERCENT = -0.9; // how many rotations the outtake motor needs to make to outtake
+            public static final double OUTTAKE_MOTOR_PERCENT = -0.9; // between -1.0 and 1.0
             public static final double PID_MAX_OUTPUT = 0.7;
             public static final double PID_MIN_OUTPUT = -0.7;
 
@@ -254,11 +254,11 @@ public final class Constants {
           public static final double PID_OUTPUT_RANGE_MAX = 0.3; // TODO: UPDATE THESE OUTPUT RANGE VALUES
           public static final double PID_OUTPUT_RANGE_MIN = -0.3; // TODO: UPDATE THESE OUTPUT RANGE VALUES
 
-          public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4); // -pi/4 TODO: update these placeholder values
+          public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4.3); // -pi/4 TODO: update these placeholder values
           public static final Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.2 * Math.PI);
           public static final Rotation2d L2_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
           public static final Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
-          public static final Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.0 * Math.PI);
+          public static final Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
           public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI); // 2pi/3 TODO: update these placeholder values
           public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(3 * Math.PI / 2); // pi/2 TODO: update these placeholder values
         }
@@ -288,8 +288,8 @@ public final class Constants {
             public static final double MIN_HEIGHT_METERS = 0.0; // probably should leave at 0.0.
             public static final double MAX_HEIGHT_METERS = 2.1336;
             public static final double L1_METERS = 0.05;
-            public static final double L2_METERS = 0.15;
-            public static final double L3_METERS = 0.6;
+            public static final double L2_METERS = 0.07;
+            public static final double L3_METERS = 0.67;
             public static final double L4_METERS = 1.7;
             public static final double INTAKE_HEIGHT_METERS = 0.05;
         }
@@ -307,7 +307,7 @@ public final class Constants {
             public static final double PID_F = 1.9;
 
             public static final Rotation2d DEPLOYED_ANGLE = Rotation2d.fromDegrees(30);
-            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(0);
+            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(-10);
         }
     }
 
