@@ -265,9 +265,9 @@ public final class Constants {
 
             public static final int CORAL_SENSOR_ID = 0;
 
-            public static final int KP = 1;
-            public static final int KI = 0;
-            public static final int KD = 0;
+            public static final double KP = 0.01;
+            public static final double KI = 0;
+            public static final double KD = 0;
 
             public static final double PID_MIN_OUTPUT = -1.0;
             public static final double PID_MAX_OUTPUT = 1.0;
@@ -281,7 +281,7 @@ public final class Constants {
             public static final double MANIPULATOR_MAX_SPEED = (MANIPULATOR_MOTOR_FREE_SPEED * WHEEL_RADIUS) / MOTOR_REDUCTION;
 
             public static final boolean TOP_MOTOR_INVERTED = true;
-            public static final boolean BOTTOM_MOTOR_INVERTED = false;
+            public static final boolean BOTTOM_MOTOR_INVERTED = true;
 
             public static final int MOTOR_CURRENT_LIMIT = 20; // Amps
             public static final IdleMode IDLE_MODE = IdleMode.kBrake;

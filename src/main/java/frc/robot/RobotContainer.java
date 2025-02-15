@@ -45,8 +45,6 @@ public class RobotContainer {
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
     private UpperAssembly upperAssembly = UpperAssemblyFactory.createUpperAssembly(Constants.UpperAssemblyConstants.DEFAULT_UPPER_ASSEMBLY);
-    private SquidManipulator squidManipulator = new SquidManipulator();
-    private SquidClimber squidClimber = new SquidClimber();
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
 
     // Commands
