@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.UpperAssembly;
 import frc.robot.util.ScoringHeight;
 
-public class NarwhalUpperAssembly implements UpperAssembly {
+public class    NarwhalUpperAssembly implements UpperAssembly {
     NarwhalWrist narwhalWrist = new NarwhalWrist();
     NarwhalIntakeOuttake narwhalIntakeOuttake = new NarwhalIntakeOuttake();
     NarwhalElevator narwhalElevator = new NarwhalElevator();

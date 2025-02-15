@@ -46,7 +46,7 @@ public class NarwhalElevator extends SubsystemBase {
             .positionConversionFactor(NarwhalElevatorConstants.ROTATIONS_TO_METERS)
             .velocityConversionFactor(NarwhalElevatorConstants.ROTATIONS_TO_METERS/60.0); // dividing by 60 accounts for RPM to Radians/Sec
         leadElevatorConfig.closedLoop // pid 
-            .outputRange(-0.5, 0.5)
+            .outputRange(NarwhalElevatorConstants.ELEVATOR_MIN_OUTPUT, NarwhalElevatorConstants.ELEVATOR_MAX_OUTPUT)
             .pid(
                 NarwhalElevatorConstants.ELEVATOR_HEIGHT_PID_P,
                 NarwhalElevatorConstants.ELEVATOR_HEIGHT_PID_I,

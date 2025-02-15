@@ -227,31 +227,38 @@ public final class Constants {
             public static final int INTAKE_OUTTAKE_MOTOR_CAN_ID = 12; // TODO: Replace this placeholder with the actual
                                                                       // id
             public static final int INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT = 20;
-            public static final double INTAKE_MOTOR_PERCENTAGE = 0.35; // between -1.0 and 1.0
-            public static final double OUTTAKE_MOTOR_PERCENTAGE = -0.35; // between -1.0 and 1.0
+            public static final double INTAKE_MOTOR_RPM = 300; // between -1.0 and 1.0
+            public static final double OUTTAKE_MOTOR_RPM = -300; // between -1.0 and 1.0
+            public static final double PID_MAX_OUTPUT = 0.6;
+            public static final double PID_MIN_OUTPUT = -0.6;
 
             public static final double POSITION_PID_P = 0.7;
             public static final double POSITION_PID_I = 0;
-            public static final double POSITION_PID_D = 0.2;
+            public static final double POSITION_PID_D = 0.4;
+
+            public static final double VELOCITY_PID_P = 0.3;
+            public static final double VELOCITY_PID_I = 0;
+            public static final double VELOCITY_PID_D = 0.1;
         }
         
         public static class NarwhalWristConstants {
           public static final int WRIST_MOTOR_CAN_ID = 14;
-          public static final int WRIST_MOTOR_CURRENT_LIMIT = 20;
+          public static final int WRIST_MOTOR_CURRENT_LIMIT = 40;
           public static final double WRIST_OFFSET = 0.0; // offset will be calculated as if unflipped, and no conversion factor.
+            
+          public static final double GEAR_REDUCTION = 60;
+          public static final double ROTATIONS_TO_RADIANS = Math.PI * 2 / GEAR_REDUCTION; // Wrist target angles (radians) are multiplied by this to get the motor target position
 
-          public static final double ROTATIONS_TO_RADIANS = Math.PI * 2; // Wrist target angles (radians) are multiplied by this to get the motor target position
-
-          public static final double POSITION_PID_P = 0.5; // TODO: UPDATE THESE PID VALUES
+          public static final double POSITION_PID_P = 0.2; // TODO: UPDATE THESE PID VALUES
           public static final double POSITION_PID_I = 0; // TODO: UPDATE THESE PID VALUES
           public static final double POSITION_PID_D = 0.2; // TODO: UPDATE THESE PID VALUES
 
-          public static final double PID_OUTPUT_RANGE_MAX = 0.5; // TODO: UPDATE THESE OUTPUT RANGE VALUES
-          public static final double PID_OUTPUT_RANGE_MIN = 0.5; // TODO: UPDATE THESE OUTPUT RANGE VALUES
+          public static final double PID_OUTPUT_RANGE_MAX = 0.3; // TODO: UPDATE THESE OUTPUT RANGE VALUES
+          public static final double PID_OUTPUT_RANGE_MIN = -0.3; // TODO: UPDATE THESE OUTPUT RANGE VALUES
 
-          public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(-Math.PI / 4); // -pi/4 TODO: update these placeholder values
-          public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(2 * Math.PI / 3); // 2pi/3 TODO: update these placeholder values
-          public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(Math.PI / 2); // pi/2 TODO: update these placeholder values
+          public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4); // -pi/4 TODO: update these placeholder values
+          public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(5 * Math.PI/4); // 2pi/3 TODO: update these placeholder values
+          public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(3 * Math.PI / 2); // pi/2 TODO: update these placeholder values
         }
         
         public static class NarwhalElevatorConstants {
@@ -270,7 +277,9 @@ public final class Constants {
             // pid AHHAHAHHAHA
             public static final double ELEVATOR_HEIGHT_PID_P = 2.5;
             public static final double ELEVATOR_HEIGHT_PID_I = 0;
-            public static final double ELEVATOR_HEIGHT_PID_D = 0.3;
+            public static final double ELEVATOR_HEIGHT_PID_D = 0.2;
+            public static final double ELEVATOR_MIN_OUTPUT = -0.6;
+            public static final double ELEVATOR_MAX_OUTPUT = 0.6;
 
             // Height set positions. Based on how much to extend to
             public static final double HEIGHT_OFF_THE_FLOOR_METERS = 1; // Distance from the zero position of the elevator and the floor
@@ -280,7 +289,7 @@ public final class Constants {
             public static final double L2_METERS = 0.4;
             public static final double L3_METERS = 0.8;
             public static final double L4_METERS = 1.2;
-            public static final double INTAKE_HEIGHT_METERS = 0.55;
+            public static final double INTAKE_HEIGHT_METERS = 0.05;
         }
     }
 

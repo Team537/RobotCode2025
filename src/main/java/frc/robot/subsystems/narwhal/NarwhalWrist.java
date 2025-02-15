@@ -52,18 +52,14 @@ public class NarwhalWrist extends SubsystemBase {
                 Constants.NarwhalConstants.NarwhalWristConstants.POSITION_PID_I, 
                 Constants.NarwhalConstants.NarwhalWristConstants.POSITION_PID_D
             )
-            .outputRange(-1, 1)
-            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder); // uses external encoder
+            .outputRange(Constants.NarwhalConstants.NarwhalWristConstants.PID_OUTPUT_RANGE_MIN, Constants.NarwhalConstants.NarwhalWristConstants.PID_OUTPUT_RANGE_MAX); // uses external encoder
         // configs for the encoder
         // NOTE FOR THE ENCODER: WHEN VIEWED FROM THE RIGHT, THE ANGLE OF THE WRIST IS BASED ON A UNIT CIRCLE WITH 0 DEGREES POINTING STRAIGHT UP
-        wristConfig.absoluteEncoder
-            .inverted(false)
+        wristConfig.encoder
             .positionConversionFactor(Constants.NarwhalConstants.NarwhalWristConstants.ROTATIONS_TO_RADIANS)
-            .velocityConversionFactor(Constants.NarwhalConstants.NarwhalWristConstants.ROTATIONS_TO_RADIANS/60.0) // dividing by 60 accounts for RPM to Radians/Sec
-            .zeroOffset(Constants.NarwhalConstants.NarwhalWristConstants.WRIST_OFFSET) // Down position should be "0" here, and -PI rads for zero centered
-            .zeroCentered(true);
-
-        // creating the spark max controller
+            .velocityConversionFactor(Constants.NarwhalConstants.NarwhalWristConstants.ROTATIONS_TO_RADIANS/60.0); // dividing by 60 accounts for RPM to Radians/Sec
+        
+            // creating the spark max controller
         wrist = new SparkMax(Constants.NarwhalConstants.NarwhalWristConstants.WRIST_MOTOR_CAN_ID, MotorType.kBrushless);
         wrist.configure(wristConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -79,6 +75,8 @@ public class NarwhalWrist extends SubsystemBase {
         double targetAngleRadians = targetAngle.getRadians();
         wristMotorPIDController.setReference(targetAngleRadians, ControlType.kPosition);
         currentState = NarwhalWristState.CUSTOM;
+        System.out.print("Running Wrist to: ");
+        System.out.println(targetAngle);
     }
 
     /**
@@ -129,20 +127,14 @@ public class NarwhalWrist extends SubsystemBase {
     }
 
     public void runXBoxController(XboxController xBoxController){
-        if(xBoxController.getAButton()){
+        if(xBoxController.getRightBumperButton()){
             goToIntakeAngle();
         }
-        else if(xBoxController.getBButton()){
-            goToOuttakeAngle();
-        }
-        else if(xBoxController.getYButton()){
+        else if(xBoxController.getLeftBumperButtonPressed()){
             goToAlgaeAngle();
         }
-        else if(xBoxController.getXButton()){
-            stop();
-        }
-        else if(xBoxController.getLeftBumperButton()){
-            hold();
+        else if(xBoxController.getBackButton() || xBoxController.getAButton() || xBoxController.getBButton() || xBoxController.getYButton()){
+            goToOuttakeAngle();
         }
     }
     
