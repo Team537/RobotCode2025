@@ -13,6 +13,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -103,57 +104,25 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
         currentState = NarwhalIntakeOuttakeState.ACTIVE_HOLDING; // must be after the stop function because the set function will default to CUSTOM state
     }
     
+    public void runXBoxController(XboxController xboxController){
+        if(xboxController.getRightBumperButton()){
+            intake();
+        }
+        else if (xboxController.getXButton()){
+            outtake();
+        }
+        else if (xboxController.getBackButton() || xboxController.getYButton() || xboxController.getBButton() || xboxController.getAButton()){
+            hold();
+        }
+    }
+
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
     }
-    // // for simming
-    // double last_called = 0;
-    // int stage = 0;
-    // double init = -1.0;
 
     @Override
     public void simulationPeriodic() {
-        // // for simulation sorry the code is terrible
-        // if (init == -1.0) init = System.currentTimeMillis()/1000;
 
-        // if(System.currentTimeMillis()/1000 - last_called > 0.2){
-        //     last_called = System.currentTimeMillis()/1000;
-        // }
-        // else return;
-
-        // // This method will be called once per scheduler run during simulation
-        // System.out.println(CurrentState.toString());
-        
-        // if(System.currentTimeMillis()/1000 - init > 5.0 && stage == 0){
-        //     stage++;
-        //     intake();
-        //     init = System.currentTimeMillis()/1000;
-        // }
-        // if(System.currentTimeMillis()/1000 - init > 5.0 && stage == 1){
-        //     stage++;
-        //     stop();
-        //     init = System.currentTimeMillis()/1000;
-        // }
-        // if(System.currentTimeMillis()/1000 - init > 5.0 && stage == 2){
-        //     stage++;
-        //     outtake();
-        //     init = System.currentTimeMillis()/1000;
-        // }
-        // if(System.currentTimeMillis()/1000 - init > 5.0 && stage == 3){
-        //     stage++;
-        //     hold();
-        //     init = System.currentTimeMillis()/1000;
-        // }
-        // if(System.currentTimeMillis()/1000 - init > 5.0 && stage == 4){
-        //     stage++;
-        //     setIntakeOuttakeMotorPercent(1.2);
-        //     init = System.currentTimeMillis()/1000;
-        // }
-        // if(System.currentTimeMillis()/1000 - init > 5.0 && stage == 5){
-        //     stage++;
-        //     setIntakeOuttakeMotorPercent(-1.2);
-        //     init = System.currentTimeMillis()/1000;
-        // }
     }
 }

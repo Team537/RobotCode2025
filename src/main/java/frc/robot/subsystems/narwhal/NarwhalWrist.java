@@ -17,6 +17,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -125,6 +126,24 @@ public class NarwhalWrist extends SubsystemBase {
 
     public Rotation2d getCurrentAngle() {
         return Rotation2d.fromRadians(wrist.getAbsoluteEncoder().getPosition());
+    }
+
+    public void runXBoxController(XboxController xBoxController){
+        if(xBoxController.getAButton()){
+            goToIntakeAngle();
+        }
+        else if(xBoxController.getBButton()){
+            goToOuttakeAngle();
+        }
+        else if(xBoxController.getYButton()){
+            goToAlgaeAngle();
+        }
+        else if(xBoxController.getXButton()){
+            stop();
+        }
+        else if(xBoxController.getLeftBumperButton()){
+            hold();
+        }
     }
     
     @Override

@@ -212,7 +212,7 @@ public final class Constants {
     
     public static class UpperAssemblyConstants {
 
-        public static final UpperAssemblyType DEFAULT_UPPER_ASSEMBLY = UpperAssemblyType.SQUID;
+        public static final UpperAssemblyType DEFAULT_UPPER_ASSEMBLY = UpperAssemblyType.NARWHAL;
 
     }
 
@@ -236,7 +236,7 @@ public final class Constants {
         }
         
         public static class NarwhalWristConstants {
-          public static final int WRIST_MOTOR_CAN_ID = 8;
+          public static final int WRIST_MOTOR_CAN_ID = 14;
           public static final int WRIST_MOTOR_CURRENT_LIMIT = 20;
           public static final double WRIST_OFFSET = 0.0; // offset will be calculated as if unflipped, and no conversion factor.
 
@@ -252,6 +252,35 @@ public final class Constants {
           public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(-Math.PI / 4); // -pi/4 TODO: update these placeholder values
           public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(2 * Math.PI / 3); // 2pi/3 TODO: update these placeholder values
           public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(Math.PI / 2); // pi/2 TODO: update these placeholder values
+        }
+        
+        public static class NarwhalElevatorConstants {
+            public static final int ELEVATOR_LEAD_MOTOR_CAN_ID = 13; // TODO: Replace this placeholder with the actual id
+            public static final int ELEVATOR_LEAD_MOTOR_CURRENT_LIMIT = 40;
+
+            public static final int ELEVATOR_FOLLOWER_CAN_ID = 14;
+            public static final int ELEVATOR_FOLLOWER_MOTOR_CURRENT_LIMIT = ELEVATOR_LEAD_MOTOR_CURRENT_LIMIT;
+            
+            // Calculating the ratio of rotations to distance
+            private static final double RADIUS_OF_GEAR_METERS = 0.065; // measured to be 0.034925, but test hight value first for saftey
+            private static final double GEAR_REDUCTION = 60.0;
+            private static final double OUTPUT_ROTATIONS_TO_METERS = RADIUS_OF_GEAR_METERS * 2 * Math.PI;
+            public static final double ROTATIONS_TO_METERS = OUTPUT_ROTATIONS_TO_METERS / GEAR_REDUCTION;
+
+            // pid AHHAHAHHAHA
+            public static final double ELEVATOR_HEIGHT_PID_P = 2.5;
+            public static final double ELEVATOR_HEIGHT_PID_I = 0;
+            public static final double ELEVATOR_HEIGHT_PID_D = 0.3;
+
+            // Height set positions. Based on how much to extend to
+            public static final double HEIGHT_OFF_THE_FLOOR_METERS = 1; // Distance from the zero position of the elevator and the floor
+            public static final double MIN_HEIGHT_METERS = 0.0; // probably should leave at 0.0.
+            public static final double MAX_HEIGHT_METERS = 2.1336;
+            public static final double L1_METERS = 0.2;
+            public static final double L2_METERS = 0.4;
+            public static final double L3_METERS = 0.8;
+            public static final double L4_METERS = 1.2;
+            public static final double INTAKE_HEIGHT_METERS = 0.55;
         }
     }
 
@@ -328,54 +357,6 @@ public final class Constants {
              */
             public static final double CLIMBED_POSITION = 0.203; //Meters
 
-        }
-
-        public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
-                new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
-                new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
-                new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
-                new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
-      }
-  
-    public static class NarwhalConstants {
-        public static class NarwhalElevatorConstants {
-                public static final int ELEVATOR_LEAD_MOTOR_CAN_ID = 13; // TODO: Replace this placeholder with the actual id
-                public static final int ELEVATOR_LEAD_MOTOR_CURRENT_LIMIT = 40;
-
-                public static final int ELEVATOR_FOLLOWER_CAN_ID = 14;
-                public static final int ELEVATOR_FOLLOWER_MOTOR_CURRENT_LIMIT = ELEVATOR_LEAD_MOTOR_CURRENT_LIMIT;
-                
-                // Calculating the ratio of rotations to distance
-                private static final double RADIUS_OF_GEAR_METERS = 0.065; // measured to be 0.034925, but test hight value first for saftey
-                private static final double GEAR_REDUCTION = 60.0;
-                private static final double OUTPUT_ROTATIONS_TO_METERS = RADIUS_OF_GEAR_METERS * 2 * Math.PI;
-                public static final double ROTATIONS_TO_METERS = OUTPUT_ROTATIONS_TO_METERS / GEAR_REDUCTION;
-
-                // pid AHHAHAHHAHA
-                public static final double ELEVATOR_HEIGHT_PID_P = 2.5;
-                public static final double ELEVATOR_HEIGHT_PID_I = 0;
-                public static final double ELEVATOR_HEIGHT_PID_D = 0.3;
-
-                // Height set positions. Based on how much to extend to
-                public static final double HEIGHT_OFF_THE_FLOOR_METERS = 1; // Distance from the zero position of the elevator and the floor
-                public static final double MIN_HEIGHT_METERS = 0.0; // probably should leave at 0.0.
-                public static final double MAX_HEIGHT_METERS = 2.1336;
-                public static final double L1_METERS = 0.2;
-                public static final double L2_METERS = 0.4;
-                public static final double L3_METERS = 0.8;
-                public static final double L4_METERS = 1.2;
-                public static final double INTAKE_HEIGHT_METERS = 0.55;
-        }
-
-        public static class NarwhalIntakeOuttakeConstants {
-                public static final int INTAKE_OUTTAKE_MOTOR_CAN_ID = 12; // TODO: Replace this placeholder with the actual id
-                public static final int INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT = 20;
-                public static final double INTAKE_MOTOR_PERCENTAGE = 0.35; // between -1.0 and 1.0
-                public static final double OUTTAKE_MOTOR_PERCENTAGE = -0.35; // between -1.0 and 1.0
-
-                public static final double POSITION_PID_P = 0.7;
-                public static final double POSITION_PID_I = 0;
-                public static final double POSITION_PID_D = 0.2;
         }
     }
 
