@@ -4,5 +4,5 @@ package frc.utils;
 public enum AutonomousRoutine {
     LEFT_HIGH_SCORE,
     RIGHT_HIGH_SCORE,
-    CENTER_HIGH_SCORE;
+    CENTER_HIGH_SCORE,
 }

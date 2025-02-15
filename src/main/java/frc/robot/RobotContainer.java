@@ -10,6 +10,9 @@ import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.utils.Alliance;
 import frc.utils.AutonomousRoutine;
+import frc.utils.UpperSubstructure;
+import frc.utils.DrivingMotor;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,6 +39,9 @@ public class RobotContainer {
     // Smart Dashboard Inputs
     private final SendableChooser<AutonomousRoutine> autonomousSelector = new SendableChooser<>();
     private final SendableChooser<Alliance> allianceSelector = new SendableChooser<>();
+    private final SendableChooser<UpperSubstructure> upperSubstructureSelector = new SendableChooser<>();
+    private final SendableChooser<DrivingMotor> drivingMotorSelector = new SendableChooser<>();
+    private final Field2d m_field = new Field2d();
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -91,9 +97,28 @@ public class RobotContainer {
             allianceSelector.addOption(alliance.toString(), alliance);
         }
 
+        // Setup Upper Substructure Selection
+        upperSubstructureSelector.setDefaultOption("NARWAL", UpperSubstructure.NARWAL);
+        for (UpperSubstructure upperSubstructure : UpperSubstructure.values()) {
+            upperSubstructureSelector.addOption(upperSubstructure.toString(), upperSubstructure);
+        }
+
+        // Setup Driving Motor Selection
+        drivingMotorSelector.setDefaultOption("NEO", DrivingMotor.NEO);
+        for (DrivingMotor drivingMotor : DrivingMotor.values()) {
+            drivingMotorSelector.addOption(drivingMotor.toString(), drivingMotor);
+        }
+
         // Add the selectors to the dashboard.
         SmartDashboard.putData(autonomousSelector);
         SmartDashboard.putData(allianceSelector);
+        SmartDashboard.putData(upperSubstructureSelector);
+        SmartDashboard.putData(drivingMotorSelector);
+        
+        // Do this in either robot or subsystem init
+        SmartDashboard.putData("Field", m_field);
+        // Do this in either robot periodic or subsystem periodic
+        // m_field.setRobotPose(m_odometry.getPoseMeters());
     }
 
     /**
