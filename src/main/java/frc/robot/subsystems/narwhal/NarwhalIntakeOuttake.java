@@ -38,7 +38,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
         intakeOuttakeMotorSparkMaxConfig = new SparkMaxConfig();
         intakeOuttakeMotorSparkMaxConfig
             .inverted(true)
-            .idleMode(IdleMode.kBrake)
+            .idleMode(IdleMode.kCoast)
             .smartCurrentLimit(Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants.INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT);
         intakeOuttakeMotorSparkMaxConfig.closedLoop
                 .pid(
@@ -112,7 +112,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
     public void hold() {
         stop();
         double current_position = intakeOuttakeMotorSparkMax.getEncoder().getPosition();
-        intakeOuttakeMotorPIDController.setReference(current_position, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        intakeOuttakeMotorPIDController.setReference(current_position, ControlType.kPosition);
 
         currentState = NarwhalIntakeOuttakeState.ACTIVE_HOLDING; // must be after the stop function because the set function will default to CUSTOM state
     }
@@ -124,11 +124,8 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
         else if (xboxController.getXButton()){
             outtake();
         }
-        else if (xboxController.getBackButton() || xboxController.getYButton() || xboxController.getBButton() || xboxController.getAButton()){
-            stop();
-        }
-        else if (currentState != NarwhalIntakeOuttakeState.ACTIVE_HOLDING){
-            stop();
+        else { // if (currentState != NarhwalIntakeState.ACTIVE_HOLDING)
+            hold();
         }
     }
 
