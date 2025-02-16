@@ -256,7 +256,6 @@ public final class Constants {
     }
 
     public static class SquidConstants {
-        
         public static class SquidManipulatorConstants {
 
             //TODO: Put actual IDs in
