@@ -18,6 +18,10 @@ public class ExampleCommand extends Command {
    * @param subsystem The subsystem used by this command.
    */
   public ExampleCommand(ExampleSubsystem subsystem) {
+
+    // Set this commands subsystem.
+    this.subsystem = subsystem;
+    
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
   }
