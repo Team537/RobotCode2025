@@ -216,16 +216,19 @@ public final class Constants {
         }
 
         public static class NarwhalClimberConstants {
-            public static final int CLIMBER_CAN_ID = 19;
+            public static final int CLIMBER_CAN_ID = 15;
             
-            public static final double GEAR_REDUCTION = 125;
+            public static final double GEAR_REDUCTION = 125.0;
+            public static final double PULLY_REDUCTION = 10.0;
+            public static final double CLIMBER_ANGLE_TO_MOTOR_ANGLE = GEAR_REDUCTION * PULLY_REDUCTION;
             
-            public static final double PID_P = 0;
+            public static final double PID_P = 5;
             public static final double PID_I = 0;
-            public static final double PID_D = 0;
+            public static final double PID_D = 0.1;
+            public static final double PID_F = 1.9;
 
-            public static final Rotation2d DEPLOYED_ANGLE = Rotation2d.fromDegrees(90);
-            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(60);
+            public static final Rotation2d DEPLOYED_ANGLE = Rotation2d.fromDegrees(30);
+            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(-5);
         }
     }
 

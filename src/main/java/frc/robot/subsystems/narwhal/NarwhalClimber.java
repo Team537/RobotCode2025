@@ -11,6 +11,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -46,15 +48,18 @@ public class NarwhalClimber extends SubsystemBase {
             .idleMode(IdleMode.kBrake)
             .inverted(false);
         climberConfig.encoder
-            .positionConversionFactor(NarwhalClimberConstants.GEAR_REDUCTION);
+            .positionConversionFactor(1.0/NarwhalClimberConstants.CLIMBER_ANGLE_TO_MOTOR_ANGLE);
+        
         climberConfig.closedLoop
-            .outputRange(-0.5, 0.5)
-            .pid(
+            .pidf(
                 NarwhalClimberConstants.PID_P,
                 NarwhalClimberConstants.PID_I,
-                NarwhalClimberConstants.PID_D);
+                NarwhalClimberConstants.PID_D,
+                NarwhalClimberConstants.PID_F)
+            .outputRange(-0.3, 0.3);
         
         climber = new SparkMax(NarwhalClimberConstants.CLIMBER_CAN_ID, MotorType.kBrushless);
+        climber.configure(climberConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         climberPID = climber.getClosedLoopController();
         currentState = NarwhalClimberState.STARTING;
@@ -66,7 +71,7 @@ public class NarwhalClimber extends SubsystemBase {
      */
     public void setCurrentMotorAngle(Rotation2d targetAngle){
         double targetAngleRotations = targetAngle.getRotations();
-        climberPID.setReference(targetAngleRotations / NarwhalClimberConstants.GEAR_REDUCTION, ControlType.kPosition);
+        climberPID.setReference(targetAngleRotations, ControlType.kPosition);
         currentState = NarwhalClimberState.CUSTOM;
     }
 
