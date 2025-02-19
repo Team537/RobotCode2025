@@ -226,11 +226,10 @@ public final class Constants {
      */
     public static class NarwhalConstants {
         public static class NarwhalIntakeOuttakeConstants {
-            public static final int INTAKE_OUTTAKE_MOTOR_CAN_ID = 12; // TODO: Replace this placeholder with the actual
-                                                                      // id
-            public static final int INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT = 20;
+            public static final int INTAKE_OUTTAKE_MOTOR_CAN_ID = 12;
+            public static final int INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT = 40;
             public static final double INTAKE_MOTOR_PERCENT = 0.3; // between -1.0 and 1.0
-            public static final double OUTTAKE_MOTOR_PERCENT = -0.9; // between -1.0 and 1.0
+            public static final double OUTTAKE_MOTOR_PERCENT = -0.5; // between -1.0 and 1.0
             public static final double PID_MAX_OUTPUT = 0.5;
             public static final double PID_MIN_OUTPUT = -0.5;
 
@@ -254,7 +253,7 @@ public final class Constants {
           public static final double PID_OUTPUT_RANGE_MAX = 0.3; // TODO: UPDATE THESE OUTPUT RANGE VALUES
           public static final double PID_OUTPUT_RANGE_MIN = -0.3; // TODO: UPDATE THESE OUTPUT RANGE VALUES
 
-          public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4.3); // -pi/4 TODO: update these placeholder values
+          public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4.5); // -pi/4 TODO: update these placeholder values
           public static final Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.2 * Math.PI);
           public static final Rotation2d L2_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
           public static final Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
@@ -267,12 +266,12 @@ public final class Constants {
             public static final int ELEVATOR_LEAD_MOTOR_CAN_ID = 13; // TODO: Replace this placeholder with the actual id
             public static final int ELEVATOR_LEAD_MOTOR_CURRENT_LIMIT = 40;
 
-            public static final int ELEVATOR_FOLLOWER_CAN_ID = 14;
+            public static final int ELEVATOR_FOLLOWER_CAN_ID = 16;
             public static final int ELEVATOR_FOLLOWER_MOTOR_CURRENT_LIMIT = ELEVATOR_LEAD_MOTOR_CURRENT_LIMIT;
             
             // Calculating the ratio of rotations to distance
             private static final double RADIUS_OF_GEAR_METERS = 0.065; // measured to be 0.034925, but test hight value first for saftey
-            private static final double GEAR_REDUCTION = 60.0;
+            private static final double GEAR_REDUCTION = 20.0;
             private static final double OUTPUT_ROTATIONS_TO_METERS = RADIUS_OF_GEAR_METERS * 2 * Math.PI;
             public static final double ROTATIONS_TO_METERS = OUTPUT_ROTATIONS_TO_METERS / GEAR_REDUCTION;
 
@@ -292,6 +291,7 @@ public final class Constants {
             public static final double L3_METERS = 0.67;
             public static final double L4_METERS = 1.7;
             public static final double INTAKE_HEIGHT_METERS = 0.05;
+            public static final boolean IS_INVERTED = true;
         }
 
         public static class NarwhalClimberConstants {

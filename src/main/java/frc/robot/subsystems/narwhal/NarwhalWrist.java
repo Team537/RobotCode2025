@@ -75,8 +75,6 @@ public class NarwhalWrist extends SubsystemBase {
         double targetAngleRadians = targetAngle.getRadians();
         wristMotorPIDController.setReference(targetAngleRadians, ControlType.kPosition);
         currentState = NarwhalWristState.CUSTOM;
-        System.out.print("Running Wrist to: ");
-        System.out.println(targetAngle);
     }
 
     /**

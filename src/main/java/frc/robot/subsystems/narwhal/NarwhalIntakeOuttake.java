@@ -14,6 +14,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -33,12 +34,14 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
     private final SparkMax intakeOuttakeMotorSparkMax;
     private final SparkMaxConfig intakeOuttakeMotorSparkMaxConfig;
     private final SparkClosedLoopController intakeOuttakeMotorPIDController;
-    
+
+    private final DigitalInput limitSwitch;
+
     public NarwhalIntakeOuttake() {
         intakeOuttakeMotorSparkMaxConfig = new SparkMaxConfig();
         intakeOuttakeMotorSparkMaxConfig
             .inverted(true)
-            .idleMode(IdleMode.kCoast)
+            .idleMode(IdleMode.kBrake)
             .smartCurrentLimit(Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants.INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT);
         intakeOuttakeMotorSparkMaxConfig.closedLoop
                 .pid(
@@ -55,6 +58,8 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
 
         intakeOuttakeMotorPIDController = intakeOuttakeMotorSparkMax.getClosedLoopController();
         currentState = NarwhalIntakeOuttakeState.STOPPED;
+
+        limitSwitch = new DigitalInput(0);
     }
 
     /**
@@ -118,15 +123,19 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
     }
     
     public void runXBoxController(XboxController xboxController){
-        if(xboxController.getRightBumperButton()){
+        if(xboxController.getRightBumperButton() && !isLimitSwitchPressed()){
             intake();
         }
-        else if (xboxController.getXButton()){
+        else if (xboxController.getXButton() && isLimitSwitchPressed()){
             outtake();
         }
-        else { // if (currentState != NarhwalIntakeState.ACTIVE_HOLDING)
-            hold();
+        else {
+            stop();
         }
+    }
+
+    public boolean isLimitSwitchPressed(){
+        return limitSwitch.get();
     }
 
     @Override
