@@ -51,7 +51,7 @@ public class RobotContainer {
     private SquidManipulator squidManipulator = new SquidManipulator();
     private SquidClimber squidClimber = new SquidClimber();
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
-
+    
     // Commands
     Command manualDriveCommand = new XboxParkerManualDriveCommand(driveSubsystem, xBoxController);
 
@@ -172,10 +172,8 @@ public class RobotContainer {
      * Schedules commands used exclusively during TeleOp.
      */
     public void scheduleTeleOp() {
-
         // The Drive Command
         driveSubsystem.setDefaultCommand(manualDriveCommand);
         upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
-        
     }
 }

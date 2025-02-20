@@ -13,9 +13,9 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants;
+import frc.robot.util.NarwhalIntakeOuttakeState;
 
 /**
  * <h2> NarwhalIntakeOuttake </h2>
@@ -29,27 +29,32 @@ import frc.robot.Constants;
 public class NarwhalIntakeOuttake extends SubsystemBase {
     public NarwhalIntakeOuttakeState currentState;
     
-    private final SparkMax intakeOuttakeMotorSparkMax;
-    private final SparkMaxConfig intakeOuttakeMotorSparkMaxConfig;
+    private final SparkMax intakeOuttakeMotor;
+    private final SparkMaxConfig intakeOuttakeMotorConfig;
     private final SparkClosedLoopController intakeOuttakeMotorPIDController;
     
     public NarwhalIntakeOuttake() {
-        intakeOuttakeMotorSparkMaxConfig = new SparkMaxConfig();
-        intakeOuttakeMotorSparkMaxConfig
+        intakeOuttakeMotorConfig = new SparkMaxConfig();
+        // General configs
+        intakeOuttakeMotorConfig
+            .inverted(true)
             .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants.INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT);
-        intakeOuttakeMotorSparkMaxConfig.closedLoop
+            .smartCurrentLimit(NarwhalIntakeOuttakeConstants.INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT);
+        // PID configs
+        intakeOuttakeMotorConfig.closedLoop
                 .pid(
-                    Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants.POSITION_PID_P, 
-                    Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants.POSITION_PID_I, 
-                    Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants.POSITION_PID_D
+                    NarwhalIntakeOuttakeConstants.POSITION_PID_P, 
+                    NarwhalIntakeOuttakeConstants.POSITION_PID_I, 
+                    NarwhalIntakeOuttakeConstants.POSITION_PID_D
                 )
-                .positionWrappingEnabled(true);
+                .maxOutput(NarwhalIntakeOuttakeConstants.PID_MAX_OUTPUT)
+                .minOutput(NarwhalIntakeOuttakeConstants.PID_MIN_OUTPUT);
         
-        intakeOuttakeMotorSparkMax = new SparkMax(Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants.INTAKE_OUTTAKE_MOTOR_CAN_ID, MotorType.kBrushless);
-        intakeOuttakeMotorSparkMax.configure(intakeOuttakeMotorSparkMaxConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-
-        intakeOuttakeMotorPIDController = intakeOuttakeMotorSparkMax.getClosedLoopController();
+        // Creating intakeOuttakeMotor and applying configs
+        intakeOuttakeMotor = new SparkMax(NarwhalIntakeOuttakeConstants.INTAKE_OUTTAKE_MOTOR_CAN_ID, MotorType.kBrushless);
+        intakeOuttakeMotor.configure(intakeOuttakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+      
+        intakeOuttakeMotorPIDController = intakeOuttakeMotor.getClosedLoopController();
         currentState = NarwhalIntakeOuttakeState.STOPPED;
     }
 
@@ -58,8 +63,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
      * @param percent percentage between -1.0 and 1.0 (negative values reverse direction)
      */
     public void setIntakeOuttakeMotorPercent(double percent){
-        double output_percent = Math.min(Math.max(-1.0, percent), 1.0); // Clamps the value of percent. Also prevents from the original variable being edited.
-        intakeOuttakeMotorSparkMax.set(output_percent); // Runs using percent output of duty cycle
+        intakeOuttakeMotor.set(percent); // Runs using percent output of duty cycle
         currentState = NarwhalIntakeOuttakeState.CUSTOM;
     }
 
@@ -67,10 +71,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
      * Set the intake-outtake motor to the intake motor percentage (defined in constants).
      */
     public void intake() {
-        // Inline construction of command goes here.
-        // Subsystem::RunOnce implicitly requires `this` subsystem.
-        setIntakeOuttakeMotorPercent(Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants.INTAKE_MOTOR_PERCENTAGE);
-
+        setIntakeOuttakeMotorPercent(NarwhalIntakeOuttakeConstants.INTAKE_MOTOR_PERCENT);
         currentState = NarwhalIntakeOuttakeState.INTAKING; // must be after the set function because the set function will default to CUSTOM state
     }
 
@@ -78,14 +79,12 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
      * Set the intake-outtake motor to the outtake motor percentage (defined in constants).
      */
     public void outtake() {
-        // Inline construction of command goes here.
-        // Subsystem::RunOnce implicitly requires `this` subsystem.
-        setIntakeOuttakeMotorPercent(Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants.OUTTAKE_MOTOR_PERCENTAGE);
+        setIntakeOuttakeMotorPercent(NarwhalIntakeOuttakeConstants.OUTTAKE_MOTOR_PERCENT);
         currentState = NarwhalIntakeOuttakeState.OUTTAKING; // must be after the set function because the set function will default to CUSTOM state
     }
 
     /**
-     * Set the intake-outtake motor to 0 percentage (assumes idle-mode is breaking).
+     * Set the intake-outtake motor to 0 percentage (will use the idle-mode to decide if it should brake or coast).
      */
     public void stop() {
         setIntakeOuttakeMotorPercent(0);
@@ -97,9 +96,8 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
      */
     public void hold() {
         stop();
-        double current_position = intakeOuttakeMotorSparkMax.getEncoder().getPosition();
-        intakeOuttakeMotorPIDController.setReference(current_position, ControlType.kPosition);
-
+        double current_position = intakeOuttakeMotor.getEncoder().getPosition(); // get its current position
+        intakeOuttakeMotorPIDController.setReference(current_position, ControlType.kPosition); // set its current position as a PID target value so the motor holds its position
         currentState = NarwhalIntakeOuttakeState.ACTIVE_HOLDING; // must be after the stop function because the set function will default to CUSTOM state
     }
     
@@ -107,53 +105,9 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
     public void periodic() {
         // This method will be called once per scheduler run
     }
-    // // for simming
-    // double last_called = 0;
-    // int stage = 0;
-    // double init = -1.0;
 
     @Override
     public void simulationPeriodic() {
-        // // for simulation sorry the code is terrible
-        // if (init == -1.0) init = System.currentTimeMillis()/1000;
-
-        // if(System.currentTimeMillis()/1000 - last_called > 0.2){
-        //     last_called = System.currentTimeMillis()/1000;
-        // }
-        // else return;
-
         // // This method will be called once per scheduler run during simulation
-        // System.out.println(CurrentState.toString());
-        
-        // if(System.currentTimeMillis()/1000 - init > 5.0 && stage == 0){
-        //     stage++;
-        //     intake();
-        //     init = System.currentTimeMillis()/1000;
-        // }
-        // if(System.currentTimeMillis()/1000 - init > 5.0 && stage == 1){
-        //     stage++;
-        //     stop();
-        //     init = System.currentTimeMillis()/1000;
-        // }
-        // if(System.currentTimeMillis()/1000 - init > 5.0 && stage == 2){
-        //     stage++;
-        //     outtake();
-        //     init = System.currentTimeMillis()/1000;
-        // }
-        // if(System.currentTimeMillis()/1000 - init > 5.0 && stage == 3){
-        //     stage++;
-        //     hold();
-        //     init = System.currentTimeMillis()/1000;
-        // }
-        // if(System.currentTimeMillis()/1000 - init > 5.0 && stage == 4){
-        //     stage++;
-        //     setIntakeOuttakeMotorPercent(1.2);
-        //     init = System.currentTimeMillis()/1000;
-        // }
-        // if(System.currentTimeMillis()/1000 - init > 5.0 && stage == 5){
-        //     stage++;
-        //     setIntakeOuttakeMotorPercent(-1.2);
-        //     init = System.currentTimeMillis()/1000;
-        // }
     }
 }
