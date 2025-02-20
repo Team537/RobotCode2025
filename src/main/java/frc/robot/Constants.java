@@ -6,6 +6,8 @@ package frc.robot;
 
 import com.revrobotics.spark.config.SparkMaxConfig;
 import org.photonvision.PhotonPoseEstimator;
+
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
@@ -252,6 +254,27 @@ public final class Constants {
           public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(-Math.PI / 4); // -pi/4 TODO: update these placeholder values
           public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(2 * Math.PI / 3); // 2pi/3 TODO: update these placeholder values
           public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(Math.PI / 2); // pi/2 TODO: update these placeholder values
+        }
+
+        public static class NarwhalClimberConstants {
+            public static final int CLIMBER_CAN_ID = 15;
+            
+            public static final boolean IS_CLIMBER_INVERTED = false;
+            
+            public static final double GEAR_REDUCTION = 125.0;
+            public static final double PULLY_REDUCTION = 10.0;
+            public static final double CLIMBER_ANGLE_TO_MOTOR_ANGLE = GEAR_REDUCTION * PULLY_REDUCTION;
+            
+            public static final double PID_P = 5;
+            public static final double PID_I = 0;
+            public static final double PID_D = 0.1;
+            public static final double PID_F = 1.9;
+
+            public static final double CLIMBER_PID_MIN_OUTPUT = -0.3;
+            public static final double CLIMBER_PID_MAX_OUTPUT = 0.3;
+
+            public static final Rotation2d DEPLOYED_ANGLE = Rotation2d.fromDegrees(30);
+            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(-5);
         }
     }
 
