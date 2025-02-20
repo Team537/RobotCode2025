@@ -16,10 +16,17 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants;
 
-
-
+/**
+ * <h2> NarwhalIntakeOuttake </h2>
+ * The {@code NarwhalIntakeOuttake} class is a class that represents the Narwhal's intake and outtake.
+ * It allows for the intake/outtake motors to be efficiently controlled, allowing for game elements to 
+ * be easily and reliably controlled.
+ * <hr>
+ * @author Patrick Wang
+ * @since v1.2.0
+ */
 public class NarwhalIntakeOuttake extends SubsystemBase {
-    public NarwhalIntakeOuttakeState CurrentState;
+    public NarwhalIntakeOuttakeState currentState;
     
     private final SparkMax intakeOuttakeMotor;
     private final SparkMaxConfig intakeOuttakeMotorConfig;
@@ -45,9 +52,9 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
         // Creating intakeOuttakeMotor and applying configs
         intakeOuttakeMotor = new SparkMax(NarwhalIntakeOuttakeConstants.INTAKE_OUTTAKE_MOTOR_CAN_ID, MotorType.kBrushless);
         intakeOuttakeMotor.configure(intakeOuttakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-
+      
         intakeOuttakeMotorPIDController = intakeOuttakeMotor.getClosedLoopController();
-        CurrentState = NarwhalIntakeOuttakeState.STOPPED;
+        currentState = NarwhalIntakeOuttakeState.STOPPED;
     }
 
     /**
@@ -56,7 +63,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
      */
     public void setIntakeOuttakeMotorPercent(double percent){
         intakeOuttakeMotor.set(percent); // Runs using percent output of duty cycle
-        CurrentState = NarwhalIntakeOuttakeState.CUSTOM;
+        currentState = NarwhalIntakeOuttakeState.CUSTOM;
     }
 
     /**
@@ -64,7 +71,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
      */
     public void intake() {
         setIntakeOuttakeMotorPercent(NarwhalIntakeOuttakeConstants.INTAKE_MOTOR_PERCENT);
-        CurrentState = NarwhalIntakeOuttakeState.INTAKING; // must be after the set function because the set function will default to CUSTOM state
+        currentState = NarwhalIntakeOuttakeState.INTAKING; // must be after the set function because the set function will default to CUSTOM state
     }
 
     /**
@@ -72,7 +79,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
      */
     public void outtake() {
         setIntakeOuttakeMotorPercent(NarwhalIntakeOuttakeConstants.OUTTAKE_MOTOR_PERCENT);
-        CurrentState = NarwhalIntakeOuttakeState.OUTTAKING; // must be after the set function because the set function will default to CUSTOM state
+        currentState = NarwhalIntakeOuttakeState.OUTTAKING; // must be after the set function because the set function will default to CUSTOM state
     }
 
     /**
@@ -80,7 +87,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
      */
     public void stop() {
         setIntakeOuttakeMotorPercent(0);
-        CurrentState = NarwhalIntakeOuttakeState.STOPPED; // must be after the set function because the set function will default to CUSTOM state
+        currentState = NarwhalIntakeOuttakeState.STOPPED; // must be after the set function because the set function will default to CUSTOM state
     }
 
     /**
@@ -90,7 +97,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
         stop();
         double current_position = intakeOuttakeMotor.getEncoder().getPosition(); // get its current position
         intakeOuttakeMotorPIDController.setReference(current_position, ControlType.kPosition); // set its current position as a PID target value so the motor holds its position
-        CurrentState = NarwhalIntakeOuttakeState.ACTIVE_HOLDING; // must be after the stop function because the set function will default to CUSTOM state
+        currentState = NarwhalIntakeOuttakeState.ACTIVE_HOLDING; // must be after the stop function because the set function will default to CUSTOM state
     }
     
     @Override
