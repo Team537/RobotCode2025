@@ -51,8 +51,7 @@ public class RobotContainer {
     private SquidManipulator squidManipulator = new SquidManipulator();
     private SquidClimber squidClimber = new SquidClimber();
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
-    private NarwhalIntakeOuttake intakeOuttake = new NarwhalIntakeOuttake();
-
+    
     // Commands
     Command manualDriveCommand = new XboxParkerManualDriveCommand(driveSubsystem, xBoxController);
 
