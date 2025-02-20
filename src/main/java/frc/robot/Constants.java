@@ -179,14 +179,18 @@ public final class Constants {
   
     public static class NarwhalConstants {
       public static class NarwhalIntakeOuttakeConstants {
-        public static final int INTAKE_OUTTAKE_MOTOR_CAN_ID = 12; // TODO: Replace this placeholder with the actual id
-        public static final int INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT = 20;
-        public static final double INTAKE_MOTOR_PERCENTAGE = 0.20; // between -1.0 and 1.0
-        public static final double OUTTAKE_MOTOR_PERCENTAGE = -0.50; // between -1.0 and 1.0
-
+        public static final int INTAKE_OUTTAKE_MOTOR_CAN_ID = 12; 
+        public static final int INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT = 40;
+        // Settings for % of max power to use on intake and outtake
+        public static final double INTAKE_MOTOR_PERCENT = 0.3; // between -1.0 and 1.0
+        public static final double OUTTAKE_MOTOR_PERCENT = -0.5; // between -1.0 and 1.0
+        
         public static final double POSITION_PID_P = 0.7;
         public static final double POSITION_PID_I = 0;
         public static final double POSITION_PID_D = 0.2;
+
+        public static final double PID_MAX_OUTPUT = 0.5;
+        public static final double PID_MIN_OUTPUT = -0.5;
       }
     }
   
