@@ -1,4 +1,4 @@
-package frc.robot.subsystems.narwhal;
+package frc.robot.util;
 
 /**
  * <h2> NarwhalClimberState </h2>

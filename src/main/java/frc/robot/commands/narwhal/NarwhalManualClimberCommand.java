@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.narwhal.NarwhalClimber;
 import frc.robot.util.NarwhalClimberState;
 
-public class ManualNarwhalClimberCommand extends Command {
+public class NarwhalManualClimberCommand extends Command {
     
     private final NarwhalClimber narwhalClimber;
     private final XboxController controller;
@@ -15,7 +15,7 @@ public class ManualNarwhalClimberCommand extends Command {
      * @param squidClimber The climber subsystem to control.
      * @param controller The Xbox controller used to drive the climber.
      */
-    public ManualNarwhalClimberCommand(NarwhalClimber narwhalClimber, XboxController controller) {
+    public NarwhalManualClimberCommand(NarwhalClimber narwhalClimber, XboxController controller) {
         this.narwhalClimber = narwhalClimber;
         this.controller = controller;
         addRequirements(narwhalClimber);
@@ -23,10 +23,12 @@ public class ManualNarwhalClimberCommand extends Command {
     
     @Override
     public void execute() {
+        // cycle between state on start button being pressed
         if(controller.getStartButtonPressed()){
+            // if it is not currently deployed, deploy
             if (narwhalClimber.currentState != NarwhalClimberState.DEPLOYING){
                 narwhalClimber.goToDeploy();
-            }
+            } // otherwise, if it is deployed and not currently climbing, climb
             else if(narwhalClimber.currentState != NarwhalClimberState.CLIMBING){
                 narwhalClimber.climb();
             }
