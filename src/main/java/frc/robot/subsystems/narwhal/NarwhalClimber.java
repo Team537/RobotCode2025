@@ -4,10 +4,6 @@
 
 package frc.robot.subsystems.narwhal;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -18,10 +14,10 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.NarwhalConstants.NarwhalClimberConstants;
+import frc.robot.util.NarwhalClimberState;
 
 /**
  * <h2> NarwhalWrist </h2>
@@ -39,25 +35,28 @@ public class NarwhalClimber extends SubsystemBase {
     private final SparkClosedLoopController climberPID;
     
     public NarwhalClimber() {
-        // a whole lotta stuff for the spark max config
-        // Motor configs
         climberConfig = new SparkMaxConfig();
-        // General Configs
+        // General configs
         climberConfig
             .smartCurrentLimit(40)
             .idleMode(IdleMode.kBrake)
-            .inverted(false);
+            .inverted(NarwhalClimberConstants.IS_CLIMBER_INVERTED);
+        // Encoder configs
         climberConfig.encoder
             .positionConversionFactor(1.0/NarwhalClimberConstants.CLIMBER_ANGLE_TO_MOTOR_ANGLE);
-        
+        // PID configs
         climberConfig.closedLoop
             .pidf(
                 NarwhalClimberConstants.PID_P,
                 NarwhalClimberConstants.PID_I,
                 NarwhalClimberConstants.PID_D,
                 NarwhalClimberConstants.PID_F)
-            .outputRange(-0.3, 0.3);
+            .outputRange(
+                -NarwhalClimberConstants.CLIMBER_PID_MIN_OUTPUT, 
+                NarwhalClimberConstants.CLIMBER_PID_MAX_OUTPUT
+            );
         
+        // Creating the motor & setting the configs
         climber = new SparkMax(NarwhalClimberConstants.CLIMBER_CAN_ID, MotorType.kBrushless);
         climber.configure(climberConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -71,37 +70,27 @@ public class NarwhalClimber extends SubsystemBase {
      */
     public void setCurrentMotorAngle(Rotation2d targetAngle){
         double targetAngleRotations = targetAngle.getRotations();
+        // updates the PID to the target value.
         climberPID.setReference(targetAngleRotations, ControlType.kPosition);
         currentState = NarwhalClimberState.CUSTOM;
     }
 
     /**
-     * Set the wrist motor to the intake angle (defined in constants) & update status.
+     * Set the climber to the deploy angle stored in constants
      */
     public void goToDeploy() {
-        // Inline construction of command goes here.
-        // Subsystem::RunOnce implicitly requires `this` subsystem.
         setCurrentMotorAngle(NarwhalClimberConstants.DEPLOYED_ANGLE);
         currentState = NarwhalClimberState.DEPLOYING; // must be after the set function because the set function will default to CUSTOM state
     }
 
     /**
-     * Set the wrist motor to the outtake angle (defined in constants) & update status.
+     * Set the climber to the target angle for climbing stored in constants
      */
     public void climb() {
         setCurrentMotorAngle(NarwhalClimberConstants.CLIMB_ANGLE);
         currentState = NarwhalClimberState.CLIMBING; // must be after the set function because the set function will default to CUSTOM state
     }
 
-    public void runXBoxController(XboxController xBoxController){
-        if(xBoxController.getPOV() == 0){
-            goToDeploy();
-        }
-        if(xBoxController.getPOV() == 90){
-            climb();
-        }
-    }
-    
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
