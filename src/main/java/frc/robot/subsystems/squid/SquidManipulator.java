@@ -11,6 +11,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SquidConstants.SquidManipulatorConstants;
+import frc.robot.util.ScoringHeight;
 
 /**
  * The {@code SquidManipulator} subsystem controls the manipulator mechanism that handles game elements.
@@ -21,21 +22,7 @@ import frc.robot.Constants.SquidConstants.SquidManipulatorConstants;
  */
 public class SquidManipulator extends SubsystemBase {
 
-    /**
-     * Enum representing various scoring positions for the manipulator.
-     * <p>
-     * TODO: Replace with a proper enum if needed.
-     * </p>
-     */
-    public enum ScoringPosition {
-        L1,
-        L2,
-        L3,
-        L4
-    }
-
-    private ScoringPosition scoringPosition = ScoringPosition.L4;
-    private boolean intaking = false;
+    private ScoringHeight scoringHeight = ScoringHeight.L4; 
 
     // Motor controllers for the manipulator wheels.
     private final SparkMax manipulatorTopMotor = new SparkMax(SquidManipulatorConstants.TOP_MOTOR_CAN_ID, MotorType.kBrushless);
@@ -56,7 +43,7 @@ public class SquidManipulator extends SubsystemBase {
         manipulatorTopConfig
             .closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .pid(SquidManipulatorConstants.KP, SquidManipulatorConstants.KI, SquidManipulatorConstants.KD)
+                .pidf(SquidManipulatorConstants.KP, SquidManipulatorConstants.KI, SquidManipulatorConstants.KD, SquidManipulatorConstants.FF)
                 .outputRange(SquidManipulatorConstants.PID_MIN_OUTPUT, SquidManipulatorConstants.PID_MAX_OUTPUT);
         manipulatorTopConfig
             .encoder
@@ -70,7 +57,7 @@ public class SquidManipulator extends SubsystemBase {
         manipulatorBottomConfig
             .closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .pid(SquidManipulatorConstants.KP, SquidManipulatorConstants.KI, SquidManipulatorConstants.KD)
+                .pidf(SquidManipulatorConstants.KP, SquidManipulatorConstants.KI, SquidManipulatorConstants.KD, SquidManipulatorConstants.FF)
                 .outputRange(SquidManipulatorConstants.PID_MIN_OUTPUT, SquidManipulatorConstants.PID_MAX_OUTPUT);
         manipulatorBottomConfig
             .encoder
@@ -111,14 +98,12 @@ public class SquidManipulator extends SubsystemBase {
     }
 
     /**
-     * Outtakes the game element (coral) at an angle determined by the given scoring position.
-     *
-     * @param scoringPosition The scoring position that determines the outtake angle.
+     * Outtakes the game element (coral) at an angle determined by the given scoring height.
      */
-    public void outtakeAngled(ScoringPosition scoringPosition) {
+    public void outtakeAngled() {
         // Set bottom roller ratio based on scoring position.
         double bottomRollerRatio;
-        switch (scoringPosition) {
+        switch (scoringHeight) {
             case L1:
                 bottomRollerRatio = SquidManipulatorConstants.L_ONE_BOTTOM_ROLLER_RATIO;
                 break;
@@ -148,28 +133,19 @@ public class SquidManipulator extends SubsystemBase {
     /**
      * Sets the scoring position for the manipulator.
      *
-     * @param scoringPosition The desired scoring position.
+     * @param scoringHeight The desired scoring position.
      */
-    public void setScoringPosition(ScoringPosition scoringPosition) {
-        this.scoringPosition = scoringPosition;
-    }
-
-    /**
-     * Sets whether the manipulator is in intaking mode.
-     *
-     * @param intaking {@code true} if the manipulator should intake game elements; {@code false} otherwise.
-     */
-    public void setIntaking(boolean intaking) {
-        this.intaking = intaking;
+    public void setScoringHeight(ScoringHeight scoringHeight) {
+        this.scoringHeight = scoringHeight;
     }
 
     /**
      * Gets the current scoring position of the manipulator.
      *
-     * @return The current {@link ScoringPosition}.
+     * @return The current {@link scoringHeight}.
      */
-    public ScoringPosition getScoringPosition() {
-        return scoringPosition;
+    public ScoringHeight getScoringHeight() {
+        return scoringHeight;
     }
 
     /**
@@ -180,4 +156,5 @@ public class SquidManipulator extends SubsystemBase {
     public boolean senseCoral() {
         return coralSensor.get();
     }
+
 }

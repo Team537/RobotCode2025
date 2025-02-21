@@ -112,10 +112,6 @@ public class SwerveModule extends SubsystemBase {
                 break;
             case KRAKEN_X60:
                 velocityRequest = new VelocityVoltage(velocity);
-                if (drivingCANID == 2) {
-                    System.out.println(velocity);
-                   System.out.println(drivingKrakenX60.getVelocity().getValueAsDouble());
-                }
                 drivingKrakenX60.setControl(velocityRequest);
                 break;
             case KRAKEN_X60_FOC:

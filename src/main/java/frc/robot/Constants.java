@@ -290,22 +290,23 @@ public final class Constants {
 
             public static final int CORAL_SENSOR_ID = 0;
 
-            public static final int KP = 1;
-            public static final int KI = 0;
-            public static final int KD = 0;
+            public static final double KP = 0.005;
+            public static final double KI = 0.0001;
+            public static final double KD = 0;
+            public static final double FF = 0.01;
 
             public static final double PID_MIN_OUTPUT = -1.0;
             public static final double PID_MAX_OUTPUT = 1.0;
 
             public static final double WHEEL_RADIUS = 0.038;
             public static final double WHEEL_CIRCUMFERENCE = 2.0 * Math.PI * WHEEL_RADIUS; //Meters
-            public static final double MOTOR_REDUCTION = 5.0;
+            public static final double MOTOR_REDUCTION = 20.0;
             public static final double ENCODER_FACTOR = WHEEL_CIRCUMFERENCE / MOTOR_REDUCTION;
             public static final double MANIPULATOR_MOTOR_FREE_SPEED = 1151.917; //Radians / second
 
             public static final double MANIPULATOR_MAX_SPEED = (MANIPULATOR_MOTOR_FREE_SPEED * WHEEL_RADIUS) / MOTOR_REDUCTION;
 
-            public static final boolean TOP_MOTOR_INVERTED = true;
+            public static final boolean TOP_MOTOR_INVERTED = false;
             public static final boolean BOTTOM_MOTOR_INVERTED = false;
 
             public static final int MOTOR_CURRENT_LIMIT = 20; // Amps
@@ -316,6 +317,8 @@ public final class Constants {
             public static final double L_TWO_BOTTOM_ROLLER_RATIO = 0.95;
             public static final double L_THREE_BOTTOM_ROLLER_RATIO = 0.95;
             public static final double L_FOUR_BOTTOM_ROLLER_RATIO = 0.6;
+
+            public static final double OUTTAKE_MAX_DISTANCE = 0.5;
             
         }
 
