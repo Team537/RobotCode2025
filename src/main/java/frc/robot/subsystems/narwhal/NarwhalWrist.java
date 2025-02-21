@@ -33,7 +33,7 @@ import frc.robot.Constants;
 public class NarwhalWrist extends SubsystemBase {
     public NarwhalWristState currentState;
     
-    private final SparkMax wrist;
+    public final SparkMax wrist;
     private final SparkMaxConfig wristConfig;
     private final SparkClosedLoopController wristMotorPIDController;
     

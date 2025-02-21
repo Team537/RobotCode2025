@@ -35,9 +35,13 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
     private final SparkMaxConfig intakeOuttakeMotorSparkMaxConfig;
     private final SparkClosedLoopController intakeOuttakeMotorPIDController;
 
-    private final DigitalInput limitSwitch;
+    private final NarwhalElevator narwhalElevatorReference;
 
-    public NarwhalIntakeOuttake() {
+    // private final DigitalInput limitSwitch;
+
+    public NarwhalIntakeOuttake(NarwhalElevator narwhalElevatorReference) { 
+        this.narwhalElevatorReference = narwhalElevatorReference;
+
         intakeOuttakeMotorSparkMaxConfig = new SparkMaxConfig();
         intakeOuttakeMotorSparkMaxConfig
             .inverted(true)
@@ -59,7 +63,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
         intakeOuttakeMotorPIDController = intakeOuttakeMotorSparkMax.getClosedLoopController();
         currentState = NarwhalIntakeOuttakeState.STOPPED;
 
-        limitSwitch = new DigitalInput(0);
+        // limitSwitch = new DigitalInput(0);
     }
 
     /**
@@ -123,10 +127,10 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
     }
     
     public void runXBoxController(XboxController xboxController){
-        if(xboxController.getRightBumperButton() && !isLimitSwitchPressed()){
+        if(xboxController.getRightBumperButton() && narwhalElevatorReference.currentState == NarwhalElevatorState.INTAKE){// && !isLimitSwitchPressed()){
             intake();
         }
-        else if (xboxController.getXButton() && isLimitSwitchPressed()){
+        else if (xboxController.getXButton()){// && isLimitSwitchPressed()){
             outtake();
         }
         else {
@@ -134,9 +138,9 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
         }
     }
 
-    public boolean isLimitSwitchPressed(){
-        return limitSwitch.get();
-    }
+    // public boolean isLimitSwitchPressed(){
+    //     return false; // limitSwitch.get();
+    // }
 
     @Override
     public void periodic() {

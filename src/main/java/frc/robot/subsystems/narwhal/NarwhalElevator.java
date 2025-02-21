@@ -5,22 +5,17 @@
 package frc.robot.subsystems.narwhal;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.NarwhalConstants.NarwhalElevatorConstants;
+import frc.robot.Constants.NarwhalConstants.NarwhalWristConstants;
 import edu.wpi.first.wpilibj.XboxController;
 
 
@@ -34,11 +29,13 @@ public class NarwhalElevator extends SubsystemBase {
     
     private final SparkMax followerElevator;
     private final SparkMaxConfig followerElevatorConfig;
+    private final NarwhalWrist narwhalWristReference;
 
     // private final SparkMax followerElevator;
     // private final SparkMaxConfig followerElevatorConfig;
 
-    public NarwhalElevator(){
+    public NarwhalElevator(NarwhalWrist narwhalWristReference){
+        this.narwhalWristReference = narwhalWristReference;
         // lead
         leadElevatorConfig = new SparkMaxConfig();
         leadElevatorConfig // general configs
@@ -64,7 +61,7 @@ public class NarwhalElevator extends SubsystemBase {
         //follower
         followerElevatorConfig = new SparkMaxConfig();
         followerElevatorConfig // general configs
-            .idleMode(IdleMode.kBrake)
+            .idleMode(IdleMode.kCoast)
             .smartCurrentLimit(NarwhalElevatorConstants.ELEVATOR_FOLLOWER_MOTOR_CURRENT_LIMIT)
             .follow(NarwhalElevatorConstants.ELEVATOR_LEAD_MOTOR_CAN_ID);
 
@@ -132,7 +129,9 @@ public class NarwhalElevator extends SubsystemBase {
     }
 
     public void runXBoxController(XboxController xboxController){
-        if(xboxController.getRightBumperButton()){
+        if(xboxController.getRightBumperButtonPressed() && 
+            Math.abs(narwhalWristReference.wrist.getEncoder().getPosition() - NarwhalWristConstants.INTAKE_ANGLE.getRadians()) < 0.8
+            ){
             intake();
         }
         else if(xboxController.getBackButton()){
@@ -146,6 +145,17 @@ public class NarwhalElevator extends SubsystemBase {
         }
         else if(xboxController.getAButton()){
             L2();
+        }
+    }
+
+    double last_time = System.currentTimeMillis();
+    @Override
+    public void periodic(){
+        if (System.currentTimeMillis() - last_time > 500){
+            System.out.println("Lead Encoder Position: " + leadElevator.getEncoder().getPosition());
+            System.out.println("Follower Encoder Position: " + leadElevator.getEncoder().getPosition());
+            System.out.println("\n");
+            last_time = System.currentTimeMillis();
         }
     }
 }

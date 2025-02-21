@@ -229,7 +229,7 @@ public final class Constants {
             public static final int INTAKE_OUTTAKE_MOTOR_CAN_ID = 12;
             public static final int INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT = 40;
             public static final double INTAKE_MOTOR_PERCENT = 0.3; // between -1.0 and 1.0
-            public static final double OUTTAKE_MOTOR_PERCENT = -0.5; // between -1.0 and 1.0
+            public static final double OUTTAKE_MOTOR_PERCENT = -0.35; // between -1.0 and 1.0
             public static final double PID_MAX_OUTPUT = 0.5;
             public static final double PID_MIN_OUTPUT = -0.5;
 
@@ -253,11 +253,11 @@ public final class Constants {
           public static final double PID_OUTPUT_RANGE_MAX = 0.3; // TODO: UPDATE THESE OUTPUT RANGE VALUES
           public static final double PID_OUTPUT_RANGE_MIN = -0.3; // TODO: UPDATE THESE OUTPUT RANGE VALUES
 
-          public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4.5); // -pi/4 TODO: update these placeholder values
-          public static final Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.2 * Math.PI);
+          public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4.85); // -pi/4 TODO: update these placeholder values
+          public static final Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
           public static final Rotation2d L2_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
           public static final Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
-          public static final Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
+          public static final Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.08 * Math.PI);
           public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI); // 2pi/3 TODO: update these placeholder values
           public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(3 * Math.PI / 2); // pi/2 TODO: update these placeholder values
         }
@@ -306,8 +306,8 @@ public final class Constants {
             public static final double PID_D = 0.1;
             public static final double PID_F = 1.9;
 
-            public static final Rotation2d DEPLOYED_ANGLE = Rotation2d.fromDegrees(30);
-            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(-10);
+            public static final Rotation2d DEPLOYED_ANGLE = Rotation2d.fromDegrees(40);
+            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(0);
         }
     }
 

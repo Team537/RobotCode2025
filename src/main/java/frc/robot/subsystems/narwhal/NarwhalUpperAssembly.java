@@ -13,8 +13,8 @@ import frc.robot.util.ScoringHeight;
 
 public class    NarwhalUpperAssembly implements UpperAssembly {
     NarwhalWrist narwhalWrist = new NarwhalWrist();
-    NarwhalIntakeOuttake narwhalIntakeOuttake = new NarwhalIntakeOuttake();
-    NarwhalElevator narwhalElevator = new NarwhalElevator();
+    NarwhalElevator narwhalElevator = new NarwhalElevator(narwhalWrist);
+    NarwhalIntakeOuttake narwhalIntakeOuttake = new NarwhalIntakeOuttake(narwhalElevator);
     NarwhalClimber narwhalClimber = new NarwhalClimber();
     
     public Command getCoralIntakeCommand(Supplier<Pose2d> robotPoseSupplier) {
