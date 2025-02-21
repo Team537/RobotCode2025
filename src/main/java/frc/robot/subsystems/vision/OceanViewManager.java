@@ -187,7 +187,7 @@ public class OceanViewManager extends SubsystemBase {
     public void periodic() {
 
         // Check the latest packet_number
-        int currentPacket = udpReceiver.getPacketNumber();
+        int currentPacket = this.udpReceiver.getPacketNumber();
 
         // If we have a new packet_number, parse new data
         if (currentPacket > lastProcessedPacket) {

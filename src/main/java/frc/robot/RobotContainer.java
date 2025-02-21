@@ -16,6 +16,8 @@ import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.vision.OceanViewManager;
 import frc.robot.subsystems.vision.odometry.PhotonVisionCamera;
 import frc.robot.subsystems.vision.odometry.VisionOdometry;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.utils.Alliance;
@@ -72,20 +74,9 @@ public class RobotContainer {
      */
     public RobotContainer() {
         
-        // Setup Networking
-        udpReceiver = new UDPReceiver(OceanViewConstants.UDP_PORT_NUMBER);
-        
-        // Attempted to create a new TCPSender object.
-        try {
-            tcpSender = new TCPSender(OceanViewConstants.PI_IP, OceanViewConstants.TCP_PORT_NUMBER);
-            System.out.println("Successfully created TCPSender object!");
-        } catch (Exception e) {
-            System.err.println("Failed to construct TCPSender object: " + e.getMessage());
-        }
+        // Setup Networking        
+        setupOceanViewManager();
 
-        // Create a new OceanViewManager object.
-        oceanViewManager = new OceanViewManager(udpReceiver, tcpSender, driveSubsystem::getRobotPose);
-        
         // Add cameras to the VisionOdometry object.
         visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, new Transform3d()));
         visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.SLIDE_CAMERA_NAME, new Transform3d()));
@@ -95,6 +86,31 @@ public class RobotContainer {
 
         // Configure the trigger bindings
         configureBindings();
+    }
+
+    /**
+     * 
+     */
+    private void setupOceanViewManager() {
+
+        // Attempted to create a new TCPSender and UDPReceiver object.
+        try {
+            this.udpReceiver = new UDPReceiver(OceanViewConstants.UDP_PORT_NUMBER);    
+            this.tcpSender = new TCPSender(OceanViewConstants.PI_IP, OceanViewConstants.TCP_PORT_NUMBER);
+            System.out.println("Successfully created TCPSender and UDPReceiver object!");
+        } catch (Exception e) {
+            System.err.println("Failed to construct TCPSender object: " + e.getMessage());
+        }
+
+        // Start the UDPReceiver.
+        if (this.udpReceiver == null) {
+            this.udpReceiver.start();
+        }
+
+        // Create a new OceanViewManager object.
+        if (!(this.udpReceiver == null) && !(this.tcpSender == null)) {
+            this.oceanViewManager = new OceanViewManager(this.udpReceiver, this.tcpSender, driveSubsystem::getRobotPose);
+        }
     }
 
     /**

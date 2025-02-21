@@ -203,9 +203,9 @@ public final class Constants {
     }
 
     public static class OceanViewConstants {
-        public static final String PI_IP = "0.0.0.0";
-        public static final int DASHBOARD_PORT_NUMBER = 537;
-        public static final int UDP_PORT_NUMBER = 537;
-        public static final int TCP_PORT_NUMBER = 537;
+        public static final String PI_IP = "10.5.37.57";
+        public static final int DASHBOARD_PORT_NUMBER = 5000;
+        public static final int UDP_PORT_NUMBER = 5400;
+        public static final int TCP_PORT_NUMBER = 5300;
     }
 }
