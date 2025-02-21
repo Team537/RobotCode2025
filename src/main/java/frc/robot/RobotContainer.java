@@ -26,8 +26,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.subsystems.UpperAssembly;
 import frc.robot.subsystems.squid.SquidClimber;
 import frc.robot.subsystems.squid.SquidManipulator;
-import frc.robot.subsystems.vision.PhotonVisionCamera;
-import frc.robot.subsystems.vision.VisionOdometry;
 import frc.robot.util.UpperAssemblyFactory;
 import frc.robot.util.UpperAssemblyType;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -60,6 +58,7 @@ public class RobotContainer {
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
     private UpperAssembly upperAssembly = UpperAssemblyFactory.createUpperAssembly(Constants.UpperAssemblyConstants.DEFAULT_UPPER_ASSEMBLY);
+    
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
     
     private OceanViewManager oceanViewManager;
@@ -94,7 +93,8 @@ public class RobotContainer {
     }
 
     /**
-     * 
+     * Sets up the OceanViewManager instance used by the robot. 
+     * If the PI is not connected to the robot, nothing will happen.
      */
     private void setupOceanViewManager() {
 
@@ -107,38 +107,19 @@ public class RobotContainer {
             System.err.println("Failed to construct TCPSender object: " + e.getMessage());
         }
 
-        // Start the UDPReceiver.
-        if (this.udpReceiver == null) {
-            this.udpReceiver.start();
+        // An OceanView manager instance cannot be created if either the TCPSender or UDPReceiver is null.
+        // Thus, we stop setting up the OceanViewManager.
+        if (this.udpReceiver == null || this.tcpSender == null) {
+            return;
         }
+
+        // Start the UDPReceiver.
+        this.udpReceiver.start();
 
         // Create a new OceanViewManager object.
-        if (!(this.udpReceiver == null) && !(this.tcpSender == null)) {
-            this.oceanViewManager = new OceanViewManager(this.udpReceiver, this.tcpSender, driveSubsystem::getRobotPose);
-        }
+        this.oceanViewManager = new OceanViewManager(this.udpReceiver, this.tcpSender, driveSubsystem::getRobotPose);
     }
 
-    /**
-     * Sets up SmartDashboard so that important settings can be configured and key values can be viewed.
-     */
-    private void setupSmartDashboard() {
-
-        // Setup Autonomous Routine Selection
-        autonomousSelector.setDefaultOption("LEFT_HIGH_SCORE", AutonomousRoutine.LEFT_HIGH_SCORE);
-        for (AutonomousRoutine autonomousRoutine : AutonomousRoutine.values()) {
-            autonomousSelector.addOption(autonomousRoutine.toString(), autonomousRoutine);
-        }
-        
-        // Setup Alliance Selection
-        allianceSelector.setDefaultOption("RED", Alliance.RED);
-        for (Alliance alliance : Alliance.values()) {
-            allianceSelector.addOption(alliance.toString(), alliance);
-        }
-
-        // Add the selectors to the dashboard.
-        SmartDashboard.putData(allianceSelector);
-        SmartDashboard.putData(autonomousSelector);
-    }
 
     /**
      * Use this method to define your trigger->command mappings. Triggers can be

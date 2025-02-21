@@ -384,6 +384,9 @@ public final class Constants {
         public static final PhotonPoseEstimator.PoseStrategy FALLBACK_STRATEGY = PhotonPoseEstimator.PoseStrategy.CLOSEST_TO_REFERENCE_POSE;
     }
 
+    /**
+     * A container class used to store all of the OceanView specific constants.
+     */
     public static class OceanViewConstants {
         public static final String PI_IP = "10.5.37.57";
         public static final int DASHBOARD_PORT_NUMBER = 5000;
