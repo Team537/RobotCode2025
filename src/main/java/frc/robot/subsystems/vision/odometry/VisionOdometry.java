@@ -13,14 +13,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
+ * <h2> VisionOdometry </h2>
  * VisionOdometry is responsible for integrating vision-based robot pose
  * estimates with drivetrain odometry using WPILib's SwerveDrivePoseEstimator.
  * <p>
  * This subsystem gathers pose data from multiple PhotonVision cameras,
- * processes
- * the data to determine the robot's position on the field, and feeds the
- * results
- * into the pose estimator to improve accuracy.
+ * processes the data to determine the robot's position on the field, and feeds the
+ * results into the pose estimator to improve accuracy.
  * <hr>
  * @author Cameron Myhre
  * @since v1.2.0

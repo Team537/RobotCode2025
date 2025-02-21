@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
 
 /**
+ * <h2> PhotonVisionCamera </h2>
  * Wraps a single PhotonVision camera + a PhotonPoseEstimator. 
  * You will call update() each loop and get the latest robot-pose measurement (if any).
  * <hr>
