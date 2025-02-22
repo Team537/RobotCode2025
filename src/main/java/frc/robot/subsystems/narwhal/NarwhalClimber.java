@@ -57,7 +57,7 @@ public class NarwhalClimber extends SubsystemBase {
                 NarwhalClimberConstants.PID_D,
                 NarwhalClimberConstants.PID_F
             )
-            .outputRange(-0.3, 0.3);
+            .outputRange(-1.0, 1.0);
         
         climber = new SparkMax(NarwhalClimberConstants.CLIMBER_CAN_ID, MotorType.kBrushless);
         climber.configure(climberConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

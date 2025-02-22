@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,6 +30,8 @@ public class Robot extends TimedRobot {
 
     // Allow the camera stream to be viewed via the robots network.
     PortForwarder.add(5800, "photonvision.local", 5800);
+
+    CameraServer.startAutomaticCapture();
   }
 
   /**

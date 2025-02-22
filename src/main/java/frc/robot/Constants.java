@@ -246,12 +246,12 @@ public final class Constants {
           public static final double GEAR_REDUCTION = 60;
           public static final double ROTATIONS_TO_RADIANS = Math.PI * 2 / GEAR_REDUCTION; // Wrist target angles (radians) are multiplied by this to get the motor target position
 
-          public static final double POSITION_PID_P = 0.2; // TODO: UPDATE THESE PID VALUES
+          public static final double POSITION_PID_P = 0.3; // TODO: UPDATE THESE PID VALUES
           public static final double POSITION_PID_I = 0; // TODO: UPDATE THESE PID VALUES
           public static final double POSITION_PID_D = 0.2; // TODO: UPDATE THESE PID VALUES
 
-          public static final double PID_OUTPUT_RANGE_MAX = 0.3; // TODO: UPDATE THESE OUTPUT RANGE VALUES
-          public static final double PID_OUTPUT_RANGE_MIN = -0.3; // TODO: UPDATE THESE OUTPUT RANGE VALUES
+          public static final double PID_OUTPUT_RANGE_MAX = 0.5; // TODO: UPDATE THESE OUTPUT RANGE VALUES
+          public static final double PID_OUTPUT_RANGE_MIN = -0.5; // TODO: UPDATE THESE OUTPUT RANGE VALUES
 
           public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4.85); // -pi/4 TODO: update these placeholder values
           public static final Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
@@ -301,13 +301,13 @@ public final class Constants {
             public static final double PULLY_REDUCTION = 10.0;
             public static final double CLIMBER_ANGLE_TO_MOTOR_ANGLE = GEAR_REDUCTION * PULLY_REDUCTION;
             
-            public static final double PID_P = 5;
+            public static final double PID_P = 8.5;
             public static final double PID_I = 0;
             public static final double PID_D = 0.1;
             public static final double PID_F = 1.9;
 
             public static final Rotation2d DEPLOYED_ANGLE = Rotation2d.fromDegrees(40);
-            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(0);
+            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(-13.5);
         }
     }
 
