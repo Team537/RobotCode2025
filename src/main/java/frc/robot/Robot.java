@@ -19,57 +19,25 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
 
-  private Command autonomousCommand;
-  private final RobotContainer robotContainer;
+    private Command autonomousCommand;
+    private final RobotContainer robotContainer;
 
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
-  public Robot() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
-    robotContainer = new RobotContainer();
+    /**
+     * This function is run when the robot is first started up and should be used
+     * for any initialization code.
+     */
+    public Robot() {
 
-    // Automatically capture data with the driver camera.
-    CameraServer.startAutomaticCapture();
+        // Instantiate our RobotContainer. This will perform all our button bindings, and put our
+        // autonomous chooser on the dashboard.
+        robotContainer = new RobotContainer();
 
-    // Allow the camera stream to be viewed via the robots network.
-    PortForwarder.add(5800, "photonvision.local", 5800);
-    PortForwarder.add(5000, "oceanview.local", 5000);
-  }
+        // Automatically capture data with the driver camera.
+        CameraServer.startAutomaticCapture();
 
-  /**
-   * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
-   * that you want ran during disabled, autonomous, teleoperated and test.
-   *
-   * <p>This runs after the mode specific periodic functions, but before LiveWindow and
-   * SmartDashboard integrated updating.
-   */
-  @Override
-  public void robotPeriodic() {
-    // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
-    // commands, running already-scheduled commands, removing finished or interrupted commands,
-    // and running subsystem periodic() methods.  This must be called from the robot's periodic
-    // block in order for anything in the Command-based framework to work.
-    CommandScheduler.getInstance().run();
-  }
-
-  /** This function is called once each time the robot enters Disabled mode. */
-  @Override
-  public void disabledInit() {}
-
-  @Override
-  public void disabledPeriodic() {}
-
-  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
-  @Override
-  public void autonomousInit() {
-    autonomousCommand = robotContainer.getAutonomousCommand();
-
-    // schedule the autonomous command (example)
-    if (autonomousCommand != null) {
-      autonomousCommand.schedule();
+        // Allow the camera stream to be viewed via the robots network.
+        PortForwarder.add(5800, "photonvision.local", 5800);
+        PortForwarder.add(5000, "oceanview.local", 5000);
     }
 
     /**
@@ -85,22 +53,10 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         // Runs the Scheduler. This is responsible for polling buttons, adding
-        // newly-scheduled
-        // commands, running already-scheduled commands, removing finished or
-        // interrupted commands,
-        // and running subsystem periodic() methods. This must be called from the
-        // robot's periodic
+        // newly-scheduled commands, running already-scheduled commands, removing finished or
+        // interrupted commands, and running subsystem periodic() methods. This must be called from the robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
-    }
-
-    /** This function is called once each time the robot enters Disabled mode. */
-    @Override
-    public void disabledInit() {
-    }
-
-    @Override
-    public void disabledPeriodic() {
     }
 
     /**
@@ -115,6 +71,15 @@ public class Robot extends TimedRobot {
         if (autonomousCommand != null) {
             autonomousCommand.schedule();
         }
+    }
+
+    /** This function is called once each time the robot enters Disabled mode. */
+    @Override
+    public void disabledInit() {
+    }
+
+    @Override
+    public void disabledPeriodic() {
     }
 
     /** This function is called periodically during autonomous. */
