@@ -18,19 +18,28 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.subsystems.UpperAssembly;
 import frc.robot.subsystems.squid.SquidClimber;
 import frc.robot.subsystems.squid.SquidManipulator;
+import frc.robot.subsystems.squid.SquidOuttake;
 import frc.robot.subsystems.vision.PhotonVisionCamera;
 import frc.robot.subsystems.vision.VisionOdometry;
 import frc.robot.util.UpperAssemblyFactory;
 import frc.robot.util.UpperAssemblyType;
+
+import javax.naming.PartialResultException;
+
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import frc.utils.Autonomous.Alliance;
 import frc.utils.Autonomous.AutonomousRoutine;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -46,11 +55,28 @@ public class RobotContainer {
 
     // Subsystems
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
+    private SquidOuttake squidOuttake = new SquidOuttake();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
     private UpperAssembly upperAssembly = UpperAssemblyFactory.createUpperAssembly(Constants.UpperAssemblyConstants.DEFAULT_UPPER_ASSEMBLY);
     private SquidManipulator squidManipulator = new SquidManipulator();
     private SquidClimber squidClimber = new SquidClimber();
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
+
+    private final XboxController driverController = new XboxController(0);
+
+
+    JoystickButton startButton = new JoystickButton(driverController, Button.kStart.value);
+    JoystickButton backButton = new JoystickButton(driverController, Button.kBack.value);
+    JoystickButton rightBumper = new JoystickButton(driverController, Button.kRightBumper.value);
+    JoystickButton leftBumper = new JoystickButton(driverController, Button.kLeftBumper.value);
+    JoystickButton aButton = new JoystickButton(driverController, Button.kA.value);
+    JoystickButton bButton = new JoystickButton(driverController, Button.kB.value);
+    JoystickButton yButton = new JoystickButton(driverController, Button.kY.value);
+    JoystickButton xButton = new JoystickButton(driverController, Button.kX.value);
+    POVButton dPadUpButton = new POVButton(driverController, 0);
+    POVButton dPadDownButton = new POVButton(driverController, 180);
+    POVButton dPadRightButton = new POVButton(driverController, 90);
+    POVButton dPadLeftButton = new POVButton(driverController, 270);
 
     // Commands
     Command manualDriveCommand = new XboxParkerManualDriveCommand(driveSubsystem, xBoxController);
@@ -67,6 +93,14 @@ public class RobotContainer {
      */
     public RobotContainer() {
         
+        aButton.onTrue(new StartEndCommand(squidOuttake::OuttakeIn, squidOuttake::OuttakeStop, squidOuttake));
+        aButton.onFalse(new StartEndCommand(squidOuttake::OuttakeStop, squidOuttake::OuttakeStop, squidOuttake));
+
+        bButton.onTrue(new StartEndCommand(squidOuttake::OuttakeOut, squidOuttake::OuttakeStop, squidOuttake));
+        bButton.onFalse(new StartEndCommand(squidOuttake::OuttakeStop, squidOuttake::OuttakeStop, squidOuttake));
+
+
+
         // Add cameras to the VisionOdometry object.
         visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, new Transform3d()));
         visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.SLIDE_CAMERA_NAME, new Transform3d()));

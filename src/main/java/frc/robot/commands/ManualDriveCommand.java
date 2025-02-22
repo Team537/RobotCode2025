@@ -15,7 +15,9 @@ public abstract class ManualDriveCommand extends Command {
     protected final XboxController controller;
 
     // The rotational offset of the driver
-    private Rotation2d driverRotationalOffset = new Rotation2d(0.0);
+    // private Rotation2d driverRotationalOffset = new Rotation2d(Math.PI*-.5);
+    private Rotation2d driverRotationalOffset = new Rotation2d(0);
+
 
 
     // Indicates whether target translation is active.

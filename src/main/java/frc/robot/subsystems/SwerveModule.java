@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -11,6 +12,7 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants.DriveConstants;
@@ -33,9 +35,11 @@ public class SwerveModule extends SubsystemBase {
     SparkMax drivingNeo;
     TalonFX drivingKrakenX60;
     TalonFX drivingKrakenX60FOC;
+    TalonFX drivingFalcon;
 
     // Turning Motors
     SparkMax turningNeo550;
+    TalonFX turningFalcon;
 
     // The offsets of the individual modules
     Rotation2d moduleAngularOffset;
@@ -66,6 +70,8 @@ public class SwerveModule extends SubsystemBase {
 
     }
 
+     
+
     /**
      * gets the position of the active driving motor
      * @return the position of the active driving motor in meters
@@ -78,6 +84,8 @@ public class SwerveModule extends SubsystemBase {
                 return drivingKrakenX60.getPosition().getValueAsDouble();
             case KRAKEN_X60_FOC:
                 return drivingKrakenX60FOC.getPosition().getValueAsDouble();
+            case FALCON:
+                return drivingFalcon.getPosition().getValueAsDouble();
             default:
                 return 0.0;
         }
@@ -95,6 +103,8 @@ public class SwerveModule extends SubsystemBase {
                 return drivingKrakenX60.getVelocity().getValueAsDouble();
             case KRAKEN_X60_FOC:
                 return drivingKrakenX60FOC.getVelocity().getValueAsDouble();
+            case FALCON:
+                return drivingFalcon.getVelocity().getValueAsDouble();
             default:
                 return 0.0;
         }
@@ -123,6 +133,10 @@ public class SwerveModule extends SubsystemBase {
                 velocityRequest.EnableFOC = true;
                 drivingKrakenX60FOC.setControl(velocityRequest);
                 break;
+            case FALCON:
+                velocityRequest = new VelocityVoltage(velocity);
+                drivingFalcon.setControl(velocityRequest);
+                break;
         }
     }
 
@@ -136,6 +150,8 @@ public class SwerveModule extends SubsystemBase {
             case NEO_550:
                 rawAngle = new Rotation2d(turningNeo550.getAbsoluteEncoder().getPosition());
                 break;
+            case FALCON:
+                rawAngle = new Rotation2d(turningFalcon.getPosition().getValueAsDouble());
             default:
                 rawAngle = new Rotation2d();
                 break;
@@ -152,6 +168,14 @@ public class SwerveModule extends SubsystemBase {
         switch (activeTurningMotor) {
             case NEO_550:
                 turningNeo550.getClosedLoopController().setReference(rawAngle.getRadians(), ControlType.kPosition);
+                break;
+            case FALCON:
+                final PositionVoltage positionRequest = new PositionVoltage(rawAngle.getRadians()*(2*Math.PI)).withSlot(0);
+                if(turningCANID == 3) {
+                    System.out.println(rawAngle.getRadians()*(2*Math.PI));
+                    System.out.println(turningFalcon.getPosition().getValueAsDouble());
+                }
+                turningFalcon.setControl(positionRequest);
                 break;
         }
     }
@@ -196,6 +220,9 @@ public class SwerveModule extends SubsystemBase {
             case KRAKEN_X60_FOC:
                 drivingKrakenX60FOC.disable();
                 break;
+            case FALCON:
+                drivingFalcon.disable();
+                break;
 
         }
 
@@ -228,6 +255,12 @@ public class SwerveModule extends SubsystemBase {
                 drivingKrakenX60FOC.setPosition(0.0);
                 break;
 
+            case FALCON:
+                drivingFalcon = new TalonFX(drivingCANID);
+                drivingFalcon.getConfigurator().apply(Configs.Swerve.Driving.FALCON_CONFIGURATION);
+                drivingFalcon.setPosition(0.0);
+                break;
+
         }
 
     }
@@ -257,6 +290,8 @@ public class SwerveModule extends SubsystemBase {
             case NEO_550:
                 turningNeo550.disable();
                 break;
+            case FALCON:
+                turningFalcon.disable();
 
         }
 
@@ -274,6 +309,11 @@ public class SwerveModule extends SubsystemBase {
             case NEO_550:
                 turningNeo550 = new SparkMax(turningCANID,MotorType.kBrushless);
                 turningNeo550.configure(Configs.Swerve.Turning.NEO_550_TURNING_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+                break;
+            case FALCON:
+                turningFalcon = new TalonFX(turningCANID);
+                turningFalcon.getConfigurator().apply(Configs.Swerve.Turning.FALCON_TURNING_CONFIG);
+                turningFalcon.setPosition(0.0);
                 break;
 
         }

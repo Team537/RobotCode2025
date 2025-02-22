@@ -2,6 +2,9 @@ package frc.robot;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
+
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import frc.robot.Constants.DriveConstants;
@@ -16,6 +19,7 @@ public final class Configs {
             public static final SparkMaxConfig NEO_DRIVING_CONFIG = new SparkMaxConfig();
             public static final TalonFXConfiguration KRAKEN_X60_CONFIGURATION = new TalonFXConfiguration();
             public static final TalonFXConfiguration KRAKEN_X60_FOC_CONFIGURATION = new TalonFXConfiguration();
+            public static final TalonFXConfiguration FALCON_CONFIGURATION = new TalonFXConfiguration();
 
             static {
 
@@ -104,16 +108,51 @@ public final class Configs {
                 KRAKEN_X60_FOC_CONFIGURATION
                     .Slot0
                         .kD = DriveConstants.KrakenX60FOCDriving.KD;
-                        KRAKEN_X60_FOC_CONFIGURATION
+                KRAKEN_X60_FOC_CONFIGURATION
                         .Slot0
                             .kV = DriveConstants.KrakenX60FOCDriving.KV;
-                    KRAKEN_X60_FOC_CONFIGURATION
+                KRAKEN_X60_FOC_CONFIGURATION
                         .Slot0
                             .kA = DriveConstants.KrakenX60FOCDriving.KA;
 
                 KRAKEN_X60_FOC_CONFIGURATION
                     .MotorOutput
                         .NeutralMode = DriveConstants.KrakenX60FOCDriving.NEUTRAL_MODE;
+
+                // --- FALCON DRIVING CONFIG ---
+
+
+                FALCON_CONFIGURATION
+                    .Feedback.SensorToMechanismRatio = DriveConstants.FalconDriving.SENSOR_TO_MECHANISM_RATIO;
+                FALCON_CONFIGURATION
+                    .CurrentLimits
+                        .SupplyCurrentLimitEnable = DriveConstants.FalconDriving.CURRENT_LIMIT_ENABLED;
+                FALCON_CONFIGURATION
+                    .CurrentLimits
+                        .SupplyCurrentLimit = DriveConstants.FalconDriving.CURRENT_LIMIT;
+                FALCON_CONFIGURATION
+                    .CurrentLimits
+                        .SupplyCurrentLowerLimit = DriveConstants.FalconDriving.CURRENT_LOWER_LIMIT;
+                FALCON_CONFIGURATION
+                    .CurrentLimits
+                        .SupplyCurrentLowerTime = DriveConstants.FalconDriving.CURRENT_LOWER_TIME;
+
+                FALCON_CONFIGURATION
+                    .Slot0
+                        .kP = DriveConstants.FalconDriving.KP;
+                FALCON_CONFIGURATION
+                    .Slot0
+                        .kI = DriveConstants.FalconDriving.KI;
+                FALCON_CONFIGURATION
+                    .Slot0
+                        .kD = DriveConstants.FalconDriving.KD;
+                FALCON_CONFIGURATION
+                    .Slot0
+                        .kV = DriveConstants.FalconDriving.KV;
+                FALCON_CONFIGURATION
+                    .Slot0
+                        .kA = DriveConstants.FalconDriving.KA;
+
             
             }
 
@@ -123,6 +162,7 @@ public final class Configs {
 
             // Turning Configs
             public static final SparkMaxConfig NEO_550_TURNING_CONFIG = new SparkMaxConfig();
+            public static final TalonFXConfiguration FALCON_TURNING_CONFIG = new TalonFXConfiguration();
 
             static {
                 
@@ -147,6 +187,38 @@ public final class Configs {
                 NEO_550_TURNING_CONFIG
                     .idleMode(DriveConstants.Neo550Turning.IDLE_MODE)
                     .smartCurrentLimit(DriveConstants.Neo550Turning.CURRENT_LIMIT);
+                
+                FALCON_TURNING_CONFIG.ClosedLoopGeneral.ContinuousWrap = DriveConstants.FalconTurning.CONTINUOUS_WRAP;
+                FALCON_TURNING_CONFIG.Feedback.SensorToMechanismRatio = DriveConstants.FalconTurning.SENSOR_TO_MECHANISM_RATIO;
+
+                FALCON_TURNING_CONFIG
+                    .CurrentLimits
+                        .SupplyCurrentLimitEnable = DriveConstants.FalconTurning.CURRENT_LIMIT_ENABLED;
+                FALCON_TURNING_CONFIG
+                    .CurrentLimits
+                        .SupplyCurrentLimit = DriveConstants.FalconTurning.CURRENT_LIMIT;
+                FALCON_TURNING_CONFIG
+                    .CurrentLimits
+                        .SupplyCurrentLowerLimit = DriveConstants.FalconTurning.CURRENT_LOWER_LIMIT;
+                FALCON_TURNING_CONFIG
+                    .CurrentLimits
+                        .SupplyCurrentLowerTime = DriveConstants.FalconTurning.CURRENT_LOWER_TIME;
+
+                FALCON_TURNING_CONFIG
+                    .Slot0
+                        .kP = DriveConstants.FalconTurning.KP;
+                FALCON_TURNING_CONFIG
+                    .Slot0
+                        .kI = DriveConstants.FalconTurning.KI;
+                FALCON_TURNING_CONFIG
+                    .Slot0
+                        .kD = DriveConstants.FalconTurning.KD;
+                FALCON_TURNING_CONFIG
+                    .Slot0
+                        .kV = DriveConstants.FalconTurning.KV;
+                FALCON_TURNING_CONFIG
+                    .Slot0
+                        .kA = DriveConstants.FalconTurning.KA;
 
             }
 

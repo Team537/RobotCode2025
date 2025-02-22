@@ -120,8 +120,8 @@ public final class Constants {
         public static final double ROTATIONAL_KD = 0.2;
         
         // Default motor values
-        public static final DrivingMotor DEFAULT_DRIVING_MOTOR = DrivingMotor.KRAKEN_X60;
-        public static final TurningMotor DEFAULT_TURNING_MOTOR = TurningMotor.NEO_550;
+        public static final DrivingMotor DEFAULT_DRIVING_MOTOR = DrivingMotor.FALCON;
+        public static final TurningMotor DEFAULT_TURNING_MOTOR = TurningMotor.FALCON;
     
         /** ---------------------------------- DRIVING CONSTANTS ---------------------------------- */
         public static final class NeoDriving {
@@ -188,6 +188,29 @@ public final class Constants {
             public static final int CURRENT_LOWER_LIMIT = 25;
             public static final double CURRENT_LOWER_TIME = 0.5;
         }
+
+        public static final class FalconDriving {
+            public static final double FREE_SPEED = 668.112038; // Rad/s
+            public static final double MOTOR_REDUCTION = 4.714;
+            public static final double DRIVE_WHEEL_FREE_SPEED = (FREE_SPEED * WHEEL_RADIUS) / MOTOR_REDUCTION;
+    
+            public static final double SENSOR_TO_MECHANISM_RATIO = MOTOR_REDUCTION / WHEEL_CIRCUMFERENCE;
+    
+            public static final double KP = 1.0;
+            public static final double KI = 1.0;
+            public static final double KD = 0.01;
+            public static final double KV = 2.36;
+            public static final double KA = 0.18;
+
+            public static final double PID_MIN_OUTPUT = -1;
+            public static final double PID_MAX_OUTPUT = 1;
+    
+            public static final NeutralModeValue NEUTRAL_MODE = NeutralModeValue.Brake;
+            public static final boolean CURRENT_LIMIT_ENABLED = true;
+            public static final int CURRENT_LIMIT = 75; // Amps
+            public static final int CURRENT_LOWER_LIMIT = 25;
+            public static final double CURRENT_LOWER_TIME = 0.5;
+        }
     
         /** ---------------------------------- TURNING CONSTANTS ---------------------------------- */
         public static final class Neo550Turning {
@@ -208,6 +231,34 @@ public final class Constants {
             public static final IdleMode IDLE_MODE = IdleMode.kBrake;
             public static final int CURRENT_LIMIT = 20; // Amps
         }
+
+        public static final class FalconTurning {
+            // public static final double ENCODER_POSITION_FACTOR = (2 * Math.PI); // Radians
+            // public static final double ENCODER_VELOCITY_FACTOR = (2 * Math.PI); // Rad/s
+            // public static final double POSITION_PID_MIN_INPUT = 0.0;
+            // public static final double POSITION_PID_MAX_INPUT = ENCODER_POSITION_FACTOR;
+    
+            // public static final boolean ENCODER_INVERTED = true;
+    
+            public static final double KP = 1;
+            public static final double KI = 1;
+            public static final double KD = 0.01;
+            public static final double KV = 0.0;
+            public static final double KA = 0.0;
+            public static final double PID_MIN_OUTPUT = -1.0;
+            public static final double PID_MAX_OUTPUT = 1.0;
+    
+            public static final NeutralModeValue NEUTRAL_MODE = NeutralModeValue.Brake;
+            public static final boolean CURRENT_LIMIT_ENABLED = true;
+            public static final int CURRENT_LIMIT = 40; // Amps
+            public static final int CURRENT_LOWER_LIMIT = 25;
+            public static final double CURRENT_LOWER_TIME = 0.5;
+
+            public static final boolean CONTINUOUS_WRAP = true;
+            // public static final double SENSOR_TO_MECHANISM_RATIO = 0.08838383838;
+            public static final double SENSOR_TO_MECHANISM_RATIO = 1;
+        }
+
     }
     
     public static class UpperAssemblyConstants {
@@ -224,7 +275,7 @@ public final class Constants {
      */
     public static class NarwhalConstants {
         public static class NarwhalIntakeOuttakeConstants {
-            public static final int INTAKE_OUTTAKE_MOTOR_CAN_ID = 12; // TODO: Replace this placeholder with the actual
+            public static final int INTAKE_OUTTAKE_MOTOR_CAN_ID = 23; // TODO: Replace this placeholder with the actual
                                                                       // id
             public static final int INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT = 20;
             public static final double INTAKE_MOTOR_PERCENTAGE = 0.35; // between -1.0 and 1.0
@@ -259,8 +310,8 @@ public final class Constants {
         public static class SquidManipulatorConstants {
 
             //TODO: Put actual IDs in
-            public static final int TOP_MOTOR_CAN_ID = 11;
-            public static final int BOTTOM_MOTOR_CAN_ID = 12;
+            public static final int TOP_MOTOR_CAN_ID = 21;
+            public static final int BOTTOM_MOTOR_CAN_ID = 22;
 
             public static final int CORAL_SENSOR_ID = 0;
 
