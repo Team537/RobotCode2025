@@ -1,4 +1,4 @@
-package frc.robot.subsystems.vision;
+package frc.robot.subsystems.vision.odometry;
 
 import java.util.ArrayList;
 import java.util.List;
