@@ -353,7 +353,7 @@ public class DriveSubsystem extends SubsystemBase {
         return commandedRotationalVelocity;
     }
 
-    // Runs whenever the robot is active. Even when dissabled.
+    // Runs whenever the robot is active. Even when disabled.
     // Periodic method called every loop
     @Override
     public void periodic() {

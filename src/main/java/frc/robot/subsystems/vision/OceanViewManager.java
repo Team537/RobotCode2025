@@ -54,7 +54,7 @@ import java.util.function.Supplier;
  *   <li>Convenient methods to compute a <strong>rolling average</strong> of the memory
  *       for advanced noise reduction.</li>
  * </ul>
- * 
+ * <hr>
  * @author Cameron Myhre
  * @since v2.0.0
  */
