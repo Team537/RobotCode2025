@@ -102,6 +102,7 @@ public abstract class ManualDriveCommand extends Command {
 
             // Lock the robot's position if no movement is commanded
             // TODO: test and fix this, delete the "false && " to activate
+            /*
             if (false && linearVelocity.magnitude() < 1e-3 && driveSubsystem.getCommandedLinearVelocity().magnitude() < 1e-3) {
                 if (!xyLockActive) {
                     xyLockActive = true;
@@ -115,14 +116,23 @@ public abstract class ManualDriveCommand extends Command {
                     (OperatorConstants.THROTTLE_LINEAR_MAX_SPEED - OperatorConstants.THROTTLE_LINEAR_MIN_SPEED);
                 finalLinearVelocity = linearVelocity.scale(linearThrottleMultiplier);
             }
+            */
+
+            // Apply throttle for speed control
+            double linearThrottleMultiplier = OperatorConstants.THROTTLE_LINEAR_MIN_SPEED + throttle * 
+                (OperatorConstants.THROTTLE_LINEAR_MAX_SPEED - OperatorConstants.THROTTLE_LINEAR_MIN_SPEED);
+            finalLinearVelocity = linearVelocity.scale(linearThrottleMultiplier);
         } else {
+
             // Target translation is active
             targetTranslationOffset.rotateBy(driverRotationalOffset.times(-1.0)); // Adjust for driver orientation
             if (!targetTranslationActive) {
+
                 // Initialize the origin for target translation
                 targetTranslationActive = true;
                 targetTranslationOrigin = driveSubsystem.getRobotPose().getTranslation().minus(targetTranslationOffset);
             }
+
             // Use PID feedback to calculate the velocity toward the target position
             finalLinearVelocity = driveSubsystem.getLinearFeedback(targetTranslationOrigin.plus(targetTranslationOffset)).scale(DriveConstants.LINEAR_MAX_SPEED);
             linearVelocityReset = false; // Prevent accidental movement when deactivating
@@ -130,6 +140,7 @@ public abstract class ManualDriveCommand extends Command {
 
         // --- Handling rotational velocity ---
         if (!useTargetRotation) {
+
             // Target rotation is not active, so use joystick input for rotation control
             targetRotationActive = false;
 
@@ -148,6 +159,7 @@ public abstract class ManualDriveCommand extends Command {
             // Lock the robot's orientation if no rotation is commanded
 
             // TODO: test and fix this, delete the "false && " to activate
+            /*
             if (false && Math.abs(rotationalVelocity) < 1e-3 && Math.abs(driveSubsystem.getCommandedRotationalVelocity()) < 1e-3) {
                 if (!thetaLockActive) {
                     thetaLockActive = true;
@@ -161,6 +173,12 @@ public abstract class ManualDriveCommand extends Command {
                     (OperatorConstants.THROTTLE_ROTATIONAL_MAX_SPEED - OperatorConstants.THROTTLE_ROTATIONAL_MIN_SPEED);
                 finalRotationalVelocity = rotationalVelocity * rotationalThrottleMultiplier;
             }
+             */
+            
+            // Apply throttle for rotational speed control
+            double rotationalThrottleMultiplier = OperatorConstants.THROTTLE_ROTATIONAL_MIN_SPEED + throttle * 
+                (OperatorConstants.THROTTLE_ROTATIONAL_MAX_SPEED - OperatorConstants.THROTTLE_ROTATIONAL_MIN_SPEED);
+            finalRotationalVelocity = rotationalVelocity * rotationalThrottleMultiplier;
         } else {
 
             // Target rotation is active

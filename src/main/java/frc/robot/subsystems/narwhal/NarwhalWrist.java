@@ -5,8 +5,6 @@
 package frc.robot.subsystems.narwhal;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -17,7 +15,6 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -123,6 +120,11 @@ public class NarwhalWrist extends SubsystemBase {
         currentState = NarwhalWristState.CUSTOM; // redundant but helps with readability
     }
 
+    /**
+     * Returns the current angle of the wrist, as a {@link Rotation2d}.
+     * 
+     * @return The current angle of the wrist, as a {@link Rotation2d}.
+     */
     public Rotation2d getCurrentAngle() {
         return Rotation2d.fromRadians(wrist.getAbsoluteEncoder().getPosition());
     }

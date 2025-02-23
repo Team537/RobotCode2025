@@ -33,14 +33,21 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
     private final SparkMaxConfig intakeOuttakeMotorConfig;
     private final SparkClosedLoopController intakeOuttakeMotorPIDController;
     
+    /**
+     * Creates a new instance of the NarwhalIntakeOuttake class, setting up all necessary hardware in the process.
+     */
     public NarwhalIntakeOuttake() {
+
+        // Create a new spark max to control the intake.
         intakeOuttakeMotorConfig = new SparkMaxConfig();
-        // General configs
+
+        // Configure the intake motor settings.
         intakeOuttakeMotorConfig
             .inverted(true)
             .idleMode(IdleMode.kBrake)
             .smartCurrentLimit(NarwhalIntakeOuttakeConstants.INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT);
-        // PID configs
+        
+        // Adjust the encoder settings.
         intakeOuttakeMotorConfig.closedLoop
                 .pid(
                     NarwhalIntakeOuttakeConstants.POSITION_PID_P, 
@@ -60,6 +67,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
 
     /**
      * Function to run the intake-outtake moter at a percentage of its maximum voltage.
+     * 
      * @param percent percentage between -1.0 and 1.0 (negative values reverse direction)
      */
     public void setIntakeOuttakeMotorPercent(double percent){
