@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.OceanViewConstants;
 import frc.robot.network.TCPSender;
 import frc.robot.network.UDPReceiver;
-import frc.utils.vision.ScoringLocation;
+import frc.robot.util.vision.ScoringLocation;
 
 import java.io.IOException;
 import java.util.*;

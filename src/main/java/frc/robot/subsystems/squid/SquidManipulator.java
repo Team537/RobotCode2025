@@ -11,7 +11,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SquidConstants.SquidManipulatorConstants;
-import frc.robot.util.ScoringHeight;
+import frc.robot.util.upper_assembly.ScoringHeight;
 
 /**
  * The {@code SquidManipulator} subsystem controls the manipulator mechanism that handles game elements.

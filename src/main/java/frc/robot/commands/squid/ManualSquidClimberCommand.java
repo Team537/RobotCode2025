@@ -3,7 +3,7 @@ package frc.robot.commands.squid;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.squid.SquidClimber;
-import frc.robot.util.SquidClimberPosition;
+import frc.robot.util.upper_assembly.squid.SquidClimberPosition;
 
 public class ManualSquidClimberCommand extends Command {
     

@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.upper_assembly;
 
 import frc.robot.subsystems.narwhal.NarwhalUpperAssembly;
 import frc.robot.subsystems.squid.SquidUpperAssembly;

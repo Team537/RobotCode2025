@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.util.Vector2d;
+import frc.robot.util.math.Vector2d;
 
 public class XboxParkerManualDriveCommand extends ManualDriveCommand {
 

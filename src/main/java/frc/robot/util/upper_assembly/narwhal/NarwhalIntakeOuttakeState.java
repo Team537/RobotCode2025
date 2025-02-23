@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.upper_assembly.narwhal;
 
 /**
  * <h2> NarwhalIntakeOuttakeState </h2>

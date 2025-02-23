@@ -3,7 +3,7 @@ package frc.robot.commands.squid;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.squid.SquidManipulator;
-import frc.robot.util.ScoringHeight;
+import frc.robot.util.upper_assembly.ScoringHeight;
 
 public class ManualSquidManipulatorCommand extends Command {
 

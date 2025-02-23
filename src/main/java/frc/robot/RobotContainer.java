@@ -17,15 +17,14 @@ import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.vision.OceanViewManager;
 import frc.robot.subsystems.vision.odometry.PhotonVisionCamera;
 import frc.robot.subsystems.vision.odometry.VisionOdometry;
-import frc.utils.UpperSubstructure;
-import frc.utils.DrivingMotor;
 import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
-import frc.robot.util.UpperAssemblyFactory;
-import frc.robot.util.UpperAssemblyType;
+import frc.robot.util.autonomous.Alliance;
+import frc.robot.util.autonomous.AutonomousRoutine;
+import frc.robot.util.swerve.DrivingMotor;
+import frc.robot.util.upper_assembly.UpperAssemblyFactory;
+import frc.robot.util.upper_assembly.UpperAssemblyType;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.utils.Autonomous.Alliance;
-import frc.utils.Autonomous.AutonomousRoutine;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -62,7 +61,7 @@ public class RobotContainer {
     // Smart Dashboard Inputs
     private final SendableChooser<AutonomousRoutine> autonomousSelector = new SendableChooser<>();
     private final SendableChooser<Alliance> allianceSelector = new SendableChooser<>();
-    private final SendableChooser<UpperSubstructure> upperSubstructureSelector = new SendableChooser<>();
+    private final SendableChooser<UpperAssemblyType> upperSubstructureSelector = new SendableChooser<>();
     private final SendableChooser<DrivingMotor> drivingMotorSelector = new SendableChooser<>();
 
     /**
@@ -148,8 +147,8 @@ public class RobotContainer {
         }
 
         // Setup Upper Substructure Selection
-        upperSubstructureSelector.setDefaultOption("NARWAL", UpperSubstructure.NARWAL);
-        for (UpperSubstructure upperSubstructure : UpperSubstructure.values()) {
+        upperSubstructureSelector.setDefaultOption("NARWAL", UpperAssemblyType.NARWHAL);
+        for (UpperAssemblyType upperSubstructure : UpperAssemblyType.values()) {
             upperSubstructureSelector.addOption(upperSubstructure.toString(), upperSubstructure);
         }
 

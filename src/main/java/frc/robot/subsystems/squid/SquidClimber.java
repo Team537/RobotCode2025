@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import frc.robot.Constants.SquidConstants.SquidClimberConstants;
-import frc.robot.util.SquidClimberPosition;
+import frc.robot.util.upper_assembly.squid.SquidClimberPosition;
 
 /**
  * The {@code SquidClimber} subsystem controls the climbing mechanism of the robot.

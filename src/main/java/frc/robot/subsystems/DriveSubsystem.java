@@ -13,11 +13,11 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.util.DrivingMotor;
-import frc.robot.util.RateLimiter;
-import frc.robot.util.RateLimiter2d;
-import frc.robot.util.TurningMotor;
-import frc.robot.util.Vector2d;
+import frc.robot.util.math.RateLimiter;
+import frc.robot.util.math.RateLimiter2d;
+import frc.robot.util.math.Vector2d;
+import frc.robot.util.swerve.DrivingMotor;
+import frc.robot.util.swerve.TurningMotor;
 
 /**
  * <h2> DriveSubsystem </h2>
