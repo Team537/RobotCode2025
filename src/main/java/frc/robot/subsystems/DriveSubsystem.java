@@ -11,15 +11,13 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.util.DrivingMotor;
-import frc.robot.util.RateLimiter;
-import frc.robot.util.RateLimiter2d;
-import frc.robot.util.TurningMotor;
-import frc.robot.util.Vector2d;
+import frc.robot.util.math.RateLimiter;
+import frc.robot.util.math.RateLimiter2d;
+import frc.robot.util.math.Vector2d;
+import frc.robot.util.swerve.DrivingMotor;
+import frc.robot.util.swerve.TurningMotor;
 
 /**
  * <h2> DriveSubsystem </h2>
@@ -141,9 +139,10 @@ public class DriveSubsystem extends SubsystemBase {
 
 
     /**
-     * gets a linear velocity value from the PID controllers
-     * @param target the target position
-     * @return the linear velocity
+     * Returns the linear velocity value from the PID controllers, as a Vector2d.
+     * 
+     * @param target The target position.
+     * @return The linear velocity, as a Vector2d.
      */
     public Vector2d getLinearFeedback(Translation2d target) {
 
@@ -158,17 +157,17 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * gets a rotational velocity value from the PID controller
-     * @param target the target orientation
-     * @return the value to go towards
+     * Returns a rotational velocity value from the PID controller, as a double.
+     * 
+     * @param target The target orientation.
+     * @return The value to go towards.
      */
     public double getRotationalFeedback(Rotation2d target) {
         return Math.tanh(thetaController.calculate(getRobotPose().getRotation().getRadians(), target.getRadians()));
     }
 
     /**
-     * Ignores all rate limiters and immediately tries to stop the robot as fast as
-     * possible
+     * Ignores all rate limiters and immediately tries to stop the robot as fast as possible.
      */
     public void instantStop() {
         targetLinearVelocity = new Vector2d(0.0, 0.0);
@@ -179,7 +178,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     /**
      * Drives linearly and rotationally using the following parameters, applying
-     * acceleration limiting
+     * acceleration limiting.
      * 
      * @param linearVelocity     The linear velocity, in meters per second, with the
      *                           X component parallel to the longer field axis and
@@ -204,11 +203,11 @@ public class DriveSubsystem extends SubsystemBase {
             rotationalVelocity = 0.0;
         }
 
-        //updating the commanded velocities
+        // Updating the commanded velocities
         commandedLinearVelocity = linearVelocity;
         commandedRotationalVelocity = rotationalVelocity;
 
-        //Calculating the desired module states for the robot
+        // Calculating the desired module states for the robot
         SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
             ChassisSpeeds.fromFieldRelativeSpeeds(
                 linearVelocity.getX(),
@@ -218,7 +217,7 @@ public class DriveSubsystem extends SubsystemBase {
             )
         );
         
-        //Capping the modules' speed at the maximum linear speed
+        // Capping the modules' speed at the maximum linear speed
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveConstants.LINEAR_MAX_SPEED);
 
         // Setting the states of the modules
@@ -231,16 +230,18 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Gets the gyroscope heading
-     * @return The gyroscope heading
+     * Returns this DriveSubsystem's gyroscope heading, as a Rotation2d. 
+     * 
+     * @return this DriveSubsystem's gyroscope heading, as a Rotation2d. 
      */
     public Rotation2d getGyroscopeHeading() {
         return gyroscope.getRotation2d();
     }
 
     /**
-     * Gets the Module States
-     * @return the Module States
+     * Returns this DriveSubsystem's swerver modules' states.
+     * 
+     * @return this DriveSubsystem's swerver modules' states.
      */
     public SwerveModuleState[] getSwerveModuleStates() {
         return new SwerveModuleState[] {
@@ -252,8 +253,9 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Gets the Module Positions
-     * @return the Module Positions
+     * Returns this DriveSubsystem's swerve modules' positions, as an array of SwerveModulePositions.
+     * 
+     * @return this DriveSubsystem's swerve modules' positions, as an array of SwerveModulePositions.
      */
     public SwerveModulePosition[] getSwerveModulePositions() {
         return new SwerveModulePosition[] {
@@ -274,40 +276,45 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Gets the pose of the robot
-     * @return the robot's pose
+     * Returns the robot's position, as a Pose2d.
+     * 
+     * @return The robot's position, as a Pose2d.
      */
     public synchronized Pose2d getRobotPose() {
         return poseEstimator.getEstimatedPosition();
     }
 
     /**
-     * sets the robot's pose
-     * @param pose the pose to set
+     * Sets the robot's pose.
+     * 
+     * @param pose The Pose2d to set the robot's position to.
      */
     public void setRobotPose(Pose2d pose) {
         poseEstimator.resetPose(pose);
     }
 
     /**
-     * sets the heading of the robot
-     * @param heading the heading to set
+     * Sets the heading of the robot.
+     * 
+     * @param heading The Rotation2d representing the direction that the robot will believe it is facing.
      */
     public void setRobotHeading(Rotation2d heading) {
         poseEstimator.resetRotation(heading);
     }
 
     /**
-     * sets the translation of the robot without modifying the heading
-     * @param position the position to set
+     * Sets the 2D position of the robot without modifying the heading.
+     * 
+     * @param position The position to set, as a Translation2d
      */
     public void setRobotTranslation(Translation2d translation) {
         poseEstimator.resetTranslation(translation);
     }
 
     /**
-     * Sets the driving motor of all four swerve modules
-     * @param drivingMotor The driving motor to set
+     * Sets the driving motor of all four swerve modules.
+     * 
+     * @param drivingMotor The driving motor to set.
      */
     public void setDrivingMotors(DrivingMotor drivingMotor) {
         frontLeftModule.setDrivingMotor(drivingMotor);
@@ -317,8 +324,9 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Sets the turning motor of all four swerve modules
-     * @param turningMotor The turning motor to set
+     * Sets the turning motor of all four swerve modules.
+     * 
+     * @param turningMotor The turning motor to set.
      */
     public void setTurningMotors(TurningMotor turningMotor) {
         frontLeftModule.setTurningMotor(turningMotor);
@@ -328,22 +336,24 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * gets the last commanded linear velocity (after acceleration limiting)
-     * @return the last commanded linear velocity, in meters per second
+     * Returns the last commanded linear velocity (after acceleration limiting).
+     * 
+     * @return The last commanded linear velocity, in meters per second, as a Vector2d.
      */
     public Vector2d getCommandedLinearVelocity() {
         return commandedLinearVelocity;
     }
 
     /**
-     * gets the last commanded rotational velocity (after accelerationg limiting)
-     * @return the last commanded rotational velocity, in radians per second
+     * Returns the last commanded rotational velocity (after acceleration limiting).
+     * 
+     * @return The last commanded rotational velocity, in radians per second.
      */
     public double getCommandedRotationalVelocity() {
         return commandedRotationalVelocity;
     }
 
-    // Runs whenever the robot is active. Even when dissabled.
+    // Runs whenever the robot is active. Even when disabled.
     // Periodic method called every loop
     @Override
     public void periodic() {
