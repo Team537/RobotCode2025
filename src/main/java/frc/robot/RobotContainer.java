@@ -12,20 +12,13 @@ import frc.robot.commands.ExampleCommand;
 import frc.robot.network.TCPSender;
 import frc.robot.network.UDPReceiver;
 import frc.robot.commands.XboxParkerManualDriveCommand;
-import frc.robot.commands.squid.ManualSquidClimberCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.vision.OceanViewManager;
 import frc.robot.subsystems.vision.odometry.PhotonVisionCamera;
 import frc.robot.subsystems.vision.odometry.VisionOdometry;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.geometry.Pose2d;
 import frc.utils.UpperSubstructure;
 import frc.utils.DrivingMotor;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import frc.robot.subsystems.squid.SquidClimber;
-import frc.robot.subsystems.squid.SquidManipulator;
-import frc.robot.subsystems.upper_assembly.UpperAssembly;
 import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
 import frc.robot.util.UpperAssemblyFactory;
 import frc.robot.util.UpperAssemblyType;
@@ -36,8 +29,6 @@ import frc.utils.Autonomous.AutonomousRoutine;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -62,6 +53,7 @@ public class RobotContainer {
     
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
     
+    @SuppressWarnings("unused") // The class is used due to how WPILib treats and stores subsystems.
     private OceanViewManager oceanViewManager;
 
     // Commands
@@ -72,7 +64,6 @@ public class RobotContainer {
     private final SendableChooser<Alliance> allianceSelector = new SendableChooser<>();
     private final SendableChooser<UpperSubstructure> upperSubstructureSelector = new SendableChooser<>();
     private final SendableChooser<DrivingMotor> drivingMotorSelector = new SendableChooser<>();
-    private final Field2d m_field = new Field2d();
 
     /**
      * Creates a new RobotContainer object and sets up SmartDashboard an the button inputs.
@@ -121,20 +112,12 @@ public class RobotContainer {
         this.oceanViewManager = new OceanViewManager(this.udpReceiver, this.tcpSender, driveSubsystem::getRobotPose);
     }
 
-
     /**
      * Use this method to define your trigger->command mappings. Triggers can be
-     * created via the
-     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
-     * an arbitrary
-     * predicate, or via the named factories in {@link
-     * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
-     * {@link
-     * CommandXboxController
-     * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-     * PS4} controllers or
-     * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-     * joysticks}.
+     * created via the {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
+     * an arbitrary predicate, or via the named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s 
+     * subclasses for {@link CommandXboxControllerXbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4ControllerPS4} 
+     * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
      */
     private void configureBindings() {
         
@@ -181,11 +164,6 @@ public class RobotContainer {
         SmartDashboard.putData(allianceSelector);
         SmartDashboard.putData(upperSubstructureSelector);
         SmartDashboard.putData(drivingMotorSelector);
-        
-        // Do this in either robot or subsystem init
-        SmartDashboard.putData("Field", m_field);
-        // Do this in either robot periodic or subsystem periodic
-        // m_field.setRobotPose(m_odometry.getPoseMeters());
     }
 
     /**
@@ -205,6 +183,7 @@ public class RobotContainer {
 
     /**
      * sets the upper assembly to the given type
+     * 
      * @param upperAssemblyType the type of upper assembly to set to
      */
     public void setUpperAssembly(UpperAssemblyType upperAssemblyType) {

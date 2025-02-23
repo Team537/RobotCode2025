@@ -3,6 +3,9 @@ package frc.robot.subsystems.vision;
 /**
  * Simple Data Transfer Object (DTO) for representing the robot's pose
  * and a timestamp in seconds.
+ * <hr>
+ * @author Cameron Myhre
+ * @since v2.0.0
  */
 public class RobotPoseData {
 
