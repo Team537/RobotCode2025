@@ -6,6 +6,15 @@ import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.util.Color;
 
+/**
+ * <h2> LEDConfiguration </h2>
+ * An enum value used to represent several preset LED patterns, allowing for easy switching between complex patterns.
+ * <hr>
+ * @author Cameron Myhre
+ * @author Viktor Austad
+ * @since v1.0.0
+ * @see {@link frc.robot.RobotContainer}
+ */
 public enum LEDConfiguration {
     MANUEL_DRIVE (LEDPattern.solid(new Color(199, 102, 255)).breathe(Seconds.of(0.25))),
     PROGRAM_STOP (LEDPattern.solid(new Color(237, 28, 35))),
