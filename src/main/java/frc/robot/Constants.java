@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import frc.robot.subsystems.upper_assembly.UpperAssembly;
 import frc.robot.util.DrivingMotor;
 import frc.robot.util.TurningMotor;
 import frc.robot.util.UpperAssemblyType;
@@ -118,7 +119,7 @@ public final class Constants {
         public static final double ROTATIONAL_KD = 0.2;
 
         // Default motor values
-        public static final DrivingMotor DEFAULT_DRIVING_MOTOR = DrivingMotor.KRAKEN_X60;
+        public static final DrivingMotor DEFAULT_DRIVING_MOTOR = DrivingMotor.NEO;
         public static final TurningMotor DEFAULT_TURNING_MOTOR = TurningMotor.NEO_550;
 
         /*

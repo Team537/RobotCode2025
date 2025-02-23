@@ -1,12 +1,12 @@
 package frc.robot.util;
 
-import frc.robot.subsystems.UpperAssembly;
 import frc.robot.subsystems.narwhal.NarwhalUpperAssembly;
 import frc.robot.subsystems.squid.SquidUpperAssembly;
+import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
 
 public class UpperAssemblyFactory {
     
-    public static UpperAssembly createUpperAssembly(UpperAssemblyType upperAssemblyType) {
+    public static UpperAssemblyBase createUpperAssembly(UpperAssemblyType upperAssemblyType) {
         
         switch(upperAssemblyType) {
             case SQUID:
