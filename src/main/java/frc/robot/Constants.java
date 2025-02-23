@@ -16,7 +16,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
-import frc.robot.subsystems.UpperAssembly;
+import frc.robot.subsystems.upper_assembly.UpperAssembly;
 import frc.robot.util.DrivingMotor;
 import frc.robot.util.TurningMotor;
 import frc.robot.util.UpperAssemblyType;

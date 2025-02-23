@@ -23,9 +23,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import frc.utils.UpperSubstructure;
 import frc.utils.DrivingMotor;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import frc.robot.subsystems.UpperAssembly;
 import frc.robot.subsystems.squid.SquidClimber;
 import frc.robot.subsystems.squid.SquidManipulator;
+import frc.robot.subsystems.upper_assembly.UpperAssembly;
+import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
 import frc.robot.util.UpperAssemblyFactory;
 import frc.robot.util.UpperAssemblyType;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -57,7 +58,7 @@ public class RobotContainer {
     // Subsystems
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
-    private UpperAssembly upperAssembly = UpperAssemblyFactory.createUpperAssembly(Constants.UpperAssemblyConstants.DEFAULT_UPPER_ASSEMBLY);
+    private UpperAssemblyBase upperAssembly = UpperAssemblyFactory.createUpperAssembly(Constants.UpperAssemblyConstants.DEFAULT_UPPER_ASSEMBLY);
     
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
     

@@ -6,10 +6,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import frc.robot.subsystems.UpperAssembly;
+import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
 import frc.robot.util.ScoringHeight;
 
-public class NarwhalUpperAssembly implements UpperAssembly {
+public class NarwhalUpperAssembly extends UpperAssemblyBase {
     
     public Command getCoralIntakeCommand(Supplier<Pose2d> robotPoseSupplier) {
         return new RunCommand(
