@@ -5,10 +5,8 @@ import frc.robot.subsystems.squid.SquidUpperAssembly;
 import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
 
 public class UpperAssemblyFactory {
-    
-    public static UpperAssemblyBase createUpperAssembly(UpperAssemblyType upperAssemblyType) {
-        
-        switch(upperAssemblyType) {
+    public static UpperAssemblyBase createUpperAssembly(UpperAssemblyType upperAssemblyType) { 
+        switch (upperAssemblyType) {
             case SQUID:
                 return new SquidUpperAssembly();
             case NARWHAL:
@@ -16,7 +14,5 @@ public class UpperAssemblyFactory {
             default:
                 return null;
         }
-
     }
-
 }
