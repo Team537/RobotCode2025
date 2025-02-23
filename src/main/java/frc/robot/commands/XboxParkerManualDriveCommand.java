@@ -12,9 +12,10 @@ public class XboxParkerManualDriveCommand extends ManualDriveCommand {
     boolean orientationOffsetTargetActive = false;
 
     /**
-     * creates a manual command of the type
-     * @param driveSubsystem the drive subsystem to be ran
-     * @param controller the controller which will be used
+     * Creates a manual drive command for Parker, using the button mappings and functionality of the XBox controller.
+     * 
+     * @param driveSubsystem The robot's drive subsystem.
+     * @param controller The controller used by the driver.
      */
     public XboxParkerManualDriveCommand(DriveSubsystem driveSubsystem, XboxController controller) {
         super(driveSubsystem,controller);

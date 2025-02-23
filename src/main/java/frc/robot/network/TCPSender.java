@@ -15,7 +15,7 @@ import com.google.gson.Gson;
  * and sending configuration data in JSON format over the network.
  * 
  * @author Cameron Myhre
- * @since v1.2.0
+ * @since v2.0.0
  */
 public class TCPSender {
 

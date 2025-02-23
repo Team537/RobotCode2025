@@ -14,37 +14,67 @@ public abstract class ManualDriveCommand extends Command {
     protected final DriveSubsystem driveSubsystem;
     protected final XboxController controller;
 
-    // The rotational offset of the driver
+    /**
+     * The rotational offset of the driver
+     */
     private Rotation2d driverRotationalOffset = new Rotation2d(0.0);
 
-
-    // Indicates whether target translation is active.
+    /**
+     * Indicates whether target translation is active.
+    */
     private boolean targetTranslationActive = false;
-    // The origin point for target translation calculations.
+
+    /**
+     * The origin point for target translation calculations.
+     */
     private Translation2d targetTranslationOrigin = new Translation2d(0.0, 0.0);
 
-    // If the robot is locked in the X-Y plane (i.e. holding position).
+    /**
+     * If the robot is locked in the X-Y plane (i.e. holding position).
+     */
     private boolean xyLockActive = false;
-    // The translation where the robot is locked.
+
+    /**
+     * The translation where the robot is locked.
+     */
     private Translation2d xyLockTranslation = new Translation2d(0.0, 0.0);
 
-    // Tracks whether linear velocity has been reset.
+    /**
+     * Tracks whether linear velocity has been reset.
+     */
     private boolean linearVelocityReset = false;
 
-    // If the robot's heading is locked.
+    /**
+     * If the robot's heading is locked.
+     */
     private boolean thetaLockActive = false;
-    // The rotation (angle) where the robot is locked.
+
+    /**
+     * The rotation (angle) where the robot is locked.
+     */
     private Rotation2d thetaLockRotation = new Rotation2d(0.0);
     
-    // Tracks whether rotational velocity has been reset.
+    /**
+     * Tracks whether rotational velocity has been reset.
+     */
     private boolean rotationalVelocityReset = false;
 
-
-    // Indicates whether target rotation is active.
+    /**
+     * Indicates whether target rotation is active.
+     */
     private boolean targetRotationActive = false;
-    // The origin angle for target rotation calculations.
+
+    /**
+     * The origin angle for target rotation calculations.
+     */
     private Rotation2d targetRotationOrigin = new Rotation2d(0.0);
 
+    /**
+     * Creates a new manual drive command to allow for the robot to be controlled manually during teleop.
+     * 
+     * @param driveSubsystem The robot's drive subsystem.
+     * @param controller The controller used by the driver.
+     */
     public ManualDriveCommand(DriveSubsystem driveSubsystem, XboxController controller) {
         this.driveSubsystem = driveSubsystem;
         this.controller = controller;
@@ -56,17 +86,17 @@ public abstract class ManualDriveCommand extends Command {
      * the final linear and rotational velocities based on the input parameters and applies 
      * them to the robot.
      *
-     * @param linearVelocity the target linear velocity of the robot. Used when useTargetTranslation is false.
+     * @param linearVelocity The target linear velocity of the robot. Used when useTargetTranslation is false.
      *                       This is represented as a vector on a unit circle.
-     * @param rotationalVelocity the target rotational velocity of the robot. Used when useTargetRotation is false.
+     * @param rotationalVelocity The target rotational velocity of the robot. Used when useTargetRotation is false.
      *                           This is a unit value (range [-1, 1]).
-     * @param targetTranslationOffset the desired translation offset for targeting a specific position.
-     * @param useTargetTranslation whether or not the robot should aim for a target translation.
-     * @param targetRotationOffset the desired rotation offset for targeting a specific orientation 
+     * @param targetTranslationOffset The desired translation offset for targeting a specific position.
+     * @param useTargetTranslation Whether or not the robot should aim for a target translation.
+     * @param targetRotationOffset The desired rotation offset for targeting a specific orientation 
      *                              (or the absolute orientation if useAbsoluteRotation is true). Measured in radians.
-     * @param useTargetRotation whether or not the robot should aim for a target rotation.
-     * @param useAbsoluteRotation whether the robot should target an absolute orientation or a relative offset.
-     * @param throttle a multiplier for controlling the max speed of the robot. Ranges from 0 (minimum speed) to 1 (maximum speed).
+     * @param useTargetRotation Whether or not the robot should aim for a target rotation.
+     * @param useAbsoluteRotation Whether the robot should target an absolute orientation or a relative offset.
+     * @param throttle A multiplier for controlling the max speed of the robot. Ranges from 0 (minimum speed) to 1 (maximum speed).
      */
     protected void manualDrive(
         Vector2d linearVelocity, 

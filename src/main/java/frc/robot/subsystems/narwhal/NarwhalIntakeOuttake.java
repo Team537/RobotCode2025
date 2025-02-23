@@ -47,7 +47,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
             .idleMode(IdleMode.kBrake)
             .smartCurrentLimit(NarwhalIntakeOuttakeConstants.INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT);
         
-        // Adjust the encoder settings.
+        // Update motor PID values.
         intakeOuttakeMotorConfig.closedLoop
                 .pid(
                     NarwhalIntakeOuttakeConstants.POSITION_PID_P, 

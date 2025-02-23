@@ -33,15 +33,21 @@ public class NarwhalWrist extends SubsystemBase {
     private final SparkMaxConfig wristConfig;
     private final SparkClosedLoopController wristMotorPIDController;
     
+    /**
+     * Create a new instance of the NarwhalWrist class, setting up necessary hardware in the process.
+     */
     public NarwhalWrist() {
-        // a whole lotta stuff for the spark max config
+
+        // Create a new spark max to control the wrist.
         wristConfig = new SparkMaxConfig();
-        // general configs
+
+        // Configure the wrist motor settings.
         wristConfig 
             .idleMode(IdleMode.kBrake)
             .smartCurrentLimit(Constants.NarwhalConstants.NarwhalWristConstants.WRIST_MOTOR_CURRENT_LIMIT)
             .inverted(true);
-        // configs for the PID
+
+        // Update motor PID values.
         wristConfig.closedLoop 
             .pid(
                 Constants.NarwhalConstants.NarwhalWristConstants.POSITION_PID_P, 
@@ -50,7 +56,8 @@ public class NarwhalWrist extends SubsystemBase {
             )
             .outputRange(-1, 1)
             .feedbackSensor(FeedbackSensor.kAbsoluteEncoder); // uses external encoder
-        // configs for the encoder
+
+        // Update encoder settings.
         // NOTE FOR THE ENCODER: WHEN VIEWED FROM THE RIGHT, THE ANGLE OF THE WRIST IS BASED ON A UNIT CIRCLE WITH 0 DEGREES POINTING STRAIGHT UP
         wristConfig.absoluteEncoder
             .inverted(false)
@@ -59,7 +66,7 @@ public class NarwhalWrist extends SubsystemBase {
             .zeroOffset(Constants.NarwhalConstants.NarwhalWristConstants.WRIST_OFFSET) // Down position should be "0" here, and -PI rads for zero centered
             .zeroCentered(true);
 
-        // creating the spark max controller
+        // Create the spark max controller with the above configured settings.
         wrist = new SparkMax(Constants.NarwhalConstants.NarwhalWristConstants.WRIST_MOTOR_CAN_ID, MotorType.kBrushless);
         wrist.configure(wristConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -68,8 +75,9 @@ public class NarwhalWrist extends SubsystemBase {
     }
 
     /**
-     * Function to move the motor to a target angle & sets the current state to CUSTOM.
-     * @param percent percentage between -1.0 and 1.0 (negative values reverse direction)
+     * Method to move the motor to a target angle & sets the current state to CUSTOM.
+     * 
+     * @param percent Percentage between -1.0 and 1.0 (negative values reverse direction)
      */
     public void setCurrentMotorAngle(Rotation2d targetAngle){
         double targetAngleRadians = targetAngle.getRadians();
@@ -81,6 +89,7 @@ public class NarwhalWrist extends SubsystemBase {
      * Set the wrist motor to the intake angle (defined in constants) & update status.
      */
     public void goToIntakeAngle() {
+        
         // Inline construction of command goes here.
         // Subsystem::RunOnce implicitly requires `this` subsystem.
         setCurrentMotorAngle(Constants.NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE);

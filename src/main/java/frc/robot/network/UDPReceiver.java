@@ -11,13 +11,11 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
- * UDPReceiver is responsible for receiving JSON data from a Raspberry Pi over
- * UDP.
- * This class runs a separate thread to continuously listen for incoming data
- * without blocking the main robot control loop.
- * 
+ * UDPReceiver is responsible for receiving JSON data from a Raspberry Pi over UDP.
+ * This class runs a separate thread to continuously listen for incoming data without blocking the main robot control loop.
+ * <hr>
  * @author Cameron Myhre
- * @since v1.2.0
+ * @since v2.0.0
  */
 public class UDPReceiver {
 

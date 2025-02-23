@@ -3,6 +3,9 @@ package frc.robot.subsystems.vision;
 /**
  * DataPacket encapsulates vision data which may include the robot's pose and frame capture flags,
  * along with a timestamp indicating when the data was recorded.
+ * <hr>
+ * @author Cameron Myhre
+ * @since v2.0.0
  */
 public class DataPacket {
 
