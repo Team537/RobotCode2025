@@ -122,7 +122,7 @@ public final class Constants {
         public static final double ROTATIONAL_KD = 0.2;
         
         // Default motor values
-        public static final DrivingMotor DEFAULT_DRIVING_MOTOR = DrivingMotor.KRAKEN_X60;
+        public static final DrivingMotor DEFAULT_DRIVING_MOTOR = DrivingMotor.NEO;
         public static final TurningMotor DEFAULT_TURNING_MOTOR = TurningMotor.NEO_550;
     
         /** ---------------------------------- DRIVING CONSTANTS ---------------------------------- */
