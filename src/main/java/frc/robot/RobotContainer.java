@@ -50,9 +50,9 @@ public class RobotContainer {
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
     private UpperAssemblyBase upperAssembly;
-    
+
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
-    
+
     @SuppressWarnings("unused") // The class is used due to how WPILib treats and stores subsystems.
     private OceanViewManager oceanViewManager;
 
@@ -162,16 +162,6 @@ public class RobotContainer {
 
         // An example command will be run in autonomous
         return Autos.exampleAuto(exampleSubsystem);
-    }
-
-    /**
-     * sets the upper assembly to the given type
-     * 
-     * @param upperAssemblyType the type of upper assembly to set to
-     */
-    public void setUpperAssembly(UpperAssemblyType upperAssemblyType) {
-        upperAssembly.disable();
-        upperAssembly = UpperAssemblyFactory.createUpperAssembly(upperAssemblyType);
     }
 
     /**
