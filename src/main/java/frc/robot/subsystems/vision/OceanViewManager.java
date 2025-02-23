@@ -56,7 +56,7 @@ import java.util.function.Supplier;
  * </ul>
  * 
  * @author Cameron Myhre
- * @since v1.2.0
+ * @since v2.0.0
  */
 public class OceanViewManager extends SubsystemBase {
 

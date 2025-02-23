@@ -15,9 +15,10 @@ public class ManualSquidManipulatorCommand extends Command {
     boolean coralSensedLastState = false;
 
     /**
-     * creates a manual squid manipulator command for an xbox controller
-     * @param squidManipulator the squid manipulator to run
-     * @param controller the xbox controller to drive the subsystem
+     * Creates a manual squid manipulator command for an xbox controller
+     * 
+     * @param squidManipulator The squid manipulator to run
+     * @param controller The xbox controller to drive the subsystem
      */
     public ManualSquidManipulatorCommand(SquidManipulator squidManipulator, XboxController controller) {
 

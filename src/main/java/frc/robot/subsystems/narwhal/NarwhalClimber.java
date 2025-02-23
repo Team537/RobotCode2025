@@ -34,17 +34,25 @@ public class NarwhalClimber extends SubsystemBase {
     private final SparkMaxConfig climberConfig;
     private final SparkClosedLoopController climberPID;
     
+    /**
+     * Creates a new instance of the NarwhalClimber class, setting up all necessary hardware in the process.
+     */
     public NarwhalClimber() {
+
+        // Create a new spark max to control the climber.
         climberConfig = new SparkMaxConfig();
-        // General configs
+        
+        // Configure the climber motor settings.
         climberConfig
             .smartCurrentLimit(40)
             .idleMode(IdleMode.kBrake)
             .inverted(NarwhalClimberConstants.IS_CLIMBER_INVERTED);
-        // Encoder configs
+
+        // Adjust the encoder settings.
         climberConfig.encoder
             .positionConversionFactor(1.0/NarwhalClimberConstants.CLIMBER_ANGLE_TO_MOTOR_ANGLE);
-        // PID configs
+
+        // Update motor PID values.
         climberConfig.closedLoop
             .pidf(
                 NarwhalClimberConstants.PID_P,
@@ -66,6 +74,7 @@ public class NarwhalClimber extends SubsystemBase {
 
     /**
      * Function to move the climber piece to a target angle (relative to the world) & sets the current state to CUSTOM.
+     * 
      * @param targetAngle Rotation2d target position
      */
     public void setCurrentMotorAngle(Rotation2d targetAngle){

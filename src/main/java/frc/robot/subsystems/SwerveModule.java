@@ -46,7 +46,7 @@ public class SwerveModule extends SubsystemBase {
     TurningMotor activeTurningMotor = DriveConstants.DEFAULT_TURNING_MOTOR;
 
     /**
-     * Creates a swerve module
+     * Creates a swerve module with the given values.
      * 
      * @param drivingCANID        The CANID for the driving motor
      * @param turningCANID        The CANID for the turning motor
@@ -63,12 +63,12 @@ public class SwerveModule extends SubsystemBase {
 
         activateDrivingMotor(activeDrivingMotor);
         activateTurningMotor(activeTurningMotor);
-
     }
 
     /**
-     * gets the position of the active driving motor
-     * @return the position of the active driving motor in meters
+     * Returns the position of the active driving motor, in meters.
+     * 
+     * @return The position of the active driving motor, in meters.
      */
     private double getDrivingPosition() {
         switch (activeDrivingMotor) {
@@ -84,8 +84,9 @@ public class SwerveModule extends SubsystemBase {
     }
 
     /**
-     * gets the velocity of the active driving motor
-     * @return the velocity of the active driving motor in meters per second
+     * Returns the velocity of the active driving motor, in meters per second.
+     * 
+     * @return The velocity of the active driving motor, in meters per second
      */
     private double getDrivingVelocity() {
         switch (activeDrivingMotor) {
@@ -101,8 +102,9 @@ public class SwerveModule extends SubsystemBase {
     }
 
     /**
-     * sets the velocity of the active motor
-     * @param velocity the desired velocity, in meters per second
+     * Sets the velocity of the active motor.
+     * 
+     * @param velocity The desired velocity, in meters per second
      */
     private void setDrivingVelocity(double velocity) {
         VelocityVoltage velocityRequest; // Used if TalonFX are being used
@@ -123,8 +125,9 @@ public class SwerveModule extends SubsystemBase {
     }
 
     /**
-     * gets the rotation of the active turning motor, relative to the chassis
-     * @return the rotation of the active turning motor, relative to the chassis
+     * Returns the rotation of the active turning motor, relative to the chassis
+     * 
+     * @return The rotation of the active turning motor, relative to the chassis
      */
     private Rotation2d getTurningAngle() {
         Rotation2d rawAngle;
@@ -140,8 +143,9 @@ public class SwerveModule extends SubsystemBase {
     }
 
     /**
-     * sets the angle of the turning motor
-     * @param angle the angle of the motor, relative to the robot base
+     * Sets the angle of the turning motor.
+     * 
+     * @param angle The angle of the motor, relative to the robot base
      */
     private void setTurningAngle(Rotation2d angle) {
         Rotation2d rawAngle = angle.plus(moduleAngularOffset);
@@ -153,9 +157,9 @@ public class SwerveModule extends SubsystemBase {
     }
 
     /**
-     * gets the module's position (relative to the field)
+     * Returns the module's position (relative to the field)
      * 
-     * @return the position of the module
+     * @return The position of the module
      */
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
@@ -165,9 +169,9 @@ public class SwerveModule extends SubsystemBase {
     }
 
     /**
-     * gets the module's state (relative to the field)
+     * Returns the module's state (relative to the field)
      * 
-     * @return the state of the module
+     * @return The state of the module
      */
     public SwerveModuleState getState() {
         return new SwerveModuleState(
@@ -192,18 +196,17 @@ public class SwerveModule extends SubsystemBase {
             case KRAKEN_X60_FOC:
                 drivingKrakenX60FOC.disable();
                 break;
-
         }
-
     }
 
     /**
-     * activates the driving motor
-     * @param drivingMotor the motor type to activate
+     * Activates the driving motor.
+     * 
+     * @param drivingMotor The type of motor to activate.
      */
     private void activateDrivingMotor(DrivingMotor drivingMotor) {
 
-        //Setting up the motors
+        // Setting up the motors
         switch (drivingMotor) {
 
             case NEO:
@@ -223,14 +226,13 @@ public class SwerveModule extends SubsystemBase {
                 drivingKrakenX60FOC.getConfigurator().apply(Configs.Swerve.Driving.KRAKEN_X60_FOC_CONFIGURATION);
                 drivingKrakenX60FOC.setPosition(0.0);
                 break;
-
         }
-
     }
 
     /**
-     * sets the driving motor type
-     * @param drivingMotor the type of driving motor
+     * Sets the driving motor type.
+     * 
+     * @param drivingMotor The type of driving motor
      */
     public void setDrivingMotor(DrivingMotor drivingMotor) {
         
@@ -247,20 +249,17 @@ public class SwerveModule extends SubsystemBase {
      * Disable active turning motors to prevent them from controlling the drive
      */
     private void disableActiveTurningMotor() {
-        
         switch (activeTurningMotor) {
-
             case NEO_550:
                 turningNeo550.disable();
                 break;
-
         }
-
     }
 
     /**
-     * activates the turning motor
-     * @param turningMotor the turning motor type to activate
+     * Activates the turning motor.
+     * 
+     * @param turningMotor The turning motor type to activate.
      */
     private void activateTurningMotor(TurningMotor turningMotor) {
         
@@ -271,14 +270,13 @@ public class SwerveModule extends SubsystemBase {
                 turningNeo550 = new SparkMax(turningCANID,MotorType.kBrushless);
                 turningNeo550.configure(Configs.Swerve.Turning.NEO_550_TURNING_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
                 break;
-
         }
-
     }
 
     /**
-     * sets the turning motor type
-     * @param turningMotor the type of turning motor
+     * Sets the turning motor type.
+     * 
+     * @param turningMotor The type of turning motor
      */
     public void setTurningMotor(TurningMotor turningMotor) {
         
@@ -292,17 +290,16 @@ public class SwerveModule extends SubsystemBase {
     }
 
     /**
-     * updates the PID controller to target a new state
+     * Updates the PID controller to target a new state
      * 
-     * @param state the new state to target
+     * @param state The new state to target
      */
     public void setState(SwerveModuleState state) {
         SwerveModuleState correctedDesiredState = new SwerveModuleState();
         correctedDesiredState.speedMetersPerSecond = state.speedMetersPerSecond;
         correctedDesiredState.angle = state.angle.times(1.0);
 
-        // optimze the desired state so that the robot will never rotate more than PI/2
-        // radians
+        // Optimize the desired state so that the robot will never rotate more than PI/2 radians
         correctedDesiredState.optimize(getPosition().angle);
 
         // Don't change the orientation of the turning wheels if the speed is low
@@ -313,7 +310,5 @@ public class SwerveModule extends SubsystemBase {
         // Setting the velocities
         setDrivingVelocity(correctedDesiredState.speedMetersPerSecond);
         setTurningAngle(correctedDesiredState.angle);
-
     }
-
 }
