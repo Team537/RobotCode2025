@@ -17,9 +17,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.UpperAssembly;
-import frc.robot.util.DrivingMotor;
-import frc.robot.util.TurningMotor;
-import frc.robot.util.UpperAssemblyType;
+import frc.robot.util.swerve.DrivingMotor;
+import frc.robot.util.swerve.TurningMotor;
+import frc.robot.util.upper_assembly.UpperAssemblyType;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 

@@ -15,7 +15,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants;
-import frc.robot.util.NarwhalIntakeOuttakeState;
+import frc.robot.util.upper_assembly.narwhal.NarwhalIntakeOuttakeState;
 
 /**
  * <h2> NarwhalIntakeOuttake </h2>

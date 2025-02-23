@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.math;
 
 import edu.wpi.first.math.MathSharedStore;
 

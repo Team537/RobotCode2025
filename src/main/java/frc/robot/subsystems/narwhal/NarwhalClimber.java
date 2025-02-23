@@ -17,7 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.NarwhalConstants.NarwhalClimberConstants;
-import frc.robot.util.NarwhalClimberState;
+import frc.robot.util.upper_assembly.narwhal.NarwhalClimberState;
 
 /**
  * <h2> NarwhalWrist </h2>
