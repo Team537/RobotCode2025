@@ -1,4 +1,4 @@
-package frc.robot.util.Autonomous;
+package frc.robot.util.autonomous;
 
 /**
  * <h2> Alliance </h2>
