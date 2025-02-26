@@ -252,6 +252,41 @@ public final class Constants {
           public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(-Math.PI / 4); // -pi/4 TODO: update these placeholder values
           public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(2 * Math.PI / 3); // 2pi/3 TODO: update these placeholder values
           public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(Math.PI / 2); // pi/2 TODO: update these placeholder values
+		    
+          /** The angle tolerance for the wrist to be considered at a specific state. */
+          public static final double WRIST_ANGLE_TOLERANCE = 0.3;
+        }
+
+        public static class NarwhalElevatorConstants {
+            public static final int ELEVATOR_LEAD_MOTOR_CAN_ID = 13;
+            public static final int ELEVATOR_LEAD_MOTOR_CURRENT_LIMIT = 40;
+
+            public static final int ELEVATOR_FOLLOWER_CAN_ID = 16;
+            public static final int ELEVATOR_FOLLOWER_MOTOR_CURRENT_LIMIT = ELEVATOR_LEAD_MOTOR_CURRENT_LIMIT; // same motor so probably should use same current limit.
+            
+            // Calculating the ratio of rotations to distance
+            /** Meters */
+            private static final double ELEVATOR_GEAR_RADIUS = 0.065; // Meters
+            private static final double ELEVATOR_GEAR_CIRCUMFERENCE = ELEVATOR_GEAR_RADIUS * 2.0 * Math.PI; // Meters
+            private static final double MOTOR_GEAR_REDUCTION = 20.0;
+            public static final double ENCODER_FACTOR = ELEVATOR_GEAR_CIRCUMFERENCE / MOTOR_GEAR_REDUCTION; // for every one rotation of the encoder, how many meters does the lift move
+
+            // PID
+            public static final double ELEVATOR_KP = 2.5;
+            public static final double ELEVATOR_KI = 0;
+            public static final double ELEVATOR_KD = 0.2;
+            public static final double ELEVATOR_MIN_OUTPUT = -0.6;
+            public static final double ELEVATOR_MAX_OUTPUT = 0.6;
+
+            // Set positions for the length the elevator needs to extend to to score.
+            public static final double MIN_HEIGHT_METERS = 0.0; // probably should leave at 0.0.
+            public static final double MAX_HEIGHT_METERS = 2.1336; // stops the robot from ending itself
+            public static final double L1_ELEVATOR_HEIGHT = 0.05; // Meters
+            public static final double L2_ELEVATOR_HEIGHT = 0.07; // Meters
+            public static final double L3_ELEVATOR_HEIGHT = 0.67; // Meters
+            public static final double L4_ELEVATOR_HEIGHT = 1.7; // Meters
+            public static final double INTAKE_ELEVATOR_HEIGHT_METERS = 0.05; // Meters
+            public static final boolean MOTOR_INVERTED = true;
         }
     }
 
@@ -329,56 +364,7 @@ public final class Constants {
             public static final double CLIMBED_POSITION = 0.203; //Meters
 
         }
-
-        public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
-                new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
-                new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
-                new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
-                new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
-      }
-  
-    public static class NarwhalConstants {
-        public static class NarwhalElevatorConstants {
-                public static final int ELEVATOR_LEAD_MOTOR_CAN_ID = 13; // TODO: Replace this placeholder with the actual id
-                public static final int ELEVATOR_LEAD_MOTOR_CURRENT_LIMIT = 40;
-
-                public static final int ELEVATOR_FOLLOWER_CAN_ID = 14;
-                public static final int ELEVATOR_FOLLOWER_MOTOR_CURRENT_LIMIT = ELEVATOR_LEAD_MOTOR_CURRENT_LIMIT;
-                
-                // Calculating the ratio of rotations to distance
-                private static final double RADIUS_OF_GEAR_METERS = 0.065; // measured to be 0.034925, but test hight value first for saftey
-                private static final double GEAR_REDUCTION = 60.0;
-                private static final double OUTPUT_ROTATIONS_TO_METERS = RADIUS_OF_GEAR_METERS * 2 * Math.PI;
-                public static final double ROTATIONS_TO_METERS = OUTPUT_ROTATIONS_TO_METERS / GEAR_REDUCTION;
-
-                // pid AHHAHAHHAHA
-                public static final double ELEVATOR_HEIGHT_PID_P = 2.5;
-                public static final double ELEVATOR_HEIGHT_PID_I = 0;
-                public static final double ELEVATOR_HEIGHT_PID_D = 0.3;
-
-                // Height set positions. Based on how much to extend to
-                public static final double HEIGHT_OFF_THE_FLOOR_METERS = 1; // Distance from the zero position of the elevator and the floor
-                public static final double MIN_HEIGHT_METERS = 0.0; // probably should leave at 0.0.
-                public static final double MAX_HEIGHT_METERS = 2.1336;
-                public static final double L1_METERS = 0.2;
-                public static final double L2_METERS = 0.4;
-                public static final double L3_METERS = 0.8;
-                public static final double L4_METERS = 1.2;
-                public static final double INTAKE_HEIGHT_METERS = 0.55;
-        }
-
-        public static class NarwhalIntakeOuttakeConstants {
-                public static final int INTAKE_OUTTAKE_MOTOR_CAN_ID = 12; // TODO: Replace this placeholder with the actual id
-                public static final int INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT = 20;
-                public static final double INTAKE_MOTOR_PERCENTAGE = 0.35; // between -1.0 and 1.0
-                public static final double OUTTAKE_MOTOR_PERCENTAGE = -0.35; // between -1.0 and 1.0
-
-                public static final double POSITION_PID_P = 0.7;
-                public static final double POSITION_PID_I = 0;
-                public static final double POSITION_PID_D = 0.2;
-        }
     }
-
     /**
      * <h2>VisionConstants</h2>
      * The {@code VisionConstants} class is a subclass contained within the {@code Constants} class. 
@@ -397,7 +383,7 @@ public final class Constants {
         // Pipeline settings
         public static final int APRIL_TAG_PIPELINE = 0;
         public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = AprilTagFieldLayout
-                .loadField(AprilTagFields.k2025Reefscape);
+                .loadField(AprilTagFields.k2025ReefscapeAndyMark);
 
         // Odometry Detection Strategy
         public static final PhotonPoseEstimator.PoseStrategy POSE_STRATEGY = PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
