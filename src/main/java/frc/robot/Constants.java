@@ -219,7 +219,7 @@ public final class Constants {
      * This contains values like the default upper assembly.
      */
     public static class UpperAssemblyConstants {
-        public static final UpperAssemblyType DEFAULT_UPPER_ASSEMBLY = UpperAssemblyType.SQUID;
+        public static final UpperAssemblyType DEFAULT_UPPER_ASSEMBLY = UpperAssemblyType.NARWHAL;
     }
 
     /**
@@ -300,17 +300,17 @@ public final class Constants {
 
             public static final int CORAL_SENSOR_ID = 0;
 
-            public static final double KP = 0.005;
-            public static final double KI = 0.0001;
+            public static final double KP = 0.05;
+            public static final double KI = 0.001;
             public static final double KD = 0;
-            public static final double FF = 0.01;
+            public static final double FF = 0.0;
 
             public static final double PID_MIN_OUTPUT = -1.0;
             public static final double PID_MAX_OUTPUT = 1.0;
 
             public static final double WHEEL_RADIUS = 0.038;
             public static final double WHEEL_CIRCUMFERENCE = 2.0 * Math.PI * WHEEL_RADIUS; // Meters
-            public static final double MOTOR_REDUCTION = 20.0;
+            public static final double MOTOR_REDUCTION = 12.0;
             public static final double ENCODER_FACTOR = WHEEL_CIRCUMFERENCE / MOTOR_REDUCTION;
             public static final double MANIPULATOR_MOTOR_FREE_SPEED = 1151.917; // Radians / second
 
