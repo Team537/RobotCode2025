@@ -11,13 +11,13 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.util.RateLimiter;
-import frc.robot.util.RateLimiter2d;
-import frc.robot.util.Vector2d;
+import frc.robot.util.math.RateLimiter;
+import frc.robot.util.math.RateLimiter2d;
+import frc.robot.util.math.Vector2d;
+import frc.robot.util.swerve.DrivingMotor;
+import frc.robot.util.swerve.TurningMotor;
 
 /**
  * <h2> DriveSubsystem </h2>
@@ -85,31 +85,6 @@ public class DriveSubsystem extends SubsystemBase {
     private Vector2d commandedLinearVelocity = new Vector2d(0.0, 0.0);
     private double commandedRotationalVelocity = 0.0;
 
-    // The rotational offset of the driver
-    private Rotation2d driverRotationalOffset = new Rotation2d(0.0);
-
-    // Variables for the linear "locking" mechanism when not commanded to drive
-    boolean xyLockActive = false;
-    Translation2d xyLockTranslation = new Translation2d();
-
-    // Variables for the rotational "locking" mechanism when not commanded to turn
-    boolean thetaLockActive = false;
-    Rotation2d thetaLockRotation = new Rotation2d();
-
-    // Variables to prevent the driver from moving right after targeting a location, set false to deactive driving until stopped
-    boolean linearVelocityReset = true;
-    boolean rotationalVelocityReset = true;
-
-    // Variables used for linear targetting
-    boolean targetTranslationActive;
-    Translation2d targetTranslationOrigin = new Translation2d();
-
-    boolean targetRotationActive = false;
-    Rotation2d targetRotationOrigin = new Rotation2d();
-
-    // Manual drive variables
-    private boolean xboxOrientationOffsetTargetActive = false;
-
     private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(DriveConstants.DRIVE_KINEMATICS, getGyroscopeHeading(), getSwerveModulePositions(), new Pose2d());
 
     public DriveSubsystem() {
@@ -162,230 +137,12 @@ public class DriveSubsystem extends SubsystemBase {
         targetRotationalVelocity = boundedRotationalVelocity;
     }
 
-    /**
-     * Drives the robot using manual inputs or target-based controls. This method calculates 
-     * the final linear and rotational velocities based on the input parameters and applies 
-     * them to the robot.
-     *
-     * @param linearVelocity the target linear velocity of the robot. Used when useTargetTranslation is false.
-     *                       This is represented as a vector on a unit circle.
-     * @param rotationalVelocity the target rotational velocity of the robot. Used when useTargetRotation is false.
-     *                           This is a unit value (range [-1, 1]).
-     * @param targetTranslationOffset the desired translation offset for targeting a specific position.
-     * @param useTargetTranslation whether or not the robot should aim for a target translation.
-     * @param targetRotationOffset the desired rotation offset for targeting a specific orientation 
-     *                              (or the absolute orientation if useAbsoluteRotation is true). Measured in radians.
-     * @param useTargetRotation whether or not the robot should aim for a target rotation.
-     * @param useAbsoluteRotation whether the robot should target an absolute orientation or a relative offset.
-     * @param throttle a multiplier for controlling the max speed of the robot. Ranges from 0 (minimum speed) to 1 (maximum speed).
-     */
-    private void manualDrive(
-        Vector2d linearVelocity, 
-        double rotationalVelocity, 
-        Translation2d targetTranslationOffset, 
-        boolean useTargetTranslation, 
-        Rotation2d targetRotationOffset, 
-        boolean useTargetRotation, 
-        boolean useAbsoluteRotation, 
-        double throttle
-    ) {
-        // The final velocities that will be used for driving the robot
-        Vector2d finalLinearVelocity;
-        double finalRotationalVelocity;
-
-        // --- Handling linear velocity ---
-        if (!useTargetTranslation) {
-            // Target translation is not active, so use joystick input for linear control
-            targetTranslationActive = false;
-
-            // Rotate and curve the input for smoother control
-            linearVelocity = linearVelocity.rotateBy(driverRotationalOffset.times(-1.0)); // Adjust for driver orientation
-            double linearSpeed = linearVelocity.magnitude();
-            linearVelocity = linearVelocity.normalize().scale(Math.pow(linearSpeed, DriveConstants.LINEAR_INPUT_CURVE_POWER));
-
-            // Resetting linear velocity when no input is provided
-            if (linearVelocity.magnitude() < 1e-3) {
-                linearVelocityReset = true;
-            }
-            if (!linearVelocityReset) {
-                linearVelocity = new Vector2d(0, 0);
-            }
-
-            // Lock the robot's position if no movement is commanded
-            // TODO: test and fix this, delete the "false && " to activate
-            if (false && linearVelocity.magnitude() < 1e-3 && commandedLinearVelocity.magnitude() < 1e-3) {
-                if (!xyLockActive) {
-                    xyLockActive = true;
-                    xyLockTranslation = getRobotPose().getTranslation();
-                }
-                xyLockActive = true;
-                finalLinearVelocity = getLinearFeedback(xyLockTranslation).scale(DriveConstants.LINEAR_MAX_SPEED);
-            } else {
-                // Apply throttle for speed control
-                double linearThrottleMultiplier = OperatorConstants.THROTTLE_LINEAR_MIN_SPEED + throttle * 
-                    (OperatorConstants.THROTTLE_LINEAR_MAX_SPEED - OperatorConstants.THROTTLE_LINEAR_MIN_SPEED);
-                finalLinearVelocity = linearVelocity.scale(linearThrottleMultiplier);
-            }
-        } else {
-            // Target translation is active
-            targetTranslationOffset.rotateBy(driverRotationalOffset.times(-1.0)); // Adjust for driver orientation
-            if (!targetTranslationActive) {
-                // Initialize the origin for target translation
-                targetTranslationActive = true;
-                targetTranslationOrigin = getRobotPose().getTranslation().minus(targetTranslationOffset);
-            }
-            // Use PID feedback to calculate the velocity toward the target position
-            finalLinearVelocity = getLinearFeedback(targetTranslationOrigin.plus(targetTranslationOffset)).scale(DriveConstants.LINEAR_MAX_SPEED);
-            linearVelocityReset = false; // Prevent accidental movement when deactivating
-        }
-
-        // --- Handling rotational velocity ---
-        if (!useTargetRotation) {
-            // Target rotation is not active, so use joystick input for rotation control
-            targetRotationActive = false;
-
-            // Curve the rotational input for smoother control
-            double rotationalSpeed = Math.abs(rotationalVelocity);
-            rotationalVelocity = Math.signum(rotationalVelocity) * Math.pow(rotationalSpeed, DriveConstants.ROTATION_INPUT_CURVE_POWER);
-
-            // Resetting rotational velocity when no input is provided
-            if (Math.abs(rotationalVelocity) < 1e-3) {
-                rotationalVelocityReset = true;
-            }
-            if (!rotationalVelocityReset) {
-                rotationalVelocity = 0.0;
-            }
-
-            // Lock the robot's orientation if no rotation is commanded
-
-            // TODO: test and fix this, delete the "false && " to activate
-            if (false && Math.abs(rotationalVelocity) < 1e-3 && Math.abs(commandedRotationalVelocity) < 1e-3) {
-                if (!thetaLockActive) {
-                    thetaLockActive = true;
-                    thetaLockRotation = getRobotPose().getRotation();
-                }
-                thetaLockActive = true;
-                finalRotationalVelocity = getRotationalFeedback(thetaLockRotation) * DriveConstants.ROTATIONAL_MAX_SPEED;
-            } else {
-                // Apply throttle for rotational speed control
-                double rotationalThrottleMultiplier = OperatorConstants.THROTTLE_ROTATIONAL_MIN_SPEED + throttle * 
-                    (OperatorConstants.THROTTLE_ROTATIONAL_MAX_SPEED - OperatorConstants.THROTTLE_ROTATIONAL_MIN_SPEED);
-                finalRotationalVelocity = rotationalVelocity * rotationalThrottleMultiplier;
-            }
-        } else {
-
-            // Target rotation is active
-            targetRotationOffset.rotateBy(driverRotationalOffset.times(-1.0)); // Adjust for driver orientation
-
-            if (!useAbsoluteRotation) {
-                // Targeting a relative rotation
-                if (!targetRotationActive) {
-                    // Initialize the origin for target rotation
-                    targetRotationActive = true;
-                    targetRotationOrigin = getRobotPose().getRotation().minus(targetRotationOffset);
-                }
-                // Use PID feedback to calculate the rotational velocity
-                finalRotationalVelocity = getRotationalFeedback(targetRotationOrigin.rotateBy(targetRotationOffset)) * DriveConstants.ROTATIONAL_MAX_SPEED;
-            } else {
-                // Targeting an absolute rotation
-                targetRotationActive = false; // Disable relative rotation targeting
-                finalRotationalVelocity = getRotationalFeedback(targetRotationOffset) * DriveConstants.ROTATIONAL_MAX_SPEED;
-            }
-
-            rotationalVelocityReset = false; // Prevent accidental movement when deactivating
-        }
-
-        // --- Apply the calculated velocities to the robot ---
-        drive(finalLinearVelocity, finalRotationalVelocity);
-    }
 
     /**
-     * Drives the robot manually using an XboxController.
-     * This method handles input for linear velocity, rotational velocity, 
-     * manual translation/rotation targeting, and throttle control.
-     *
-     * @param controller The XboxController used to control the robot.
-     */
-    public void driveFromXBoxController(XboxController controller) {
-
-        // --- Linear Velocity Control ---
-        // Calculate linear velocity based on the left stick input (x for strafe, y for forward/backward).
-        // Apply a deadband to ignore small joystick movements and normalize the vector if it's too large.
-        Vector2d linearVelocity = new Vector2d(controller.getLeftX(), -controller.getLeftY());
-        if (linearVelocity.magnitude() < OperatorConstants.XBOX_CONTROLLER_JOYSTICK_DEADMAND_RADIUS) {
-            linearVelocity = new Vector2d(0, 0); // Ignore small joystick movements
-        } else if (linearVelocity.magnitude() > 1.0) {
-            linearVelocity = linearVelocity.normalize(); // Normalize to keep within [-1, 1]
-        }
-
-        // --- Rotational Velocity Control ---
-        // Calculate rotational velocity from the right stick's X-axis input.
-        // Apply a deadband to ignore small movements and clamp the value to [-1, 1].
-        double rotationalVelocity = -controller.getRightX();
-        if (Math.abs(rotationalVelocity) < OperatorConstants.XBOX_CONTROLLER_JOYSTICK_DEADMAND_RADIUS) {
-            rotationalVelocity = 0.0; // Ignore small joystick movements
-        } else if (Math.abs(rotationalVelocity) > 1.0) {
-            rotationalVelocity = Math.signum(rotationalVelocity); // Clamp to [-1, 1]
-        }
-
-        // --- Manual Translation Targeting ---
-        // Calculate a target offset for translation based on the left stick and right trigger.
-        // The trigger adjusts the radius of the target offset, ranging from minimum to maximum radius.
-        // Activates when the left stick button is pressed.
-        double linearTargetRadius = OperatorConstants.XBOX_CONTROLLER_TARGET_MIN_RADIUS 
-            + controller.getRightTriggerAxis() * (OperatorConstants.XBOX_CONTROLLER_TARGET_MAX_RADIUS 
-            - OperatorConstants.XBOX_CONTROLLER_TARGET_MIN_RADIUS);
-        Translation2d targetTranslationOffset = new Translation2d(
-            controller.getLeftX() * linearTargetRadius, 
-            -controller.getLeftY() * linearTargetRadius
-        );
-        boolean useTargetTranslation = controller.getLeftStickButton();
-
-        // --- Manual Rotation Targeting ---
-        // Calculate a target offset for rotation based on the right stick vector.
-        // Activates rotation targeting if:
-        // - The right stick button is pressed, OR
-        // - The right stick's Y-axis exceeds a specific activation zone, OR
-        // - Rotation targeting was already active and the right stick magnitude is above the deactivation threshold.
-        Vector2d rightStickVector = new Vector2d(controller.getRightX(), -controller.getRightY());
-        Rotation2d targetRotationOffset = rightStickVector.angle();
-        if (
-            controller.getRightStickButton() ||
-            Math.abs(controller.getRightY()) > OperatorConstants.XBOX_CONTROLLER_ROTATIONAL_TARGET_ACTIVATION_ZONE || // Activate if pushed enough
-            (xboxOrientationOffsetTargetActive && rightStickVector.magnitude() > OperatorConstants.XBOX_CONTROLLER_ROTATIONAL_TARGET_DEACTIVATION_ZONE) // Stay active if above threshold
-        ) {
-            xboxOrientationOffsetTargetActive = true; // Enable rotation targeting
-        } else {
-            xboxOrientationOffsetTargetActive = false; // Disable rotation targeting
-        }
-        boolean useTargetRotation = xboxOrientationOffsetTargetActive;
-
-        // Use absolute rotation if the right stick button is pressed.
-        boolean useAbsoluteRotation = controller.getRightStickButton();
-
-        // --- Throttle Control ---
-        // Throttle determines the overall speed of the robot, based on the right trigger's position (0 to 1).
-        double throttle = controller.getRightTriggerAxis();
-
-        // --- Call the Manual Drive Method ---
-        // Pass all calculated values to the manualDrive method for execution.
-        manualDrive(
-            linearVelocity,
-            rotationalVelocity,
-            targetTranslationOffset,
-            useTargetTranslation,
-            targetRotationOffset,
-            useTargetRotation,
-            useAbsoluteRotation,
-            throttle
-        );
-    }
-
-
-    /**
-     * gets a linear velocity value from the PID controllers
-     * @param target the target position
-     * @return the linear velocity
+     * Returns the linear velocity value from the PID controllers, as a Vector2d.
+     * 
+     * @param target The target position.
+     * @return The linear velocity, as a Vector2d.
      */
     public Vector2d getLinearFeedback(Translation2d target) {
 
@@ -400,17 +157,17 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * gets a rotational velocity value from the PID controller
-     * @param target the target orientation
-     * @return the value to go towards
+     * Returns a rotational velocity value from the PID controller, as a double.
+     * 
+     * @param target The target orientation.
+     * @return The value to go towards.
      */
     public double getRotationalFeedback(Rotation2d target) {
         return Math.tanh(thetaController.calculate(getRobotPose().getRotation().getRadians(), target.getRadians()));
     }
 
     /**
-     * Ignores all rate limiters and immediately tries to stop the robot as fast as
-     * possible
+     * Ignores all rate limiters and immediately tries to stop the robot as fast as possible.
      */
     public void instantStop() {
         targetLinearVelocity = new Vector2d(0.0, 0.0);
@@ -421,7 +178,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     /**
      * Drives linearly and rotationally using the following parameters, applying
-     * acceleration limiting
+     * acceleration limiting.
      * 
      * @param linearVelocity     The linear velocity, in meters per second, with the
      *                           X component parallel to the longer field axis and
@@ -446,11 +203,11 @@ public class DriveSubsystem extends SubsystemBase {
             rotationalVelocity = 0.0;
         }
 
-        //updating the commanded velocities
+        // Updating the commanded velocities
         commandedLinearVelocity = linearVelocity;
         commandedRotationalVelocity = rotationalVelocity;
 
-        //Calculating the desired module states for the robot
+        // Calculating the desired module states for the robot
         SwerveModuleState[] swerveModuleStates = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
             ChassisSpeeds.fromFieldRelativeSpeeds(
                 linearVelocity.getX(),
@@ -460,7 +217,7 @@ public class DriveSubsystem extends SubsystemBase {
             )
         );
         
-        //Capping the modules' speed at the maximum linear speed
+        // Capping the modules' speed at the maximum linear speed
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveConstants.LINEAR_MAX_SPEED);
 
         // Setting the states of the modules
@@ -473,16 +230,18 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Gets the gyroscope heading
-     * @return The gyroscope heading
+     * Returns this DriveSubsystem's gyroscope heading, as a Rotation2d. 
+     * 
+     * @return this DriveSubsystem's gyroscope heading, as a Rotation2d. 
      */
     public Rotation2d getGyroscopeHeading() {
         return gyroscope.getRotation2d();
     }
 
     /**
-     * Gets the Module States
-     * @return the Module States
+     * Returns this DriveSubsystem's swerver modules' states.
+     * 
+     * @return this DriveSubsystem's swerver modules' states.
      */
     public SwerveModuleState[] getSwerveModuleStates() {
         return new SwerveModuleState[] {
@@ -494,8 +253,9 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Gets the Module Positions
-     * @return the Module Positions
+     * Returns this DriveSubsystem's swerve modules' positions, as an array of SwerveModulePositions.
+     * 
+     * @return this DriveSubsystem's swerve modules' positions, as an array of SwerveModulePositions.
      */
     public SwerveModulePosition[] getSwerveModulePositions() {
         return new SwerveModulePosition[] {
@@ -516,38 +276,84 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Gets the pose of the robot
-     * @return the robot's pose
+     * Returns the robot's position, as a Pose2d.
+     * 
+     * @return The robot's position, as a Pose2d.
      */
     public synchronized Pose2d getRobotPose() {
         return poseEstimator.getEstimatedPosition();
     }
 
     /**
-     * sets the robot's pose
-     * @param pose the pose to set
+     * Sets the robot's pose.
+     * 
+     * @param pose The Pose2d to set the robot's position to.
      */
     public void setRobotPose(Pose2d pose) {
         poseEstimator.resetPose(pose);
     }
 
     /**
-     * sets the heading of the robot
-     * @param heading the heading to set
+     * Sets the heading of the robot.
+     * 
+     * @param heading The Rotation2d representing the direction that the robot will believe it is facing.
      */
     public void setRobotHeading(Rotation2d heading) {
         poseEstimator.resetRotation(heading);
     }
 
     /**
-     * sets the translation of the robot without modifying the heading
-     * @param position the position to set
+     * Sets the 2D position of the robot without modifying the heading.
+     * 
+     * @param position The position to set, as a Translation2d
      */
     public void setRobotTranslation(Translation2d translation) {
         poseEstimator.resetTranslation(translation);
     }
 
-    // Runs whenever the robot is active. Even when dissabled.
+    /**
+     * Sets the driving motor of all four swerve modules.
+     * 
+     * @param drivingMotor The driving motor to set.
+     */
+    public void setDrivingMotors(DrivingMotor drivingMotor) {
+        frontLeftModule.setDrivingMotor(drivingMotor);
+        frontRightModule.setDrivingMotor(drivingMotor);
+        rearLeftModule.setDrivingMotor(drivingMotor);
+        rearRightModule.setDrivingMotor(drivingMotor);
+    }
+
+    /**
+     * Sets the turning motor of all four swerve modules.
+     * 
+     * @param turningMotor The turning motor to set.
+     */
+    public void setTurningMotors(TurningMotor turningMotor) {
+        frontLeftModule.setTurningMotor(turningMotor);
+        frontRightModule.setTurningMotor(turningMotor);
+        rearLeftModule.setTurningMotor(turningMotor);
+        rearRightModule.setTurningMotor(turningMotor);
+    }
+
+    /**
+     * Returns the last commanded linear velocity (after acceleration limiting).
+     * 
+     * @return The last commanded linear velocity, in meters per second, as a Vector2d.
+     */
+    public Vector2d getCommandedLinearVelocity() {
+        return commandedLinearVelocity;
+    }
+
+    /**
+     * Returns the last commanded rotational velocity (after acceleration limiting).
+     * 
+     * @return The last commanded rotational velocity, in radians per second.
+     */
+    public double getCommandedRotationalVelocity() {
+        return commandedRotationalVelocity;
+    }
+
+    // Runs whenever the robot is active. Even when disabled.
     // Periodic method called every loop
     @Override
     public void periodic() {

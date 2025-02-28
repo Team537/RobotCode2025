@@ -2,7 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import frc.utils.LEDs.LEDConfiguration;
+import frc.robot.util.LEDs.LEDConfiguration;
 
 /**
  * <h2> LEDManager </h2>

@@ -1,19 +1,21 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Configs;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.util.swerve.DrivingMotor;
+import frc.robot.util.swerve.TurningMotor;
 
 /**
  * <h2> SwerverModule </h2>
@@ -27,16 +29,24 @@ import frc.robot.Constants.DriveConstants;
 */
 public class SwerveModule extends SubsystemBase {
 
-    SparkMax drivingSparkMax;
-    SparkMax turningSparkMax;
+    // Driving Motors
+    SparkMax drivingNeo;
+    TalonFX drivingKrakenX60;
+    TalonFX drivingKrakenX60FOC;
 
-    SparkClosedLoopController drivingClosedLoopController;
-    SparkClosedLoopController turningClosedLoopController;
+    // Turning Motors
+    SparkMax turningNeo550;
 
+    // The offsets of the individual modules
     Rotation2d moduleAngularOffset;
+    int drivingCANID;
+    int turningCANID;
+
+    DrivingMotor activeDrivingMotor = DriveConstants.DEFAULT_DRIVING_MOTOR;
+    TurningMotor activeTurningMotor = DriveConstants.DEFAULT_TURNING_MOTOR;
 
     /**
-     * Creates a swerve module
+     * Creates a swerve module with the given values.
      * 
      * @param drivingCANID        The CANID for the driving motor
      * @param turningCANID        The CANID for the turning motor
@@ -47,57 +57,249 @@ public class SwerveModule extends SubsystemBase {
         // Updating the module offset
         this.moduleAngularOffset = moduleAngularOffset;
 
-        // Creating the motor objects
-        drivingSparkMax = new SparkMax(drivingCANID, MotorType.kBrushless);
-        turningSparkMax = new SparkMax(turningCANID, MotorType.kBrushless);
+        // Setting the CAN IDs
+        this.drivingCANID = drivingCANID;
+        this.turningCANID = turningCANID;
 
-        drivingClosedLoopController = drivingSparkMax.getClosedLoopController();
-        turningClosedLoopController = turningSparkMax.getClosedLoopController();
-
-        // Creating the configuration file for thr driving motor
-        SparkMaxConfig drivingConfig = new SparkMaxConfig();
-        drivingConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder);
-        drivingConfig.encoder.positionConversionFactor(DriveConstants.DRIVING_ENCODER_POSITION_FACTOR);
-        drivingConfig.encoder.velocityConversionFactor(DriveConstants.DRIVING_ENCODER_VELOCITY_FACTOR);
-        drivingConfig.closedLoop.pidf(DriveConstants.DRIVING_KP, DriveConstants.DRIVING_KI, DriveConstants.DRIVING_KD, DriveConstants.DRIVING_FF);
-        drivingConfig.closedLoop.outputRange(DriveConstants.DRIVING_PID_MIN_OUTPUT, DriveConstants.DRIVING_PID_MAX_OUTPUT);
-        drivingConfig.idleMode(DriveConstants.DRIVING_MOTOR_IDLE_MODE);
-        drivingConfig.smartCurrentLimit(DriveConstants.DRIVING_MOTOR_CURRENT_LIMIT);
-        drivingConfig.inverted(DriveConstants.DRIVING_ENCODER_INVERTED);
-
-        // Creating the configuration file for the turning motor
-        SparkMaxConfig turningConfig = new SparkMaxConfig();
-        turningConfig.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
-        turningConfig.absoluteEncoder.positionConversionFactor(DriveConstants.TURNING_ENCODER_POSITION_FACTOR);
-        turningConfig.absoluteEncoder.velocityConversionFactor(DriveConstants.TURNING_ENCODER_VELOCITY_FACTOR);
-        turningConfig.closedLoop.pid(DriveConstants.TURNING_KP, DriveConstants.TURNING_KI, DriveConstants.TURNING_KD);
-        turningConfig.closedLoop.outputRange(DriveConstants.TURNING_PID_MIN_OUTPUT, DriveConstants.TURNING_PID_MAX_OUTPUT);
-        turningConfig.closedLoop.positionWrappingEnabled(true);
-        turningConfig.closedLoop.positionWrappingInputRange(0, DriveConstants.TURNING_FACTOR);
-        turningConfig.idleMode(DriveConstants.TURNING_MOTOR_IDLE_MODE);
-        turningConfig.smartCurrentLimit(DriveConstants.TURNING_MOTOR_CURRENT_LIMIT);
-        turningConfig.absoluteEncoder.inverted(DriveConstants.TURNING_ENCODER_INVERTED);
-        turningConfig.closedLoop.positionWrappingEnabled(true);
-        turningConfig.closedLoop.positionWrappingInputRange(DriveConstants.TURNING_ENCODER_POSITION_PID_MIN_INPUT, DriveConstants.TURNING_ENCODER_POSITION_PID_MAX_INPUT);
-
-        drivingSparkMax.configure(drivingConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        turningSparkMax.configure(turningConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-        drivingSparkMax.getEncoder().setPosition(0);
+        activateDrivingMotor(activeDrivingMotor);
+        activateTurningMotor(activeTurningMotor);
     }
 
     /**
-     * updates the PID controller to target a new state
+     * Returns the position of the active driving motor, in meters.
      * 
-     * @param state the new state to target
+     * @return The position of the active driving motor, in meters.
+     */
+    private double getDrivingPosition() {
+        switch (activeDrivingMotor) {
+            case NEO:
+                return drivingNeo.getEncoder().getPosition();
+            case KRAKEN_X60:
+                return drivingKrakenX60.getPosition().getValueAsDouble();
+            case KRAKEN_X60_FOC:
+                return drivingKrakenX60FOC.getPosition().getValueAsDouble();
+            default:
+                return 0.0;
+        }
+    }
+
+    /**
+     * Returns the velocity of the active driving motor, in meters per second.
+     * 
+     * @return The velocity of the active driving motor, in meters per second
+     */
+    private double getDrivingVelocity() {
+        switch (activeDrivingMotor) {
+            case NEO:
+                return drivingNeo.getEncoder().getVelocity();
+            case KRAKEN_X60:
+                return drivingKrakenX60.getVelocity().getValueAsDouble();
+            case KRAKEN_X60_FOC:
+                return drivingKrakenX60FOC.getVelocity().getValueAsDouble();
+            default:
+                return 0.0;
+        }
+    }
+
+    /**
+     * Sets the velocity of the active motor.
+     * 
+     * @param velocity The desired velocity, in meters per second
+     */
+    private void setDrivingVelocity(double velocity) {
+        VelocityVoltage velocityRequest; // Used if TalonFX are being used
+        switch (activeDrivingMotor) {
+            case NEO:
+                drivingNeo.getClosedLoopController().setReference(velocity, ControlType.kVelocity);
+                break;
+            case KRAKEN_X60:
+                velocityRequest = new VelocityVoltage(velocity);
+                drivingKrakenX60.setControl(velocityRequest);
+                break;
+            case KRAKEN_X60_FOC:
+                velocityRequest = new VelocityVoltage(velocity);
+                velocityRequest.EnableFOC = true;
+                drivingKrakenX60FOC.setControl(velocityRequest);
+                break;
+        }
+    }
+
+    /**
+     * Returns the rotation of the active turning motor, relative to the chassis
+     * 
+     * @return The rotation of the active turning motor, relative to the chassis
+     */
+    private Rotation2d getTurningAngle() {
+        Rotation2d rawAngle;
+        switch (activeTurningMotor) {
+            case NEO_550:
+                rawAngle = new Rotation2d(turningNeo550.getAbsoluteEncoder().getPosition());
+                break;
+            default:
+                rawAngle = new Rotation2d();
+                break;
+        }
+        return rawAngle.minus(moduleAngularOffset);
+    }
+
+    /**
+     * Sets the angle of the turning motor.
+     * 
+     * @param angle The angle of the motor, relative to the robot base
+     */
+    private void setTurningAngle(Rotation2d angle) {
+        Rotation2d rawAngle = angle.plus(moduleAngularOffset);
+        switch (activeTurningMotor) {
+            case NEO_550:
+                turningNeo550.getClosedLoopController().setReference(rawAngle.getRadians(), ControlType.kPosition);
+                break;
+        }
+    }
+
+    /**
+     * Returns the module's position (relative to the field)
+     * 
+     * @return The position of the module
+     */
+    public SwerveModulePosition getPosition() {
+        return new SwerveModulePosition(
+                getDrivingPosition(),
+                getTurningAngle()
+        );
+    }
+
+    /**
+     * Returns the module's state (relative to the field)
+     * 
+     * @return The state of the module
+     */
+    public SwerveModuleState getState() {
+        return new SwerveModuleState(
+                getDrivingVelocity(),
+                getTurningAngle()
+        );        
+    }
+
+    /**
+     * Disable active driving motors to prevent them from controlling the drive
+     */
+    private void disableActiveDrivingMotor() {
+        
+        switch (activeDrivingMotor) {
+
+            case NEO:
+                drivingNeo.disable();
+                break;
+            case KRAKEN_X60:
+                drivingKrakenX60.disable();
+                break;
+            case KRAKEN_X60_FOC:
+                drivingKrakenX60FOC.disable();
+                break;
+        }
+    }
+
+    /**
+     * Activates the driving motor.
+     * 
+     * @param drivingMotor The type of motor to activate.
+     */
+    private void activateDrivingMotor(DrivingMotor drivingMotor) {
+
+        // Setting up the motors
+        switch (drivingMotor) {
+
+            case NEO:
+                drivingNeo = new SparkMax(drivingCANID,MotorType.kBrushless);
+                drivingNeo.configure(Configs.Swerve.Driving.NEO_DRIVING_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+                drivingNeo.getEncoder().setPosition(0.0);
+                break;
+            
+            case KRAKEN_X60:
+                drivingKrakenX60 = new TalonFX(drivingCANID);
+                drivingKrakenX60.getConfigurator().apply(Configs.Swerve.Driving.KRAKEN_X60_CONFIGURATION);
+                drivingKrakenX60.setPosition(0.0);
+                break;
+
+            case KRAKEN_X60_FOC:
+                drivingKrakenX60FOC = new TalonFX(drivingCANID);
+                drivingKrakenX60FOC.getConfigurator().apply(Configs.Swerve.Driving.KRAKEN_X60_FOC_CONFIGURATION);
+                drivingKrakenX60FOC.setPosition(0.0);
+                break;
+        }
+    }
+
+    /**
+     * Sets the driving motor type.
+     * 
+     * @param drivingMotor The type of driving motor
+     */
+    public void setDrivingMotor(DrivingMotor drivingMotor) {
+        
+        //Disabling the current active motor
+        disableActiveDrivingMotor();
+
+        activateDrivingMotor(drivingMotor);
+
+        //Setting the current active motor to the new one
+        activeDrivingMotor = drivingMotor;
+    }
+
+    /**
+     * Disable active turning motors to prevent them from controlling the drive
+     */
+    private void disableActiveTurningMotor() {
+        switch (activeTurningMotor) {
+            case NEO_550:
+                turningNeo550.disable();
+                break;
+        }
+    }
+
+    /**
+     * Activates the turning motor.
+     * 
+     * @param turningMotor The turning motor type to activate.
+     */
+    private void activateTurningMotor(TurningMotor turningMotor) {
+        
+        //Setting up the motors
+        switch (turningMotor) {
+
+            case NEO_550:
+                turningNeo550 = new SparkMax(turningCANID,MotorType.kBrushless);
+                turningNeo550.configure(Configs.Swerve.Turning.NEO_550_TURNING_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+                break;
+        }
+    }
+
+    /**
+     * Sets the turning motor type.
+     * 
+     * @param turningMotor The type of turning motor
+     */
+    public void setTurningMotor(TurningMotor turningMotor) {
+        
+        //Disabling the current active motor
+        disableActiveTurningMotor();
+
+        activateTurningMotor(turningMotor);
+
+        //Setting the current active motor to the new one
+        activeTurningMotor = turningMotor;
+    }
+
+    /**
+     * Updates the PID controller to target a new state
+     * 
+     * @param state The new state to target
      */
     public void setState(SwerveModuleState state) {
         SwerveModuleState correctedDesiredState = new SwerveModuleState();
         correctedDesiredState.speedMetersPerSecond = state.speedMetersPerSecond;
         correctedDesiredState.angle = state.angle.times(1.0);
 
-        // optimze the desired state so that the robot will never rotate more than PI/2
-        // radians
+        // Optimize the desired state so that the robot will never rotate more than PI/2 radians
         correctedDesiredState.optimize(getPosition().angle);
 
         // Don't change the orientation of the turning wheels if the speed is low
@@ -105,32 +307,8 @@ public class SwerveModule extends SubsystemBase {
             correctedDesiredState.angle = getPosition().angle;
         }
 
-        // Setting the references on the PID controllers
-        drivingClosedLoopController.setReference(correctedDesiredState.speedMetersPerSecond, ControlType.kVelocity);
-        turningClosedLoopController.setReference(correctedDesiredState.angle.plus(moduleAngularOffset).getRadians(),
-                ControlType.kPosition);
+        // Setting the velocities
+        setDrivingVelocity(correctedDesiredState.speedMetersPerSecond);
+        setTurningAngle(correctedDesiredState.angle);
     }
-
-    /**
-     * gets the module's position (relative to the field)
-     * 
-     * @return the position of the module
-     */
-    public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(
-                drivingSparkMax.getEncoder().getPosition(),
-                new Rotation2d(turningSparkMax.getAbsoluteEncoder().getPosition()).minus(moduleAngularOffset));
-    }
-
-    /**
-     * gets the module's state (relative to the field)
-     * 
-     * @return the state of the module
-     */
-    public SwerveModuleState getState() {
-        return new SwerveModuleState(
-                drivingSparkMax.getEncoder().getVelocity(),
-                new Rotation2d(turningSparkMax.getAbsoluteEncoder().getPosition()).minus(moduleAngularOffset));
-    }
-    
 }
