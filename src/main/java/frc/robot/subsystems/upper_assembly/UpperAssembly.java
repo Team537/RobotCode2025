@@ -1,19 +1,18 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.upper_assembly;
 
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.util.ScoringHeight;
+import frc.robot.util.upper_assembly.ScoringHeight;
 
 /**
  * Represents the upper assembly of the robot, which may vary depending on the selected implementation.
  * Provides methods for various assembly-specific actions such as scoring, intaking, climbing, 
  * and manual control. 
  */
-public interface UpperAssembly extends Subsystem {
+public interface UpperAssembly {
 
     /**
      * Creates a command to run the coral intake mechanism.
