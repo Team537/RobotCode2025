@@ -184,24 +184,29 @@ public final class Constants {
      * CAN loop IDs, set positions, etc.
      */
     public static class NarwhalConstants {
-      public static class NarwhalWristConstants {
-        public static final int WRIST_MOTOR_CAN_ID = 11;
-        public static final int WRIST_MOTOR_CURRENT_LIMIT = 20;
-        public static final double WRIST_OFFSET = 0.0; // offset will be calculated as if unflipped, and no conversion factor.
-        
-        public static final double MOTOR_ROTATIONS_TO_WORLD_RADIANS = 45 * Math.PI * 2; // Wrist target angles (radians) are multiplied by this to get the motor target position
+        public static class NarwhalWristConstants {
+            public static final int WRIST_MOTOR_CAN_ID = 14;
+            public static final int WRIST_MOTOR_CURRENT_LIMIT = 40;
 
-        public static final double POSITION_PID_P = 0.5; // TODO: UPDATE THESE PID VALUES
-        public static final double POSITION_PID_I = 0; // TODO: UPDATE THESE PID VALUES
-        public static final double POSITION_PID_D = 0.2; // TODO: UPDATE THESE PID VALUES
-        
-        public static final double PID_OUTPUT_RANGE_MAX = 0.5; // TODO: UPDATE THESE OUTPUT RANGE VALUES
-        public static final double PID_OUTPUT_RANGE_MIN = 0.5; // TODO: UPDATE THESE OUTPUT RANGE VALUES
-        
-        public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(-Math.PI / 4); // -pi/4 TODO: update these placeholder values
-        public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(2 * Math.PI / 3); // 2pi/3 TODO: update these placeholder values
-        public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(Math.PI / 2); // pi/2 TODO: update these placeholder values
-      }
+            // Calculating encoder conversion factor
+            public static final double GEAR_REDUCTION = 20;
+            public static final double ROTATIONS_TO_RADIANS = Math.PI * 2 / GEAR_REDUCTION; // Wrist target angles (radians) are multiplied by this to get the motor target position           
+            
+            // PID configurations
+            public static final double POSITION_PID_P = 0.3;
+            public static final double POSITION_PID_I = 0;
+            public static final double POSITION_PID_D = 0.2;
+            public static final double PID_OUTPUT_RANGE_MAX = 0.35;
+            public static final double PID_OUTPUT_RANGE_MIN = -0.35;        
+
+            // Set position for wrist angles (Angle is relative to the world, with 0 being the down position and rotating away from 0 being positive)
+            public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4.85);
+            public static final Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
+            public static final Rotation2d L2_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
+            public static final Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
+            public static final Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
+            public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(3 * Math.PI / 2);
+        }
     }
 
     /**
