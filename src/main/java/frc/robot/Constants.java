@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.List;
+
 import org.photonvision.PhotonPoseEstimator;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -127,12 +129,12 @@ public final class Constants {
             new Translation2d(-WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0);
 
         // Alternatively, you can define an array containing all four positions:
-        public static final Translation2d[] MODULE_POSITIONS = {
+        public static final List<Translation2d> MODULE_POSITIONS = List.of(
             FRONT_LEFT_POSITION,
             FRONT_RIGHT_POSITION,
             BACK_LEFT_POSITION,
-            BACK_RIGHT_POSITION,
-        };
+            BACK_RIGHT_POSITION
+        );
 
         public static final double WHEEL_RADIUS = 0.0381; // Meters
         public static final double WHEEL_CIRCUMFERENCE = WHEEL_RADIUS * 2.0 * Math.PI; // Meters

@@ -273,7 +273,7 @@ public class DriveSubsystem extends SubsystemBase {
         double maxAngularAcceleration = (DriveConstants.WHEEL_COEFFICIENT_FRICTION * DriveConstants.GRAVITY_ACCELERATION * robotMass * effectiveRadius) / robotMOI;
 
         // --- Swerve and Auto-Builder Configuration ---
-        RobotConfig swerveConfig = new RobotConfig(robotMass, robotMOI, moduleConfig, DriveConstants.MODULE_POSITIONS);
+        RobotConfig swerveConfig = new RobotConfig(robotMass, robotMOI, moduleConfig, DriveConstants.MODULE_POSITIONS.toArray(new Translation2d[0]));
         constraints = new PathConstraints(maxDriveVelocity, maxTranslationalAcceleration, maxAngularVelocity, maxAngularAcceleration);
 
         AutoBuilder.configure(
