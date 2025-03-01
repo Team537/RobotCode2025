@@ -15,8 +15,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.util.NarwhalWristState;
+import frc.robot.Constants.NarwhalConstants.NarwhalWristConstants;
 
 /**
  * <h2> NarwhalWrist </h2>
@@ -33,39 +33,51 @@ public class NarwhalWrist extends SubsystemBase {
     private final SparkMaxConfig wristConfig;
     private final SparkClosedLoopController wristMotorPIDController;
     
+    /**
+     * Create a new instance of the NarwhalWrist class, setting up necessary hardware in the process.
+     */
     public NarwhalWrist() {
-        // a whole lotta stuff for the spark max config
+
+        // Create a new spark max to control the wrist.
         wristConfig = new SparkMaxConfig();
-        // general configs
+
+        // Configure the wrist motor settings.
         wristConfig 
             .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(Constants.NarwhalConstants.NarwhalWristConstants.WRIST_MOTOR_CURRENT_LIMIT)
+            .smartCurrentLimit(NarwhalWristConstants.WRIST_MOTOR_CURRENT_LIMIT)
             .inverted(true);
-        // configs for the PID
+
+        // Update motor PID values.
         wristConfig.closedLoop 
             .pid(
-                Constants.NarwhalConstants.NarwhalWristConstants.POSITION_PID_P, 
-                Constants.NarwhalConstants.NarwhalWristConstants.POSITION_PID_I, 
-                Constants.NarwhalConstants.NarwhalWristConstants.POSITION_PID_D
+                NarwhalWristConstants.POSITION_PID_P, 
+                NarwhalWristConstants.POSITION_PID_I, 
+                NarwhalWristConstants.POSITION_PID_D
             )
-            .outputRange(Constants.NarwhalConstants.NarwhalWristConstants.PID_OUTPUT_RANGE_MIN, Constants.NarwhalConstants.NarwhalWristConstants.PID_OUTPUT_RANGE_MAX); // uses external encoder
+            .outputRange(NarwhalWristConstants.PID_OUTPUT_RANGE_MIN, NarwhalWristConstants.PID_OUTPUT_RANGE_MAX); // uses external encoder
         // configs for the encoder
         // NOTE FOR THE ENCODER: WHEN VIEWED FROM THE RIGHT, THE ANGLE OF THE WRIST IS BASED ON A UNIT CIRCLE WITH 0 DEGREES POINTING STRAIGHT UP
         wristConfig.encoder
-            .positionConversionFactor(Constants.NarwhalConstants.NarwhalWristConstants.ROTATIONS_TO_RADIANS)
-            .velocityConversionFactor(Constants.NarwhalConstants.NarwhalWristConstants.ROTATIONS_TO_RADIANS/60.0); // dividing by 60 accounts for RPM to Radians/Sec
+            .positionConversionFactor(NarwhalConstants.ROTATIONS_TO_RADIANS)
+            .velocityConversionFactor(NarwhalConstants.ROTATIONS_TO_RADIANS/60.0); // dividing by 60 accounts for RPM to Radians/Sec
         
             // creating the spark max controller
-        wrist = new SparkMax(Constants.NarwhalConstants.NarwhalWristConstants.WRIST_MOTOR_CAN_ID, MotorType.kBrushless);
+        wrist = new SparkMax(NarwhalWristConstants.WRIST_MOTOR_CAN_ID, MotorType.kBrushless);
         wrist.configure(wristConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         wristMotorPIDController = wrist.getClosedLoopController();
         currentState = NarwhalWristState.STOPPED;
     }
 
+    public boolean readyToIntake(){
+        double current_position = wrist.getAbsoluteEncoder().getPosition();
+        return Math.abs(current_position - NarwhalWristConstants.INTAKE_ANGLE.getRadians()) < NarwhalWristConstants.WRIST_ANGLE_TOLERANCE;
+    }
+
     /**
-     * Function to move the motor to a target angle & sets the current state to CUSTOM.
-     * @param percent percentage between -1.0 and 1.0 (negative values reverse direction)
+     * Method to move the motor to a target angle & sets the current state to CUSTOM.
+     * 
+     * @param percent Percentage between -1.0 and 1.0 (negative values reverse direction)
      */
     public void setCurrentMotorAngle(Rotation2d targetAngle){
         double targetAngleRadians = targetAngle.getRadians();
@@ -77,9 +89,10 @@ public class NarwhalWrist extends SubsystemBase {
      * Set the wrist motor to the intake angle (defined in constants) & update status.
      */
     public void goToIntakeAngle() {
+        
         // Inline construction of command goes here.
         // Subsystem::RunOnce implicitly requires `this` subsystem.
-        setCurrentMotorAngle(Constants.NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE);
+        setCurrentMotorAngle(NarwhalWristConstants.INTAKE_ANGLE);
         currentState = NarwhalWristState.INTAKING; // must be after the set function because the set function will default to CUSTOM state
     }
     
@@ -87,7 +100,7 @@ public class NarwhalWrist extends SubsystemBase {
      * Set the wrist motor to the angle for scoring L1 (defined in constants) & update status.
      */
     public void goToL1WristAngle(){
-        setCurrentMotorAngle(Constants.NarwhalConstants.NarwhalWristConstants.L1_OUTTAKE_ANGLE);
+        setCurrentMotorAngle(NarwhalWristConstants.L1_OUTTAKE_ANGLE);
         currentState = NarwhalWristState.L1; // must be after the set function because the set function will default to CUSTOM state
     }
     
@@ -95,7 +108,7 @@ public class NarwhalWrist extends SubsystemBase {
      * Set the wrist motor to the angle for scoring L2 (defined in constants) & update status.
      */
     public void goToL2WristAngle(){
-        setCurrentMotorAngle(Constants.NarwhalConstants.NarwhalWristConstants.L2_OUTTAKE_ANGLE);
+        setCurrentMotorAngle(NarwhalWristConstants.L2_OUTTAKE_ANGLE);
         currentState = NarwhalWristState.L2; // must be after the set function because the set function will default to CUSTOM state
     }
 
@@ -103,7 +116,7 @@ public class NarwhalWrist extends SubsystemBase {
      * Set the wrist motor to the angle for scoring L3 (defined in constants) & update status.
      */
     public void goToL3WristAngle(){
-        setCurrentMotorAngle(Constants.NarwhalConstants.NarwhalWristConstants.L3_OUTTAKE_ANGLE);
+        setCurrentMotorAngle(NarwhalWristConstants.L3_OUTTAKE_ANGLE);
         currentState = NarwhalWristState.L3; // must be after the set function because the set function will default to CUSTOM state
     }
 
@@ -111,7 +124,7 @@ public class NarwhalWrist extends SubsystemBase {
      * Set the wrist motor to the angle for scoring L4 (defined in constants) & update status.
      */
     public void goToL4WristAngle(){
-        setCurrentMotorAngle(Constants.NarwhalConstants.NarwhalWristConstants.L4_OUTTAKE_ANGLE);
+        setCurrentMotorAngle(NarwhalWristConstants.L4_OUTTAKE_ANGLE);
         currentState = NarwhalWristState.L4; // must be after the set function because the set function will default to CUSTOM state
     }
 
@@ -119,7 +132,7 @@ public class NarwhalWrist extends SubsystemBase {
      * Set the wrist motor to the algae descore angle (defined in constants) & update status.
      */
     public void goToAlgaeAngle() {
-        setCurrentMotorAngle(Constants.NarwhalConstants.NarwhalWristConstants.ALGAE_ANGLE);
+        setCurrentMotorAngle(NarwhalWristConstants.ALGAE_ANGLE);
         currentState = NarwhalWristState.ALGAE; // must be after the set function because the set function will default to CUSTOM state
     }
 
@@ -141,8 +154,9 @@ public class NarwhalWrist extends SubsystemBase {
     }
 
     /**
-     * Gets the the current angle of the wrist from the encoder
-     * @return a Rotation2d object representing the wrist angle
+     * Returns the current angle of the wrist, as a {@link Rotation2d}.
+     * 
+     * @return The current angle of the wrist, as a {@link Rotation2d}.
      */
     public Rotation2d getCurrentAngle() {
         return Rotation2d.fromRadians(wrist.getAbsoluteEncoder().getPosition());
