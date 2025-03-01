@@ -192,7 +192,6 @@ public class RobotContainer {
      */
     public void scheduleTeleOp() {
         // The Drive Command
-        driveSubsystem.setRobotPose(new Pose2d(1.0,4.5,new Rotation2d(0.0 * Math.PI)));
         driveSubsystem.setDefaultCommand(manualDriveCommand);
         upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
     }
