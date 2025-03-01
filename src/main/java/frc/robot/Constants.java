@@ -33,9 +33,9 @@ public final class Constants {
     public static class Defaults {
 
         // Default motor values
-        public static final DrivingMotorType DEFAULT_DRIVING_MOTOR = DrivingMotorType.NEO;
+        public static final DrivingMotorType DEFAULT_DRIVING_MOTOR = DrivingMotorType.KRAKEN_X60;
         public static final TurningMotorType DEFAULT_TURNING_MOTOR = TurningMotorType.NEO_550;
-        public static final UpperAssemblyType DEFAULT_UPPER_ASSEMBLY = UpperAssemblyType.NONE;
+        public static final UpperAssemblyType DEFAULT_UPPER_ASSEMBLY = UpperAssemblyType.NARWHAL;
 
     }
 
@@ -63,8 +63,8 @@ public final class Constants {
         public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; // Radians per
                                                                                                         // second
         public static final double XBOX_CONTROLLER_JOYSTICK_DEADMAND_RADIUS = 0.01;
-        public static final double XBOX_CONTROLLER_TARGET_MIN_RADIUS = 1.0; // Meters
-        public static final double XBOX_CONTROLLER_TARGET_MAX_RADIUS = 5.0; // Meters
+        public static final double XBOX_CONTROLLER_TARGET_MIN_RADIUS = 2.0; // Meters
+        public static final double XBOX_CONTROLLER_TARGET_MAX_RADIUS = 0.5; // Meters
         public static final double XBOX_CONTROLLER_ROTATIONAL_TARGET_ACTIVATION_ZONE = 0.8;
         public static final double XBOX_CONTROLLER_ROTATIONAL_TARGET_DEACTIVATION_ZONE = 0.7;
     }
@@ -150,13 +150,9 @@ public final class Constants {
         public static final double LINEAR_KI = 0.0;
         public static final double LINEAR_KD = 0.0;
 
-        public static final double ROTATIONAL_KP = 0.5;
+        public static final double ROTATIONAL_KP = 0.3;
         public static final double ROTATIONAL_KI = 0.0;
-        public static final double ROTATIONAL_KD = 0.2;
-
-        // Default motor values
-        public static final DrivingMotorType DEFAULT_DRIVING_MOTOR = DrivingMotorType.NEO;
-        public static final TurningMotorType DEFAULT_TURNING_MOTOR = TurningMotorType.NEO_550;
+        public static final double ROTATIONAL_KD = 0.0;
 
         /*
          * ---------------------------------- DRIVING CONSTANTS ----------------------------------
@@ -253,17 +249,6 @@ public final class Constants {
             public static final IdleMode IDLE_MODE = IdleMode.kBrake;
             public static final int CURRENT_LIMIT = 20; // Amps
         }
-    }
-
-
-    /**
-     * <h2>UpperAssemblyConstants</h2>
-     * The {@code UpperAssemblyConstants} class is a subclass contained within the {@code Constants} class.
-     * This subclass contains all of the constants relating to both team's mechanisms.
-     * This contains values like the default upper assembly.
-     */
-    public static class UpperAssemblyConstants {
-        public static final UpperAssemblyType DEFAULT_UPPER_ASSEMBLY = UpperAssemblyType.NARWHAL;
     }
 
     /**

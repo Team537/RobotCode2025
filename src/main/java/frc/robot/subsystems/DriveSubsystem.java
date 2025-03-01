@@ -27,6 +27,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -620,6 +621,10 @@ public class DriveSubsystem extends SubsystemBase {
         // Update the robot's estimated pose using current sensor readings.
         poseEstimator.update(getGyroscopeHeading(), getSwerveModulePositions());
 
+        SmartDashboard.putNumber("X Position",getRobotPose().getX());
+        SmartDashboard.putNumber("Y Position",getRobotPose().getY());
+        SmartDashboard.putNumber("Theta Rotation", getRobotPose().getRotation().getRadians());
+
         // Refresh dynamic pathfinding obstacles.
         pathfindingObstacles.clear();
         pathfindingObstaclesSuppliers.forEach(supplier -> pathfindingObstacles.addAll(supplier.get()));
@@ -627,9 +632,4 @@ public class DriveSubsystem extends SubsystemBase {
         Pathfinding.setDynamicObstacles(translatedPathfindingObstacles, getRobotPose().getTranslation());
     }
 
-    public void simulationPeriodic() {
-        double time = testTime.getDeltaTime();
-        System.out.println(commandedVelocities.vxMetersPerSecond);
-        poseEstimator.resetPose(getRobotPose().plus(new Transform2d(commandedVelocities.vxMetersPerSecond * time, commandedVelocities.vyMetersPerSecond * time, new Rotation2d(commandedVelocities.omegaRadiansPerSecond * time))));
-    }
 }

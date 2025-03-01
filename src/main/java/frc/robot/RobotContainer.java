@@ -56,7 +56,7 @@ public class RobotContainer {
     // Subsystems
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
-    private UpperAssemblyBase upperAssembly = UpperAssemblyFactory.createUpperAssembly(Constants.UpperAssemblyConstants.DEFAULT_UPPER_ASSEMBLY);
+    private UpperAssemblyBase upperAssembly = UpperAssemblyFactory.createUpperAssembly(Constants.Defaults.DEFAULT_UPPER_ASSEMBLY);
     
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
     
@@ -192,13 +192,8 @@ public class RobotContainer {
      */
     public void scheduleTeleOp() {
         // The Drive Command
-        driveSubsystem.setRobotPose(new Pose2d(1.0,4.000,new Rotation2d(0.0)));
-        Obstacle testObstacle = new Obstacle(new Translation2d(5.000,1.000),2.0);
-        Obstacle testObstacle2 = new Obstacle(new Translation2d(5.000,7.000),2.0);
-        driveSubsystem.addPathfindingObstaclesSupplier(() -> {
-            return List.of(testObstacle);
-        });
-        driveSubsystem.setDefaultCommand(driveSubsystem.getPathfindingCommand(new Pose2d(10.000,4.000,new Rotation2d(2.0))));
+        driveSubsystem.setRobotPose(new Pose2d(1.0,4.5,new Rotation2d(0.0 * Math.PI)));
+        driveSubsystem.setDefaultCommand(manualDriveCommand);
         upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
     }
 }
