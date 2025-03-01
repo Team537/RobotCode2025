@@ -58,8 +58,8 @@ public class NarwhalWrist extends SubsystemBase {
         // configs for the encoder
         // NOTE FOR THE ENCODER: WHEN VIEWED FROM THE RIGHT, THE ANGLE OF THE WRIST IS BASED ON A UNIT CIRCLE WITH 0 DEGREES POINTING STRAIGHT UP
         wristConfig.encoder
-            .positionConversionFactor(NarwhalConstants.ROTATIONS_TO_RADIANS)
-            .velocityConversionFactor(NarwhalConstants.ROTATIONS_TO_RADIANS/60.0); // dividing by 60 accounts for RPM to Radians/Sec
+            .positionConversionFactor(NarwhalWristConstants.ROTATIONS_TO_RADIANS)
+            .velocityConversionFactor(NarwhalWristConstants.ROTATIONS_TO_RADIANS/60.0); // dividing by 60 accounts for RPM to Radians/Sec
         
             // creating the spark max controller
         wrist = new SparkMax(NarwhalWristConstants.WRIST_MOTOR_CAN_ID, MotorType.kBrushless);
