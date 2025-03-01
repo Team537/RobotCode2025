@@ -260,7 +260,10 @@ public final class Constants {
 
             public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(-Math.PI / 4); // -pi/4 TODO: update these placeholder values
             public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(2 * Math.PI / 3); // 2pi/3 TODO: update these placeholder values
-            public static final Rotation2d ALGAE_ANGLE = Rotation2d.fromRadians(Math.PI / 2); // pi/2 TODO: update these placeholder values
+            public static final Rotation2d ALGAE_ANGLE = Rotation2d.fromRadians(Math.PI / 2); // pi/2 TODO: update these placeholder values4
+            
+            /** The angle tolerance for the wrist to be considered at a specific state. */
+            public static final double WRIST_ANGLE_TOLERANCE = 0.3;
         }
 
         public static class NarwhalClimberConstants {
@@ -279,9 +282,41 @@ public final class Constants {
 
             public static final double CLIMBER_PID_MIN_OUTPUT = -0.3;
             public static final double CLIMBER_PID_MAX_OUTPUT = 0.3;
-
+            
             public static final Rotation2d DEPLOYED_ANGLE = Rotation2d.fromDegrees(30);
             public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(-5);
+        }
+
+        public static class NarwhalElevatorConstants {
+            public static final int ELEVATOR_LEAD_MOTOR_CAN_ID = 13;
+            public static final int ELEVATOR_LEAD_MOTOR_CURRENT_LIMIT = 40;
+
+            public static final int ELEVATOR_FOLLOWER_CAN_ID = 16;
+            public static final int ELEVATOR_FOLLOWER_MOTOR_CURRENT_LIMIT = ELEVATOR_LEAD_MOTOR_CURRENT_LIMIT; // same motor so probably should use same current limit.
+            
+            // Calculating the ratio of rotations to distance
+            /** Meters */
+            private static final double ELEVATOR_GEAR_RADIUS = 0.065; // Meters
+            private static final double ELEVATOR_GEAR_CIRCUMFERENCE = ELEVATOR_GEAR_RADIUS * 2.0 * Math.PI; // Meters
+            private static final double MOTOR_GEAR_REDUCTION = 20.0;
+            public static final double ENCODER_FACTOR = ELEVATOR_GEAR_CIRCUMFERENCE / MOTOR_GEAR_REDUCTION; // for every one rotation of the encoder, how many meters does the lift move
+
+            // PID
+            public static final double ELEVATOR_KP = 2.5;
+            public static final double ELEVATOR_KI = 0;
+            public static final double ELEVATOR_KD = 0.2;
+            public static final double ELEVATOR_MIN_OUTPUT = -0.6;
+            public static final double ELEVATOR_MAX_OUTPUT = 0.6;
+
+            // Set positions for the length the elevator needs to extend to to score.
+            public static final double MIN_HEIGHT_METERS = 0.0; // probably should leave at 0.0.
+            public static final double MAX_HEIGHT_METERS = 2.1336; // stops the robot from ending itself
+            public static final double L1_ELEVATOR_HEIGHT = 0.05; // Meters
+            public static final double L2_ELEVATOR_HEIGHT = 0.07; // Meters
+            public static final double L3_ELEVATOR_HEIGHT = 0.67; // Meters
+            public static final double L4_ELEVATOR_HEIGHT = 1.7; // Meters
+            public static final double INTAKE_ELEVATOR_HEIGHT_METERS = 0.05; // Meters
+            public static final boolean MOTOR_INVERTED = true;
         }
     }
 
@@ -369,7 +404,6 @@ public final class Constants {
 
         }
     }
-
     /**
      * <h2>VisionConstants</h2>
      * The {@code VisionConstants} class is a subclass contained within the {@code Constants} class.

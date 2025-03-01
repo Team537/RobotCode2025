@@ -17,6 +17,7 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.NarwhalConstants.NarwhalWristConstants;
 
 /**
  * <h2> NarwhalWrist </h2>
@@ -72,6 +73,11 @@ public class NarwhalWrist extends SubsystemBase {
 
         wristMotorPIDController = wrist.getClosedLoopController();
         currentState = NarwhalWristState.STOPPED;
+    }
+
+    public boolean readyToIntake(){
+        double current_position = wrist.getAbsoluteEncoder().getPosition();
+        return Math.abs(current_position - NarwhalWristConstants.INTAKE_ANGLE.getRadians()) < NarwhalWristConstants.WRIST_ANGLE_TOLERANCE;
     }
 
     /**
