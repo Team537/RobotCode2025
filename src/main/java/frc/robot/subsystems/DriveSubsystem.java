@@ -11,7 +11,6 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
@@ -36,12 +35,12 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.SquidConstants;
 import frc.robot.commands.DriveToPoseCommand;
-import frc.robot.util.DeltaTime;
-import frc.robot.util.DrivingMotorType;
-import frc.robot.util.Obstacle;
-import frc.robot.util.TurningMotorType;
-import frc.robot.util.UpperAssemblyType;
-import frc.robot.util.Vector2d;
+import frc.robot.util.math.DeltaTime;
+import frc.robot.util.swerve.DrivingMotorType;
+import frc.robot.util.autonomous.Obstacle;
+import frc.robot.util.swerve.TurningMotorType;
+import frc.robot.util.upper_assembly.UpperAssemblyType;
+import frc.robot.util.math.Vector2d;
 
 /**
  * <h2> DriveSubsystem </h2>
@@ -340,10 +339,10 @@ public class DriveSubsystem extends SubsystemBase {
     //////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Computes linear feedback for the drive system based on a target position.
-     *
-     * @param target the target translation (meters)
-     * @return a normalized vector (scaled by tanh of its magnitude) representing the feedback
+     * Returns the linear velocity value from the PID controllers, as a Vector2d.
+     * 
+     * @param target The target position.
+     * @return The linear velocity, as a Vector2d.
      */
     public Vector2d getLinearFeedback(Translation2d target) {
         Vector2d feedback = new Vector2d(
@@ -354,16 +353,19 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Computes rotational feedback for the drive system based on a target orientation.
-     *
-     * @param target the target rotation
-     * @return the rotational feedback value (scaled via tanh)
+     * Returns a rotational velocity value from the PID controller, as a double.
+     * 
+     * @param target The target orientation.
+     * @return The value to go towards.
      */
     public double getRotationalFeedback(Rotation2d target) {
         return Math.tanh(thetaController.calculate(getRobotPose().getRotation().getRadians(), target.getRadians()));
     }
 
     /**
+     * Returns this DriveSubsystem's gyroscope heading, as a Rotation2d. 
+     * 
+     * @return this DriveSubsystem's gyroscope heading, as a Rotation2d. 
      * Generates a command that drives the robot to a specific pose
      * 
      * @param pose the target Pose2d to reach
@@ -400,6 +402,9 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
+     * Returns this DriveSubsystem's swerver modules' states.
+     * 
+     * @return this DriveSubsystem's swerver modules' states.
      * Returns the current states of all swerve modules.
      *
      * @return an array of SwerveModuleState representing each module's state
@@ -414,9 +419,9 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Returns the current positions of all swerve modules.
-     *
-     * @return an array of SwerveModulePosition representing each module's position
+     * Returns this DriveSubsystem's swerve modules' positions, as an array of SwerveModulePositions.
+     * 
+     * @return this DriveSubsystem's swerve modules' positions, as an array of SwerveModulePositions.
      */
     public SwerveModulePosition[] getSwerveModulePositions() {
         return new SwerveModulePosition[] {
@@ -437,36 +442,36 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Returns the current estimated pose of the robot.
-     *
-     * @return the robot's Pose2d (position and orientation)
+     * Returns the robot's position, as a Pose2d.
+     * 
+     * @return The robot's position, as a Pose2d.
      */
     public synchronized Pose2d getRobotPose() {
         return poseEstimator.getEstimatedPosition();
     }
 
     /**
-     * Resets the robot's pose estimator to a specified pose.
-     *
-     * @param pose the new Pose2d to set for the robot
+     * Sets the robot's pose.
+     * 
+     * @param pose The Pose2d to set the robot's position to.
      */
     public void setRobotPose(Pose2d pose) {
         poseEstimator.resetPose(pose);
     }
 
     /**
-     * Resets only the robot's heading in the pose estimator.
-     *
-     * @param heading the new heading (Rotation2d)
+     * Sets the heading of the robot.
+     * 
+     * @param heading The Rotation2d representing the direction that the robot will believe it is facing.
      */
     public void setRobotHeading(Rotation2d heading) {
         poseEstimator.resetRotation(heading);
     }
 
     /**
-     * Resets only the robot's translation (position) in the pose estimator.
-     *
-     * @param translation the new position (Translation2d)
+     * Sets the 2D position of the robot without modifying the heading.
+     * 
+     * @param position The position to set, as a Translation2d
      */
     public void setRobotTranslation(Translation2d translation) {
         poseEstimator.resetTranslation(translation);
@@ -499,9 +504,9 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Sets the turning motor type for all swerve modules.
-     *
-     * @param turningMotorType the desired turning motor type
+     * Sets the turning motor of all four swerve modules.
+     * 
+     * @param turningMotor The turning motor to set.
      */
     public void setTurningMotors(TurningMotorType turningMotorType) {
         frontLeftModule.setTurningMotor(turningMotorType);

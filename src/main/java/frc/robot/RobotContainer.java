@@ -4,17 +4,27 @@
 
 package frc.robot;
 
+import frc.robot.Constants.OceanViewConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.network.TCPSender;
+import frc.robot.network.UDPReceiver;
 import frc.robot.commands.XboxParkerManualDriveCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.vision.PhotonVisionCamera;
-import frc.robot.subsystems.vision.VisionOdometry;
-import frc.robot.util.Obstacle;
+import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
+import frc.robot.subsystems.vision.OceanViewManager;
+import frc.robot.subsystems.vision.odometry.PhotonVisionCamera;
+import frc.robot.subsystems.vision.odometry.VisionOdometry;
+import frc.robot.util.autonomous.Alliance;
+import frc.robot.util.autonomous.AutonomousRoutine;
+import frc.robot.util.autonomous.Obstacle;
+import frc.robot.util.swerve.DrivingMotorType;
+import frc.robot.util.upper_assembly.UpperAssemblyFactory;
+import frc.robot.util.upper_assembly.UpperAssemblyType;
 
 import java.util.List;
 
@@ -23,13 +33,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.utils.Autonomous.Alliance;
-import frc.utils.Autonomous.AutonomousRoutine;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -43,27 +49,38 @@ public class RobotContainer {
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final XboxController xBoxController = new XboxController(OperatorConstants.DRIVER_CONTROLLER_PORT);
 
+    // Networking
+    private UDPReceiver udpReceiver;
+    private TCPSender tcpSender;
+
     // Subsystems
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
+    private UpperAssemblyBase upperAssembly = UpperAssemblyFactory.createUpperAssembly(Constants.UpperAssemblyConstants.DEFAULT_UPPER_ASSEMBLY);
+    
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
+    
+    @SuppressWarnings("unused") // The class is used due to how WPILib treats and stores subsystems.
+    private OceanViewManager oceanViewManager;
 
     // Commands
     Command manualDriveCommand = new XboxParkerManualDriveCommand(driveSubsystem, xBoxController);
 
-    // Replace with CommandPS4Controller or CommandJoystick if needed
-    private final CommandXboxController driverController = new CommandXboxController(
-            OperatorConstants.DRIVER_CONTROLLER_PORT);
-
     // Smart Dashboard Inputs
     private final SendableChooser<AutonomousRoutine> autonomousSelector = new SendableChooser<>();
     private final SendableChooser<Alliance> allianceSelector = new SendableChooser<>();
+
+    private final SendableChooser<UpperAssemblyType> upperAssemblySelector = new SendableChooser<>();
+    private final SendableChooser<DrivingMotorType> drivingMotorSelector = new SendableChooser<>();
 
     /**
      * Creates a new RobotContainer object and sets up SmartDashboard an the button inputs.
      */
     public RobotContainer() {
         
+        // Setup Networking        
+        setupOceanViewManager();
+
         // Add cameras to the VisionOdometry object.
         visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, new Transform3d()));
         visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.SLIDE_CAMERA_NAME, new Transform3d()));
@@ -76,18 +93,39 @@ public class RobotContainer {
     }
 
     /**
+     * Sets up the OceanViewManager instance used by the robot. 
+     * If the PI is not connected to the robot, nothing will happen.
+     */
+    private void setupOceanViewManager() {
+
+        // Attempted to create a new TCPSender and UDPReceiver object.
+        try {
+            this.udpReceiver = new UDPReceiver(OceanViewConstants.UDP_PORT_NUMBER);    
+            this.tcpSender = new TCPSender(OceanViewConstants.PI_IP, OceanViewConstants.TCP_PORT_NUMBER);
+            System.out.println("Successfully created TCPSender and UDPReceiver object!");
+        } catch (Exception e) {
+            System.err.println("Failed to construct TCPSender object: " + e.getMessage());
+        }
+
+        // An OceanView manager instance cannot be created if either the TCPSender or UDPReceiver is null.
+        // Thus, we stop setting up the OceanViewManager.
+        if (this.udpReceiver == null || this.tcpSender == null) {
+            return;
+        }
+
+        // Start the UDPReceiver.
+        this.udpReceiver.start();
+
+        // Create a new OceanViewManager object.
+        this.oceanViewManager = new OceanViewManager(this.udpReceiver, this.tcpSender, driveSubsystem::getRobotPose);
+    }
+
+    /**
      * Use this method to define your trigger->command mappings. Triggers can be
-     * created via the
-     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
-     * an arbitrary
-     * predicate, or via the named factories in {@link
-     * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
-     * {@link
-     * CommandXboxController
-     * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-     * PS4} controllers or
-     * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-     * joysticks}.
+     * created via the {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
+     * an arbitrary predicate, or via the named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s 
+     * subclasses for {@link CommandXboxControllerXbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4ControllerPS4} 
+     * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
      */
     private void configureBindings() {
         
@@ -120,6 +158,8 @@ public class RobotContainer {
         // Add the selectors to the dashboard.
         SmartDashboard.putData(autonomousSelector);
         SmartDashboard.putData(allianceSelector);
+        SmartDashboard.putData(upperAssemblySelector);
+        SmartDashboard.putData(drivingMotorSelector);
     }
 
     /**
@@ -138,10 +178,19 @@ public class RobotContainer {
     }
 
     /**
+     * sets the upper assembly to the given type
+     * 
+     * @param upperAssemblyType the type of upper assembly to set to
+     */
+    public void setUpperAssembly(UpperAssemblyType upperAssemblyType) {
+        upperAssembly.disable();
+        upperAssembly = UpperAssemblyFactory.createUpperAssembly(upperAssemblyType);
+    }
+
+    /**
      * Schedules commands used exclusively during TeleOp.
      */
     public void scheduleTeleOp() {
-
         // The Drive Command
         driveSubsystem.setRobotPose(new Pose2d(1.0,4.000,new Rotation2d(0.0)));
         Obstacle testObstacle = new Obstacle(new Translation2d(5.000,1.000),2.0);
@@ -150,6 +199,6 @@ public class RobotContainer {
             return List.of(testObstacle);
         });
         driveSubsystem.setDefaultCommand(driveSubsystem.getPathfindingCommand(new Pose2d(10.000,4.000,new Rotation2d(2.0))));
-        
+        upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
     }
 }

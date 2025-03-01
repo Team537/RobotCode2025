@@ -68,7 +68,10 @@ public final class Configs {
                         .kD = DriveConstants.KrakenX60Driving.KD;
                 KRAKEN_X60_CONFIGURATION
                     .Slot0
-                        .kV = DriveConstants.KrakenX60Driving.FF;
+                        .kV = DriveConstants.KrakenX60Driving.KV;
+                KRAKEN_X60_CONFIGURATION
+                    .Slot0
+                        .kA = DriveConstants.KrakenX60Driving.KA;
 
                 KRAKEN_X60_CONFIGURATION
                     .MotorOutput
@@ -101,9 +104,12 @@ public final class Configs {
                 KRAKEN_X60_FOC_CONFIGURATION
                     .Slot0
                         .kD = DriveConstants.KrakenX60FOCDriving.KD;
-                KRAKEN_X60_FOC_CONFIGURATION
-                    .Slot0
-                        .kV = DriveConstants.KrakenX60FOCDriving.FF;
+                        KRAKEN_X60_FOC_CONFIGURATION
+                        .Slot0
+                            .kV = DriveConstants.KrakenX60FOCDriving.KV;
+                    KRAKEN_X60_FOC_CONFIGURATION
+                        .Slot0
+                            .kA = DriveConstants.KrakenX60FOCDriving.KA;
 
                 KRAKEN_X60_FOC_CONFIGURATION
                     .MotorOutput
