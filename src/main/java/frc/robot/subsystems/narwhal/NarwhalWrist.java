@@ -12,11 +12,10 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.util.NarwhalWristState;
 import frc.robot.Constants.NarwhalConstants.NarwhalWristConstants;
 
 /**
@@ -30,7 +29,7 @@ import frc.robot.Constants.NarwhalConstants.NarwhalWristConstants;
 public class NarwhalWrist extends SubsystemBase {
     public NarwhalWristState currentState;
     
-    private final SparkMax wrist;
+    public final SparkMax wrist;
     private final SparkMaxConfig wristConfig;
     private final SparkClosedLoopController wristMotorPIDController;
     
@@ -45,30 +44,25 @@ public class NarwhalWrist extends SubsystemBase {
         // Configure the wrist motor settings.
         wristConfig 
             .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(Constants.NarwhalConstants.NarwhalWristConstants.WRIST_MOTOR_CURRENT_LIMIT)
+            .smartCurrentLimit(NarwhalWristConstants.WRIST_MOTOR_CURRENT_LIMIT)
             .inverted(true);
 
         // Update motor PID values.
         wristConfig.closedLoop 
             .pid(
-                Constants.NarwhalConstants.NarwhalWristConstants.POSITION_PID_P, 
-                Constants.NarwhalConstants.NarwhalWristConstants.POSITION_PID_I, 
-                Constants.NarwhalConstants.NarwhalWristConstants.POSITION_PID_D
+                NarwhalWristConstants.POSITION_PID_P, 
+                NarwhalWristConstants.POSITION_PID_I, 
+                NarwhalWristConstants.POSITION_PID_D
             )
-            .outputRange(-1, 1)
-            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder); // uses external encoder
-
-        // Update encoder settings.
+            .outputRange(NarwhalWristConstants.PID_OUTPUT_RANGE_MIN, NarwhalWristConstants.PID_OUTPUT_RANGE_MAX); // uses external encoder
+        // configs for the encoder
         // NOTE FOR THE ENCODER: WHEN VIEWED FROM THE RIGHT, THE ANGLE OF THE WRIST IS BASED ON A UNIT CIRCLE WITH 0 DEGREES POINTING STRAIGHT UP
-        wristConfig.absoluteEncoder
-            .inverted(false)
-            .positionConversionFactor(Constants.NarwhalConstants.NarwhalWristConstants.ROTATIONS_TO_RADIANS)
-            .velocityConversionFactor(Constants.NarwhalConstants.NarwhalWristConstants.ROTATIONS_TO_RADIANS/60.0) // dividing by 60 accounts for RPM to Radians/Sec
-            .zeroOffset(Constants.NarwhalConstants.NarwhalWristConstants.WRIST_OFFSET) // Down position should be "0" here, and -PI rads for zero centered
-            .zeroCentered(true);
-
-        // Create the spark max controller with the above configured settings.
-        wrist = new SparkMax(Constants.NarwhalConstants.NarwhalWristConstants.WRIST_MOTOR_CAN_ID, MotorType.kBrushless);
+        wristConfig.encoder
+            .positionConversionFactor(NarwhalWristConstants.ROTATIONS_TO_RADIANS)
+            .velocityConversionFactor(NarwhalWristConstants.ROTATIONS_TO_RADIANS/60.0); // dividing by 60 accounts for RPM to Radians/Sec
+        
+            // creating the spark max controller
+        wrist = new SparkMax(NarwhalWristConstants.WRIST_MOTOR_CAN_ID, MotorType.kBrushless);
         wrist.configure(wristConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         wristMotorPIDController = wrist.getClosedLoopController();
@@ -98,23 +92,47 @@ public class NarwhalWrist extends SubsystemBase {
         
         // Inline construction of command goes here.
         // Subsystem::RunOnce implicitly requires `this` subsystem.
-        setCurrentMotorAngle(Constants.NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE);
+        setCurrentMotorAngle(NarwhalWristConstants.INTAKE_ANGLE);
         currentState = NarwhalWristState.INTAKING; // must be after the set function because the set function will default to CUSTOM state
+    }
+    
+    /**
+     * Set the wrist motor to the angle for scoring L1 (defined in constants) & update status.
+     */
+    public void goToL1WristAngle(){
+        setCurrentMotorAngle(NarwhalWristConstants.L1_OUTTAKE_ANGLE);
+        currentState = NarwhalWristState.L1; // must be after the set function because the set function will default to CUSTOM state
+    }
+    
+    /**
+     * Set the wrist motor to the angle for scoring L2 (defined in constants) & update status.
+     */
+    public void goToL2WristAngle(){
+        setCurrentMotorAngle(NarwhalWristConstants.L2_OUTTAKE_ANGLE);
+        currentState = NarwhalWristState.L2; // must be after the set function because the set function will default to CUSTOM state
     }
 
     /**
-     * Set the wrist motor to the outtake angle (defined in constants) & update status.
+     * Set the wrist motor to the angle for scoring L3 (defined in constants) & update status.
      */
-    public void goToOuttakeAngle() {
-        setCurrentMotorAngle(Constants.NarwhalConstants.NarwhalWristConstants.OUTTAKE_ANGLE);
-        currentState = NarwhalWristState.OUTTAKING; // must be after the set function because the set function will default to CUSTOM state
+    public void goToL3WristAngle(){
+        setCurrentMotorAngle(NarwhalWristConstants.L3_OUTTAKE_ANGLE);
+        currentState = NarwhalWristState.L3; // must be after the set function because the set function will default to CUSTOM state
     }
-    
+
+    /**
+     * Set the wrist motor to the angle for scoring L4 (defined in constants) & update status.
+     */
+    public void goToL4WristAngle(){
+        setCurrentMotorAngle(NarwhalWristConstants.L4_OUTTAKE_ANGLE);
+        currentState = NarwhalWristState.L4; // must be after the set function because the set function will default to CUSTOM state
+    }
+
     /**
      * Set the wrist motor to the algae descore angle (defined in constants) & update status.
      */
     public void goToAlgaeAngle() {
-        setCurrentMotorAngle(Constants.NarwhalConstants.NarwhalWristConstants.ALGAE_ANGLE);
+        setCurrentMotorAngle(NarwhalWristConstants.ALGAE_ANGLE);
         currentState = NarwhalWristState.ALGAE; // must be after the set function because the set function will default to CUSTOM state
     }
 
