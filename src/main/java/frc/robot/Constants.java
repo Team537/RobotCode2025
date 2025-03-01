@@ -422,7 +422,7 @@ public final class Constants {
         // Pipeline settings
         public static final int APRIL_TAG_PIPELINE = 0;
         public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = AprilTagFieldLayout
-                .loadField(AprilTagFields.k2025ReefscapeAndyMark);
+                .loadField(AprilTagFields.k2025Reefscape);
 
         // Odometry Detection Strategy
         public static final PhotonPoseEstimator.PoseStrategy POSE_STRATEGY = PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
