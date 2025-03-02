@@ -14,7 +14,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants.Defaults;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.util.swerve.DrivingMotorType;
 import frc.robot.util.swerve.TurningMotorType;
 
