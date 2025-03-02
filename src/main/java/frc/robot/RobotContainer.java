@@ -5,7 +5,6 @@
 package frc.robot;
 
 import frc.robot.Constants.OceanViewConstants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Autos;
@@ -21,17 +20,11 @@ import frc.robot.subsystems.vision.odometry.PhotonVisionCamera;
 import frc.robot.subsystems.vision.odometry.VisionOdometry;
 import frc.robot.util.autonomous.Alliance;
 import frc.robot.util.autonomous.AutonomousRoutine;
-import frc.robot.util.autonomous.Obstacle;
 import frc.robot.util.swerve.DrivingMotorType;
 import frc.robot.util.upper_assembly.UpperAssemblyFactory;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
 
-import java.util.List;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -78,7 +71,7 @@ public class RobotContainer {
      */
     public RobotContainer() {
         
-        // Setup Networking        
+        // Setup OceanView & all of its networking dependencies.
         setupOceanViewManager();
 
         // Add cameras to the VisionOdometry object.
