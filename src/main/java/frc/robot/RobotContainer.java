@@ -183,7 +183,6 @@ public class RobotContainer {
      * @param upperAssemblyType the type of upper assembly to set to
      */
     public void setUpperAssembly(UpperAssemblyType upperAssemblyType) {
-        upperAssembly.disable();
         upperAssembly = UpperAssemblyFactory.createUpperAssembly(upperAssemblyType);
     }
 
