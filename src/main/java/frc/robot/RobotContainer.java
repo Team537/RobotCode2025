@@ -140,8 +140,8 @@ public class RobotContainer {
         // Setup dropdowns from enumeration values
         EnumPrettifier.setupSendableChooserFromEnum(this.autonomousSelector, AutonomousRoutine.class, AutonomousRoutine.LEFT_HIGH_SCORE);
         EnumPrettifier.setupSendableChooserFromEnum(this.allianceSelector, Alliance.class, Alliance.RED);
-        EnumPrettifier.setupSendableChooserFromEnum(this.upperSubstructureSelector, UpperAssemblyType.class, UpperAssemblyType.NARWHAL);
-        EnumPrettifier.setupSendableChooserFromEnum(this.drivingMotorSelector, DrivingMotor.class, DrivingMotor.NEO);
+        EnumPrettifier.setupSendableChooserFromEnum(this.upperAssemblySelector, UpperAssemblyType.class, UpperAssemblyType.NARWHAL);
+        EnumPrettifier.setupSendableChooserFromEnum(this.drivingMotorSelector, DrivingMotorType.class, DrivingMotorType.NEO);
 
         // Add the selectors to the dashboard.
         SmartDashboard.putData(autonomousSelector);
@@ -161,7 +161,7 @@ public class RobotContainer {
         SmartDashboard.putString("Selected Autonomous", selectedAutonomousRoutine.toString());
         SmartDashboard.putString("Selected Alliance", selectedAlliance.toString());
 
-        this.upperAssembly = UpperAssemblyFactory.createUpperAssembly(this.upperSubstructureSelector.getSelected());
+        this.upperAssembly = UpperAssemblyFactory.createUpperAssembly(this.upperAssemblySelector.getSelected());
 
         // An example command will be run in autonomous
         return Autos.exampleAuto(exampleSubsystem);
