@@ -18,6 +18,7 @@ import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
 import frc.robot.subsystems.vision.OceanViewManager;
 import frc.robot.subsystems.vision.odometry.PhotonVisionCamera;
 import frc.robot.subsystems.vision.odometry.VisionOdometry;
+import frc.robot.util.EnumPrettifier;
 import frc.robot.util.autonomous.Alliance;
 import frc.robot.util.autonomous.AutonomousRoutine;
 import frc.robot.util.swerve.DrivingMotorType;
@@ -49,10 +50,11 @@ public class RobotContainer {
     // Subsystems
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
+
     private UpperAssemblyBase upperAssembly = UpperAssemblyFactory.createUpperAssembly(Constants.Defaults.DEFAULT_UPPER_ASSEMBLY);
-    
+
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
-    
+
     @SuppressWarnings("unused") // The class is used due to how WPILib treats and stores subsystems.
     private OceanViewManager oceanViewManager;
 
@@ -135,18 +137,11 @@ public class RobotContainer {
      * This method sets up the dashboard so that the drivers can configure the robots settings.
      */
     private void setupSmartDashboard() {
-            
-        // Setup Autonomous Routine Selection
-        autonomousSelector.setDefaultOption("LEFT_HIGH_SCORE", AutonomousRoutine.LEFT_HIGH_SCORE);
-        for (AutonomousRoutine autonomousRoutine : AutonomousRoutine.values()) {
-            autonomousSelector.addOption(autonomousRoutine.toString(), autonomousRoutine);
-        }
-
-        // Setup Alliance Selection
-        allianceSelector.setDefaultOption("RED", Alliance.RED);
-        for (Alliance alliance : Alliance.values()) {
-            allianceSelector.addOption(alliance.toString(), alliance);
-        }
+        // Setup dropdowns from enumeration values
+        EnumPrettifier.setupSendableChooserFromEnum(this.autonomousSelector, AutonomousRoutine.class, AutonomousRoutine.LEFT_HIGH_SCORE);
+        EnumPrettifier.setupSendableChooserFromEnum(this.allianceSelector, Alliance.class, Alliance.RED);
+        EnumPrettifier.setupSendableChooserFromEnum(this.upperAssemblySelector, UpperAssemblyType.class, UpperAssemblyType.NARWHAL);
+        EnumPrettifier.setupSendableChooserFromEnum(this.drivingMotorSelector, DrivingMotorType.class, DrivingMotorType.NEO);
 
         // Add the selectors to the dashboard.
         SmartDashboard.putData(autonomousSelector);
@@ -165,6 +160,8 @@ public class RobotContainer {
         Alliance selectedAlliance = allianceSelector.getSelected();
         SmartDashboard.putString("Selected Autonomous", selectedAutonomousRoutine.toString());
         SmartDashboard.putString("Selected Alliance", selectedAlliance.toString());
+
+        this.upperAssembly = UpperAssemblyFactory.createUpperAssembly(this.upperAssemblySelector.getSelected());
 
         // An example command will be run in autonomous
         return Autos.exampleAuto(exampleSubsystem);
