@@ -15,28 +15,28 @@ public class SquidUpperAssembly extends UpperAssemblyBase {
 
     SquidManipulator squidManipulator;
     
-    public Command getCoralIntakeCommand(Supplier<Pose2d> robotPoseSupplier) {
+    public Command getCoralIntakeCommand() {
         return new RunCommand(
             () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
             this
         );
     }
 
-    public Command getCoralScoreCommand(ScoringHeight scoringHeight, Supplier<Pose2d> robotPoseSupplier) {
+    public Command getCoralScoreCommand(ScoringHeight scoringHeight) {
         return new RunCommand(
             () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
             this
         );
     }
 
-    public Command getRemoveAlgaeCommand(Supplier<Pose2d> robotPoseSupplier) {
+    public Command getRemoveAlgaeCommand() {
         return new RunCommand(
             () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
             this
         );
     }
 
-    public Command getClimbCommand(Supplier<Pose2d> robotPoseSupplier) {
+    public Command getClimbCommand() {
         return new RunCommand(
             () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
             this

@@ -1,5 +1,7 @@
 package frc.robot.subsystems.upper_assembly;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -14,8 +16,26 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  */
 public abstract class UpperAssemblyBase extends SubsystemBase implements UpperAssembly {
     
-    @Override
-    public void disable() { // Basic implementation of the disable method. Ensures both teams have this defined.
-        System.err.println("Error: Upper Assembly does not provide functionality to disable hardware in the event of an emergency.");
+    protected Supplier<Boolean> robotInScoringPositionSupplier;
+    protected Supplier<Boolean> robotInIntakingPositionSupplier;
+    protected Supplier<Boolean> robotInClimbPositionSupplier;
+
+    protected UpperAssemblyBase() {
+        robotInScoringPositionSupplier = () -> {return true;};
+        robotInIntakingPositionSupplier = () -> {return true;};
+        robotInClimbPositionSupplier = () -> {return true;};
     }
+
+    public void setRobotInScoringPositionSupplier(Supplier<Boolean> supplier) {
+        robotInScoringPositionSupplier = supplier;
+    }
+
+    public void setRobotInIntakingPositionSupplier(Supplier<Boolean> supplier) {
+        robotInIntakingPositionSupplier = supplier;
+    }
+
+    public void setRobotInClimbPositionSupplier(Supplier<Boolean> supplier) {
+        robotInClimbPositionSupplier = supplier;
+    }
+
 }
