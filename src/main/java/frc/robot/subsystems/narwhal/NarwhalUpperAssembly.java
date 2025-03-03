@@ -10,29 +10,33 @@ import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
 import frc.robot.util.upper_assembly.ScoringHeight;
 
 public class NarwhalUpperAssembly extends UpperAssemblyBase {
-    
-    public Command getCoralIntakeCommand(Supplier<Pose2d> robotPoseSupplier) {
+
+    public NarwhalUpperAssembly() {
+        super();
+    }
+
+    public Command getCoralIntakeCommand() {
         return new RunCommand(
             () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
             this
         );
     }
 
-    public Command getCoralScoreCommand(ScoringHeight scoringHeight, Supplier<Pose2d> robotPoseSupplier) {
+    public Command getCoralScoreCommand(ScoringHeight scoringHeight) {
         return new RunCommand(
             () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
             this
         );
     }
 
-    public Command getRemoveAlgaeCommand(Supplier<Pose2d> robotPoseSupplier) {
+    public Command getRemoveAlgaeCommand() {
         return new RunCommand(
             () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
             this
         );
     }
 
-    public Command getClimbCommand(Supplier<Pose2d> robotPoseSupplier) {
+    public Command getClimbCommand() {
         return new RunCommand(
             () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
             this
