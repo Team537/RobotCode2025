@@ -1,6 +1,8 @@
 package frc.robot.util.vision;
 
 import edu.wpi.first.math.geometry.Transform3d;
+import frc.robot.util.field.ReefScoringLocation;
+import frc.robot.util.upper_assembly.ScoringHeight;
 
 /**
  * <p>
@@ -37,6 +39,24 @@ public class ScoringLocation {
         this.branch = branch;
         this.level = level;
         this.transform = transform;
+    }
+
+    /**
+     * Returns this ScoringLocation`s branch as a <code> ReefScoringLocation </code> enum.
+     * 
+     * @return This ScoringLocation`s branch as a <code> ReefScoringLocation </code> enum.
+     */
+    public ReefScoringLocation getBranchAsEnum() {
+        return ReefScoringLocation.valueOf(this.branch);
+    }
+
+    /**
+     * Returns this ScoringLocation`s level as a <code> ScoringHeight </code> enum.
+     * 
+     * @return This ScoringLocation`s level as a <code> ScoringHeight </code> enum.
+     */
+    public ScoringHeight getLevelAsEnum() {
+        return ScoringHeight.valueOf(this.level);
     }
 
     /**
