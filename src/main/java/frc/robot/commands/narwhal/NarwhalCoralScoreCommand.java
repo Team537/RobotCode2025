@@ -16,7 +16,7 @@ import frc.robot.util.upper_assembly.ScoringHeight;
  * Will raise the elevator to the appropriate height, move the wrist to the
  * appropriate angle, wait for the ready to score supplier to return true, and then score the Coral.
  */
-public class NarwhalScoreCommand extends Command{
+public class NarwhalCoralScoreCommand extends Command{
     private final NarwhalElevator narwhalElevator;
     private final NarwhalWrist narwhalWrist;
     private final NarwhalIntakeOuttake narwhalIntakeOuttake;
@@ -34,7 +34,7 @@ public class NarwhalScoreCommand extends Command{
      * @param readyToScoreSupplier A supplier that returns true when the robot is ready to score.
      * @param targetScoringHeight The height to score the Coral at.
      */
-    public NarwhalScoreCommand(NarwhalElevator narwhalElevator, NarwhalWrist narwhalWrist, NarwhalIntakeOuttake narwhalIntakeOuttake, Supplier<Boolean> readyToScoreSupplier, ScoringHeight targetScoringHeight){
+    public NarwhalCoralScoreCommand(NarwhalElevator narwhalElevator, NarwhalWrist narwhalWrist, NarwhalIntakeOuttake narwhalIntakeOuttake, Supplier<Boolean> readyToScoreSupplier, ScoringHeight targetScoringHeight){
         this.narwhalElevator = narwhalElevator;
         this.narwhalWrist = narwhalWrist;
         this.narwhalIntakeOuttake = narwhalIntakeOuttake;
@@ -78,12 +78,12 @@ public class NarwhalScoreCommand extends Command{
         }
         
         // If the robot is ready to score, score the Coral, otherwise do nothing with the intake/outtake
-        if(readyToScoreSupplier.get()){
+        if(readyToScoreSupplier.get()  && narwhalElevator.isAtTargetPosition() && narwhalWrist.isAtTargetPosition()){
             narwhalIntakeOuttake.outtake();
         }
 
-        // Start the outtake delay timer if the Coral sensor is triggered and the outtake delay timer isn't already running
-        if(narwhalIntakeOuttake.isCoralSensorTriggered()){
+        // Start the outtake delay timer if the Coral sensor is no longer triggered and the outtake delay timer isn't already running
+        if(!narwhalIntakeOuttake.isCoralSensorTriggered()){
             if (!outtakeDelayTimer.isRunning()){
                 outtakeDelayTimer.start();
             }
@@ -100,5 +100,9 @@ public class NarwhalScoreCommand extends Command{
     public void end(boolean interrupted){
         // Stop the intake/outtake motor when the command ends
         narwhalIntakeOuttake.stop();
+
+        // Stop & reset the outtake delay timer when the command ends
+        outtakeDelayTimer.stop();
+        outtakeDelayTimer.reset();
     }
 }

@@ -4,7 +4,6 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Configs.Narwhal;
 import frc.robot.Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants;
 import frc.robot.subsystems.narwhal.NarwhalElevator;
 import frc.robot.subsystems.narwhal.NarwhalIntakeOuttake;
@@ -26,11 +25,11 @@ public class NarwhalCoralIntakeCommand extends Command{
     private final Timer intakeDelayTimer;
 
     /**
-     * Creates a new NarwhalScoreCommand.
+     * Creates a new NarwhalCoralIntakeCommand.
      * @param narwhalElevator The NarwhalElevator subsystem to use.
      * @param narwhalWrist The NarwhalWrist subsystem to use.
      * @param narwhalIntakeOuttake The NarwhalIntakeOuttake subsystem to use.
-     * @param readyToIntakeSupplier A supplier that returns true when the robot is ready to score.
+     * @param readyToIntakeSupplier A supplier that returns true when the robot is ready to intake.
      */
     public NarwhalCoralIntakeCommand(NarwhalElevator narwhalElevator, NarwhalWrist narwhalWrist, NarwhalIntakeOuttake narwhalIntakeOuttake, Supplier<Boolean> readyToIntakeSupplier){
         this.narwhalElevator = narwhalElevator;
@@ -44,7 +43,7 @@ public class NarwhalCoralIntakeCommand extends Command{
 
     @Override
     public void initialize(){
-        // Reset the intake delay timer when the command starts
+        // Ensures the intake delay timer is stopped when the command starts
         intakeDelayTimer.stop();
         intakeDelayTimer.reset();
     }
@@ -56,7 +55,7 @@ public class NarwhalCoralIntakeCommand extends Command{
         narwhalWrist.goToIntakeAngle();
 
         // If the robot is ready to intake, intake the Coral, otherwise do nothing with the intake/outtake
-        if(readyToIntakeSupplier.get()){
+        if(readyToIntakeSupplier.get() && narwhalElevator.isAtTargetPosition() && narwhalWrist.isAtTargetPosition()){
             narwhalIntakeOuttake.intake();
         }
 
@@ -78,6 +77,8 @@ public class NarwhalCoralIntakeCommand extends Command{
     public void end(boolean interrupted){
         // Stop the intake/outtake motor when the command ends
         narwhalIntakeOuttake.hold();
+        // Stop & reset the intake delay timer when the command ends
         intakeDelayTimer.stop();
+        intakeDelayTimer.reset();
     }
 }

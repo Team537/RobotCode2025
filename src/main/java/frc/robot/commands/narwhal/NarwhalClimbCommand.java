@@ -5,14 +5,13 @@ import java.util.function.Supplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.narwhal.NarwhalClimber;
 import frc.robot.subsystems.narwhal.NarwhalElevator;
-import frc.robot.subsystems.narwhal.NarwhalIntakeOuttake;
 import frc.robot.subsystems.narwhal.NarwhalWrist;
 
 
 /** 
- * A command that scores the Coral using the Narwhal upper assembly. (NOTE: IF THERE IS NO CORAL OR THE CORAL SENSOR IS MALFUNCTIONING, THIS COMMAND WILL END PREMATURLY)
- * Will raise the elevator to the appropriate height, move the wrist to the
- * appropriate angle, wait for the ready to score supplier to return true, and then score the Coral.
+ * A command that climbs using the Narwhal upper assembly.
+ * Will lower the elevator to the minimum height, move the wrist out of the way to the
+ * climb angle, and then climb. If the robot is not ready to climb, the climber arm will be moved to the deploy position.
  */
 public class NarwhalClimbCommand extends Command{
     private final NarwhalElevator narwhalElevator;
@@ -21,12 +20,11 @@ public class NarwhalClimbCommand extends Command{
     private final Supplier<Boolean> readyToClimbSupplier;
 
     /**
-     * Creates a new NarwhalScoreCommand.
+     * Creates a new NarwhalClimbCommand.
      * @param narwhalElevator The NarwhalElevator subsystem to use.
      * @param narwhalWrist The NarwhalWrist subsystem to use.
-     * @param narwhalIntakeOuttake The NarwhalIntakeOuttake subsystem to use.
-     * @param readyToScoreSupplier A supplier that returns true when the robot is ready to score.
-     * @param targetScoringHeight The height to score the Coral at.
+     * @param narwhalClimber The NarwhalClimber subsystem to use.
+     * @param readyToClimbSupplier A supplier that returns true when the robot is ready to climb.
      */
     public NarwhalClimbCommand(NarwhalElevator narwhalElevator, NarwhalWrist narwhalWrist, NarwhalClimber narwhalClimber, Supplier<Boolean> readyToClimbSupplier){
         this.narwhalElevator = narwhalElevator;
@@ -42,7 +40,7 @@ public class NarwhalClimbCommand extends Command{
         narwhalWrist.goToClimbAngle();
 
         // If the robot is ready to climb, climb, otherwise move the climber arm to the deploy position
-        if(readyToClimbSupplier.get()){
+        if(readyToClimbSupplier.get() && narwhalClimber.isAtDeployAngle() && narwhalElevator.isAtTargetPosition() && narwhalWrist.isAtTargetPosition()){
             narwhalClimber.climb();
         }
         else {

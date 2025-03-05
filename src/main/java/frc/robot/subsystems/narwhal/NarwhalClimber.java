@@ -108,6 +108,14 @@ public class NarwhalClimber extends SubsystemBase {
         return Math.abs(current_position - NarwhalClimberConstants.CLIMB_ANGLE.getRotations()) < NarwhalClimberConstants.CLIMBER_ANGLE_TOLERANCE.getRotations();
     }
 
+    /**
+     * Check if the climber is at the Deploy angle
+     */
+    public boolean isAtDeployAngle(){
+        double current_position = climber.getAbsoluteEncoder().getPosition();
+        return Math.abs(current_position - NarwhalClimberConstants.DEPLOYED_ANGLE.getRotations()) < NarwhalClimberConstants.CLIMBER_ANGLE_TOLERANCE.getRotations();
+    }
+
     @Override
     public void periodic() {
         // This method will be called once per scheduler run

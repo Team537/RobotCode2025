@@ -21,6 +21,7 @@ import frc.robot.util.NarwhalElevatorState;
 
 public class NarwhalElevator extends SubsystemBase {
     public NarwhalElevatorState currentState;
+    private double currentTargetPosition;
 
     private final SparkMax leadElevator;
     private final SparkMaxConfig leadElevatorConfig;
@@ -30,6 +31,8 @@ public class NarwhalElevator extends SubsystemBase {
     private final SparkMaxConfig followerElevatorConfig;
 
     public NarwhalElevator(){
+        currentTargetPosition = 0.0;
+
         // Configurations for the Spark Max that controls the lead elevator motor
         leadElevatorConfig = new SparkMaxConfig();
         leadElevatorConfig // general configs
@@ -78,6 +81,8 @@ public class NarwhalElevator extends SubsystemBase {
         double target_height = Math.min(Math.max(meters, NarwhalElevatorConstants.MIN_HEIGHT_METERS), NarwhalElevatorConstants.MAX_HEIGHT_METERS); // Clamps the height to [MAX_HEIGHT_METERS, MIN_HEIGHT_METERS]
         leadElevatorPID.setReference(target_height, ControlType.kPosition); // Runs using percent output of duty cycle
         currentState = NarwhalElevatorState.CUSTOM;
+
+        currentTargetPosition = target_height;
     }
 
     /**
@@ -126,6 +131,15 @@ public class NarwhalElevator extends SubsystemBase {
     public void goToScoreHeightL4(){
         setHeight(NarwhalElevatorConstants.L4_ELEVATOR_HEIGHT);
         currentState = NarwhalElevatorState.L4;
+    }
+
+    /**
+     * Checks if the elevator is at the target position. Note: this method does not account for velocity and uses a tolerance.
+     * 
+     * @return Returns true if the elevator is at the target position
+     */
+    public boolean isAtTargetPosition(){
+        return Math.abs(leadElevator.getEncoder().getPosition() - currentTargetPosition) < NarwhalElevatorConstants.ELEVATOR_POSITION_TOLERANCE;
     }
 
     @Override

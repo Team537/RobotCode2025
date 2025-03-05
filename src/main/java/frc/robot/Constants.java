@@ -295,7 +295,7 @@ public final class Constants {
 
             // Calculating encoder conversion factor
             public static final double GEAR_REDUCTION = 20;
-            public static final double ROTATIONS_TO_RADIANS = Math.PI * 2 / GEAR_REDUCTION; // Wrist target angles (radians) are multiplied by this to get the motor target position           
+            public static final double ENCODER_FACTOR = Math.PI * 2 / GEAR_REDUCTION; // Wrist target angles (radians) are multiplied by this to get the motor target position           
             
             // PID configurations
             public static final double POSITION_PID_P = 0.3;
@@ -314,7 +314,7 @@ public final class Constants {
             public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(3 * Math.PI / 2);
             
             /** The angle tolerance for the wrist to be considered at a specific state. */
-            public static final double WRIST_ANGLE_TOLERANCE = 0.3;
+            public static final Rotation2d WRIST_ANGLE_TOLERANCE = Rotation2d.fromRadians(0.06 * Math.PI);
         }
 
         public static class NarwhalClimberConstants {
@@ -371,6 +371,7 @@ public final class Constants {
             public static final double L4_ELEVATOR_HEIGHT = 1.7; // Meters
             public static final double INTAKE_ELEVATOR_HEIGHT_METERS = 0.05; // Meters
             public static final boolean MOTOR_INVERTED = true;
+            public static final double ELEVATOR_POSITION_TOLERANCE = 0.05; // Meters
         }
     }
 
