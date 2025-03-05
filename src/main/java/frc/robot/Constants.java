@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.List;
+
 import org.photonvision.PhotonPoseEstimator;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -14,8 +16,8 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
-import frc.robot.util.swerve.DrivingMotor;
-import frc.robot.util.swerve.TurningMotor;
+import frc.robot.util.swerve.DrivingMotorType;
+import frc.robot.util.swerve.TurningMotorType;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -30,6 +32,15 @@ import edu.wpi.first.apriltag.AprilTagFields;
  */
 public final class Constants {
 
+    public static class Defaults {
+
+        // Default motor values
+        public static final DrivingMotorType DEFAULT_DRIVING_MOTOR = DrivingMotorType.KRAKEN_X60;
+        public static final TurningMotorType DEFAULT_TURNING_MOTOR = TurningMotorType.NEO_550;
+        public static final UpperAssemblyType DEFAULT_UPPER_ASSEMBLY = UpperAssemblyType.NARWHAL;
+
+    }
+
     /**
      * <h2>OperatorConstants</h2>
      * The {@code OperatorConstants} class is a subclass contained within the {@code Constants} class.
@@ -37,6 +48,7 @@ public final class Constants {
      * This includes things like the maximum boost mode speed, the driver controller port, driver rotational offsets, etc.
      */
     public static class OperatorConstants {
+
         public static final int DRIVER_CONTROLLER_PORT = 0;
 
         // Position offsets, used to determine the orientation of the driver
@@ -53,8 +65,8 @@ public final class Constants {
         public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; // Radians per
                                                                                                         // second
         public static final double XBOX_CONTROLLER_JOYSTICK_DEADMAND_RADIUS = 0.01;
-        public static final double XBOX_CONTROLLER_TARGET_MIN_RADIUS = 1.0; // Meters
-        public static final double XBOX_CONTROLLER_TARGET_MAX_RADIUS = 5.0; // Meters
+        public static final double XBOX_CONTROLLER_TARGET_MIN_RADIUS = 2.0; // Meters
+        public static final double XBOX_CONTROLLER_TARGET_MAX_RADIUS = 0.5; // Meters
         public static final double XBOX_CONTROLLER_ROTATIONAL_TARGET_ACTIVATION_ZONE = 0.8;
         public static final double XBOX_CONTROLLER_ROTATIONAL_TARGET_DEACTIVATION_ZONE = 0.7;
     }
@@ -67,6 +79,14 @@ public final class Constants {
      */
     public final class DriveConstants {
 
+        // Robot Features
+        public static final double DRIVETRAIN_MASS = 39.5; //Kg
+        public static final double DRIVETRAIN_MOI = 1.227; //Kg meters
+        public static final double GRAVITY_ACCELERATION = 9.81; // Meters / sec^2
+
+        public static final double TRANSLATION_THRESHOLD = 0.05; // Meters
+        public static final double ROTATION_THRESHOLD = 0.08; // Radians
+    
         // Angular Offsets for Swerve Modules
         public static final Rotation2d FRONT_LEFT_MODULE_ANGULAR_OFFSET = new Rotation2d(-0.5 * Math.PI);
         public static final Rotation2d REAR_LEFT_MODULE_ANGULAR_OFFSET = new Rotation2d(Math.PI);
@@ -98,9 +118,28 @@ public final class Constants {
                 new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
                 new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
 
+        // Define module locations relative to the robot's center
+        public static final Translation2d FRONT_LEFT_POSITION = 
+            new Translation2d(WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0);
+        public static final Translation2d FRONT_RIGHT_POSITION = 
+            new Translation2d(WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0);
+        public static final Translation2d BACK_LEFT_POSITION = 
+            new Translation2d(-WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0);
+        public static final Translation2d BACK_RIGHT_POSITION = 
+            new Translation2d(-WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0);
+
+        // Alternatively, you can define an array containing all four positions:
+        public static final List<Translation2d> MODULE_POSITIONS = List.of(
+            FRONT_LEFT_POSITION,
+            FRONT_RIGHT_POSITION,
+            BACK_LEFT_POSITION,
+            BACK_RIGHT_POSITION
+        );
+
         public static final double WHEEL_RADIUS = 0.0381; // Meters
         public static final double WHEEL_CIRCUMFERENCE = WHEEL_RADIUS * 2.0 * Math.PI; // Meters
-
+        public static final double WHEEL_COEFFICIENT_FRICTION = 1.0;
+    
         // Motion Constraints
         public static final double LINEAR_MAX_SPEED = 4.8; // m/s
         public static final double ROTATIONAL_MAX_SPEED = 16.7; // rad/s
@@ -113,13 +152,9 @@ public final class Constants {
         public static final double LINEAR_KI = 0.0;
         public static final double LINEAR_KD = 0.0;
 
-        public static final double ROTATIONAL_KP = 0.5;
+        public static final double ROTATIONAL_KP = 0.3;
         public static final double ROTATIONAL_KI = 0.0;
-        public static final double ROTATIONAL_KD = 0.2;
-
-        // Default motor values
-        public static final DrivingMotor DEFAULT_DRIVING_MOTOR = DrivingMotor.NEO;
-        public static final TurningMotor DEFAULT_TURNING_MOTOR = TurningMotor.NEO_550;
+        public static final double ROTATIONAL_KD = 0.0;
 
         /*
          * ---------------------------------- DRIVING CONSTANTS ----------------------------------
@@ -193,6 +228,12 @@ public final class Constants {
          * ---------------------------------- TURNING CONSTANTS ----------------------------------
          */
         public static final class Neo550Turning {
+
+            public static final double FREE_SPEED = 1151.917; // Rad/s
+
+            public static final double MOTOR_REDUCTION = 46.42;
+            public static final double MAX_TURNING_SPEED = FREE_SPEED / MOTOR_REDUCTION;
+
             public static final double ENCODER_POSITION_FACTOR = (2 * Math.PI); // Radians
             public static final double ENCODER_VELOCITY_FACTOR = (2 * Math.PI) / 60.0; // Rad/s
             public static final double POSITION_PID_MIN_INPUT = 0.0;
@@ -213,22 +254,16 @@ public final class Constants {
     }
 
     /**
-     * <h2>UpperAssemblyConstants</h2>
-     * The {@code UpperAssemblyConstants} class is a subclass contained within the {@code Constants} class.
-     * This subclass contains all of the constants relating to both team's mechanisms.
-     * This contains values like the default upper assembly.
-     */
-    public static class UpperAssemblyConstants {
-        public static final UpperAssemblyType DEFAULT_UPPER_ASSEMBLY = UpperAssemblyType.NARWHAL;
-    }
-
-    /**
      * <h2>NarwhalConstants</h2>
      * The {@code NarwhalConstants} class is a subclass contained within the {@code Constants} class.
      * This subclass contains all of the constants relating to the Narwhal's mechanisms.
      * This contains values like motor IDs, PID coefficients, etc.
      */
     public static class NarwhalConstants {
+
+        public static final double UPPER_ASSEMBLY_MASS = 0.0; //Kg
+        public static final double UPPER_ASSEMBLY_MOI = 0.0; //Kg m^2
+
         public static class NarwhalIntakeOuttakeConstants {
             public static final int INTAKE_OUTTAKE_MOTOR_CAN_ID = 12;
             public static final int INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT = 40;
@@ -332,6 +367,10 @@ public final class Constants {
      * This contains values like motor IDs, PID coefficients, etc.
      */
     public static class SquidConstants {
+
+        public static final double UPPER_ASSEMBLY_MASS = 0.0;
+        public static final double UPPER_ASSEMBLY_MOI = 0.0; //Kg m^2
+
         public static class SquidManipulatorConstants {
 
             // TODO: Put actual IDs in

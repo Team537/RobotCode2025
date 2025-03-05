@@ -21,6 +21,7 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
     private final NarwhalClimber narwhalClimber;
 
     public NarwhalUpperAssembly(){
+        super();
         narwhalIntakeOuttake = new NarwhalIntakeOuttake();
         narwhalWrist = new NarwhalWrist();
         narwhalElevator = new NarwhalElevator();
@@ -33,22 +34,30 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
             this
         );
     }
+    
 
-    public Command getCoralScoreCommand(ScoringHeight scoringHeight, Supplier<Pose2d> robotPoseSupplier) {
+    public Command getCoralIntakeCommand() {
         return new RunCommand(
             () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
             this
         );
     }
 
-    public Command getRemoveAlgaeCommand(Supplier<Pose2d> robotPoseSupplier) {
+    public Command getCoralScoreCommand(ScoringHeight scoringHeight) {
         return new RunCommand(
             () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
             this
         );
     }
 
-    public Command getClimbCommand(Supplier<Pose2d> robotPoseSupplier) {
+    public Command getRemoveAlgaeCommand() {
+        return new RunCommand(
+            () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
+            this
+        );
+    }
+
+    public Command getClimbCommand() {
         return new RunCommand(
             () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
             this

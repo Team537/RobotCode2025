@@ -20,9 +20,10 @@ import frc.robot.subsystems.vision.odometry.PhotonVisionCamera;
 import frc.robot.subsystems.vision.odometry.VisionOdometry;
 import frc.robot.util.autonomous.Alliance;
 import frc.robot.util.autonomous.AutonomousRoutine;
-import frc.robot.util.swerve.DrivingMotor;
+import frc.robot.util.swerve.DrivingMotorType;
 import frc.robot.util.upper_assembly.UpperAssemblyFactory;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
+
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -48,7 +49,7 @@ public class RobotContainer {
     // Subsystems
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
-    private UpperAssemblyBase upperAssembly = UpperAssemblyFactory.createUpperAssembly(Constants.UpperAssemblyConstants.DEFAULT_UPPER_ASSEMBLY);
+    private UpperAssemblyBase upperAssembly = UpperAssemblyFactory.createUpperAssembly(Constants.Defaults.DEFAULT_UPPER_ASSEMBLY);
     
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
     
@@ -61,15 +62,16 @@ public class RobotContainer {
     // Smart Dashboard Inputs
     private final SendableChooser<AutonomousRoutine> autonomousSelector = new SendableChooser<>();
     private final SendableChooser<Alliance> allianceSelector = new SendableChooser<>();
-    private final SendableChooser<UpperAssemblyType> upperSubstructureSelector = new SendableChooser<>();
-    private final SendableChooser<DrivingMotor> drivingMotorSelector = new SendableChooser<>();
+
+    private final SendableChooser<UpperAssemblyType> upperAssemblySelector = new SendableChooser<>();
+    private final SendableChooser<DrivingMotorType> drivingMotorSelector = new SendableChooser<>();
 
     /**
      * Creates a new RobotContainer object and sets up SmartDashboard an the button inputs.
      */
     public RobotContainer() {
         
-        // Setup Networking        
+        // Setup OceanView & all of its networking dependencies.
         setupOceanViewManager();
 
         // Add cameras to the VisionOdometry object.
@@ -146,22 +148,10 @@ public class RobotContainer {
             allianceSelector.addOption(alliance.toString(), alliance);
         }
 
-        // Setup Upper Substructure Selection
-        upperSubstructureSelector.setDefaultOption("NARWAL", UpperAssemblyType.NARWHAL);
-        for (UpperAssemblyType upperSubstructure : UpperAssemblyType.values()) {
-            upperSubstructureSelector.addOption(upperSubstructure.toString(), upperSubstructure);
-        }
-
-        // Setup Driving Motor Selection
-        drivingMotorSelector.setDefaultOption("NEO", DrivingMotor.NEO);
-        for (DrivingMotor drivingMotor : DrivingMotor.values()) {
-            drivingMotorSelector.addOption(drivingMotor.toString(), drivingMotor);
-        }
-
         // Add the selectors to the dashboard.
         SmartDashboard.putData(autonomousSelector);
         SmartDashboard.putData(allianceSelector);
-        SmartDashboard.putData(upperSubstructureSelector);
+        SmartDashboard.putData(upperAssemblySelector);
         SmartDashboard.putData(drivingMotorSelector);
     }
 
@@ -186,7 +176,6 @@ public class RobotContainer {
      * @param upperAssemblyType the type of upper assembly to set to
      */
     public void setUpperAssembly(UpperAssemblyType upperAssemblyType) {
-        upperAssembly.disable();
         upperAssembly = UpperAssemblyFactory.createUpperAssembly(upperAssemblyType);
     }
 
