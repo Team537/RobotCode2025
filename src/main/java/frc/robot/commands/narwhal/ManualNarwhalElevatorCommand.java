@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.narwhal.NarwhalElevator;
 
-public class NarwhalManualElevatorCommand extends Command {
+public class ManualNarwhalElevatorCommand extends Command {
     private final NarwhalElevator narwhalElevator;
     private final XboxController xboxController;
     private final Supplier<Boolean> narwhalWristReadyToIntakeSupplier;
@@ -17,7 +17,7 @@ public class NarwhalManualElevatorCommand extends Command {
      * @param controller The Xbox controller used to drive the elevator.
      * @param narwhalWristReadyToIntakeSupplier A supplier that indicates if the narwhal wrist is ready to intake.
      */
-    public NarwhalManualElevatorCommand(
+    public ManualNarwhalElevatorCommand(
             NarwhalElevator narwhalElevator, 
             XboxController controller, 
             Supplier<Boolean> narwhalWristReadyToIntakeSupplier) {

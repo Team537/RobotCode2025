@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.narwhal.NarwhalWrist;
 
-public class NarwhalManualWristCommand extends Command {
+public class ManualNarwhalWristCommand extends Command {
     private final XboxController xBoxController;
     private final NarwhalWrist narwhalWrist;
 
@@ -13,7 +13,7 @@ public class NarwhalManualWristCommand extends Command {
      * @param squidClimber The climber subsystem to control.
      * @param controller The Xbox controller used to control the subsystem.
      */
-    public NarwhalManualWristCommand(NarwhalWrist narwhalWrist, XboxController xboxController){
+    public ManualNarwhalWristCommand(XboxController xboxController, NarwhalWrist narwhalWrist){
         this.xBoxController = xboxController;
         this.narwhalWrist = narwhalWrist;
         addRequirements(narwhalWrist);

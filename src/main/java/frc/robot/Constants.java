@@ -313,9 +313,9 @@ public final class Constants {
 
             public static final double GEAR_REDUCTION = 125.0;
             public static final double PULLY_REDUCTION = 10.0;
-            public static final double CLIMBER_ANGLE_TO_MOTOR_ANGLE = GEAR_REDUCTION * PULLY_REDUCTION; // technically not a 1 to 1 conversion because of how the climber arm and winch are linked
+            public static final double CLIMBER_ANGLE_TO_MOTOR_ANGLE = GEAR_REDUCTION * PULLY_REDUCTION;
 
-            public static final double PID_P = 8.5;
+            public static final double PID_P = 5;
             public static final double PID_I = 0;
             public static final double PID_D = 0.1;
             public static final double PID_F = 1.9;
@@ -323,8 +323,8 @@ public final class Constants {
             public static final double CLIMBER_PID_MIN_OUTPUT = -0.3;
             public static final double CLIMBER_PID_MAX_OUTPUT = 0.3;
             
-            public static final Rotation2d DEPLOYED_ANGLE = Rotation2d.fromDegrees(40);
-            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(-13.5);
+            public static final Rotation2d DEPLOYED_ANGLE = Rotation2d.fromDegrees(30);
+            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(-5);
         }
 
         public static class NarwhalElevatorConstants {
@@ -466,7 +466,7 @@ public final class Constants {
         // Pipeline settings
         public static final int APRIL_TAG_PIPELINE = 0;
         public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = AprilTagFieldLayout
-                .loadField(AprilTagFields.k2025ReefscapeAndyMark);
+                .loadField(AprilTagFields.k2025Reefscape);
 
         // Odometry Detection Strategy
         public static final PhotonPoseEstimator.PoseStrategy POSE_STRATEGY = PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
