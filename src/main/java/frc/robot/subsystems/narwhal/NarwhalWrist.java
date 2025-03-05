@@ -145,6 +145,14 @@ public class NarwhalWrist extends SubsystemBase {
     }
 
     /**
+     * Set the wrist motor to the climb angle (defined in constants) & update status.
+     */
+    public void goToClimbAngle(){
+        setCurrentMotorAngle(NarwhalWristConstants.CLIMB_ANGLE);
+        currentState = NarwhalWristState.CLIMB;
+    }
+
+    /**
      * Uses a PID to actively hold the position of the motor when this function is called.
      */
     public void hold() {

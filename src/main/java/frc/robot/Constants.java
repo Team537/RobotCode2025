@@ -265,18 +265,28 @@ public final class Constants {
         public static final double UPPER_ASSEMBLY_MOI = 0.0; //Kg m^2
 
         public static class NarwhalIntakeOuttakeConstants {
+            // Sensor IDs
+            public static final int CORAL_LIMIT_SWITCH_PORT = 1; // Should be 0-9
+
+            // Motor IDs
             public static final int INTAKE_OUTTAKE_MOTOR_CAN_ID = 12;
             public static final int INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT = 40;
+
             // Settings for % of max power to use on intake and outtake
             public static final double INTAKE_MOTOR_PERCENT = 0.3; // between -1.0 and 1.0
             public static final double OUTTAKE_MOTOR_PERCENT = -0.5; // between -1.0 and 1.0
 
+            // PID configurations
             public static final double POSITION_PID_P = 0.7;
             public static final double POSITION_PID_I = 0;
             public static final double POSITION_PID_D = 0.2;
 
             public static final double PID_MAX_OUTPUT = 0.5;
             public static final double PID_MIN_OUTPUT = -0.5;
+
+            // Coral intake detection delay - used in the CoralIntakeCommand for auto to prevent the command from ending too early
+            public static final double CORAL_INTAKE_DETECTION_DELAY = 0.1; // seconds
+            public static final double CORAL_OUTTAKE_DETECTION_DELAY = 0.2; // seconds
         }
 
         public static class NarwhalWristConstants {
@@ -295,12 +305,13 @@ public final class Constants {
             public static final double PID_OUTPUT_RANGE_MIN = -0.35;        
 
             // Set position for wrist angles (Angle is relative to the world, with 0 being the down position and rotating away from 0 being positive)
-            public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4.85); // -pi/4 TODO: update these placeholder values
+            public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4.85);
             public static final Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d L2_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.08 * Math.PI);
-            public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(3 * Math.PI / 2); // pi/2 TODO: update these placeholder values
+            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromRadians(0); // This is the angle the wrist should be at when climbing
+            public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(3 * Math.PI / 2);
             
             /** The angle tolerance for the wrist to be considered at a specific state. */
             public static final double WRIST_ANGLE_TOLERANCE = 0.3;
@@ -325,6 +336,9 @@ public final class Constants {
             
             public static final Rotation2d DEPLOYED_ANGLE = Rotation2d.fromDegrees(30);
             public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(-5);
+
+            /** The angle tolerance for the climber to be considered at a specific state. */
+            public static final Rotation2d CLIMBER_ANGLE_TOLERANCE = Rotation2d.fromDegrees(3);
         }
 
         public static class NarwhalElevatorConstants {
