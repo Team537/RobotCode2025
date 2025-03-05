@@ -69,6 +69,10 @@ public class NarwhalWrist extends SubsystemBase {
         currentState = NarwhalWristState.STOPPED;
     }
 
+    /**
+     * Get the wrist position and detect if the position is within the WRIST_ANGLE_TOLERANCE to the INTAKE_ANGLE
+     * @return true if the wrist is within the angle tolerance to the intake angle, otherwise false.
+     */
     public boolean readyToIntake(){
         double current_position = wrist.getAbsoluteEncoder().getPosition();
         return Math.abs(current_position - NarwhalWristConstants.INTAKE_ANGLE.getRadians()) < NarwhalWristConstants.WRIST_ANGLE_TOLERANCE;
@@ -89,9 +93,6 @@ public class NarwhalWrist extends SubsystemBase {
      * Set the wrist motor to the intake angle (defined in constants) & update status.
      */
     public void goToIntakeAngle() {
-        
-        // Inline construction of command goes here.
-        // Subsystem::RunOnce implicitly requires `this` subsystem.
         setCurrentMotorAngle(NarwhalWristConstants.INTAKE_ANGLE);
         currentState = NarwhalWristState.INTAKING; // must be after the set function because the set function will default to CUSTOM state
     }
