@@ -4,13 +4,14 @@ import edu.wpi.first.math.geometry.Transform3d;
 
 /**
  * <p>
- * <strong>ScoringLocation</strong> is a data container representing a single
- * scoring position on the field. It has:
+ * ScoringLocation is a data container representing a single scoring position on the field.
+ * It contains:
  * </p>
  * <ul>
- * <li><code>branch</code>: e.g., "B1", "B2"</li>
- * <li><code>level</code>: e.g., "L2", "L3", "L4"</li>
- * <li><code>transform</code>: The 3D transform (position + orientation).</li>
+ *   <li><code>branch</code>: e.g., "B1", "B2"</li>
+ *   <li><code>level</code>: e.g., "L2", "L3", "L4"</li>
+ *   <li><code>transform</code>: The 3D transform specifying position (x, y, z) and rotation.</li>
+ *   <li><code>timestamp</code>: The time (in nanoseconds) when this detection data was received.</li>
  * </ul>
  * <hr>
  * @author Cameron Myhre
@@ -18,40 +19,39 @@ import edu.wpi.first.math.geometry.Transform3d;
  */
 public class ScoringLocation {
     
-    /** The branch name (e.g., "B1"). */
     public final String branch;
-    /** The level (e.g., "L2"). */
     public final String level;
-    /** The 3D transform specifying position (x, y, z) and rotation. */
     public final Transform3d transform;
+    public final long timestamp;
 
     /**
-     * Constructs a new ScoringLocation with the given identifiers and transform.
+     * Constructs a new ScoringLocation with the given identifiers, transform, and timestamp.
      *
      * @param branch    The branch identifier (e.g. "B1").
      * @param level     The level identifier (e.g. "L2").
-     * @param transform A 3D transform with (x, y, z) position (and optional
-     *                  rotation).
+     * @param transform A 3D transform with (x, y, z) position and rotation.
+     * @param timestamp The time (in nanoseconds) when the detection was received.
      */
-    public ScoringLocation(String branch, String level, Transform3d transform) {
+    public ScoringLocation(String branch, String level, Transform3d transform, long timestamp) {
         this.branch = branch;
         this.level = level;
         this.transform = transform;
+        this.timestamp = timestamp;
     }
 
     /**
-     * Returns a string representation for debugging, e.g. "B1-L2 @ (1.00, 0.00,
-     * 2.00)".
+     * Returns a string representation for debugging, e.g. "B1-L2 @ (1.00, 0.00, 2.00) [ts=1234567890123]".
      *
-     * @return A simple string format describing this location.
+     * @return A formatted string describing this scoring location.
      */
     @Override
     public String toString() {
-        return String.format("%s-%s @ (%.2f, %.2f, %.2f)",
+        return String.format("%s-%s @ (%.2f, %.2f, %.2f) [ts=%d]",
                 branch,
                 level,
-                transform.getX(), //
+                transform.getX(), 
                 transform.getY(),
-                transform.getZ());
+                transform.getZ(),
+                timestamp);
     }
 }

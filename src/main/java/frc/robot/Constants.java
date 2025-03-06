@@ -483,5 +483,9 @@ public final class Constants {
         public static final int DASHBOARD_PORT_NUMBER = 5000;
         public static final int UDP_PORT_NUMBER = 5400;
         public static final int TCP_PORT_NUMBER = 5300;
+
+        // Time Synchronization
+        public static final int TIME_SYNC_PORT_NUMBER = 6000;
+        public static final int DEFAULT_NUM_SAMPLES = 10;
     }
 }
