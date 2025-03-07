@@ -9,6 +9,7 @@ import frc.robot.Constants.OceanViewConstants;
 import frc.robot.network.TCPSender;
 import frc.robot.network.TimeSyncClient;
 import frc.robot.network.UDPReceiver;
+import frc.robot.util.upper_assembly.ScoringHeight;
 import frc.robot.util.vision.ScoringLocation;
 
 import java.io.IOException;
@@ -531,8 +532,8 @@ public class OceanViewManager extends SubsystemBase {
     }
 
     // ------------------------------------------------------------------------
-    // Safe Accessors
-    // ------------------------------------------------------------------------
+    //   Safe Accessors
+    // ------------------------------------------------------------------------ 
 
     /**
      * Retrieves a string from a map. If the key is missing or not a string, returns defaultVal.
@@ -596,16 +597,65 @@ public class OceanViewManager extends SubsystemBase {
 
     /**
      * <p>
+     * (Deprecated) Retrieves all <strong>available scoring locations</strong> for a given level,
+     * such as "L2", "L3", or "L4".
+     * </p>
+     * <strong>Deprecated:</strong> This method is deprecated in favor of {@link #getAvailableByLevel(ScoringHeight)}
+     * which provides improved type safety and clarity by using the <code>ScoringHeight</code> type rather than a raw String.
+     * 
+     * @param level The desired level (e.g., "L2"). {@link #getAvailableByLevel(ScoringHeight)}
+     * @return A list of matching <code>ScoringLocation</code> objects.
+     */
+    @Deprecated
+    public List<ScoringLocation> getAvailableByLevel(String level) {
+        List<ScoringLocation> result = new ArrayList<>();
+        for (ScoringLocation loc : availableLocations) {
+            if (loc.level.equalsIgnoreCase(level)) {
+                result.add(loc);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * <p>
      * Retrieves all <strong>available scoring locations</strong> for a given level,
      * such as "L2", "L3", or "L4".
      * </p>
      *
-     * @param level The desired level (e.g., "L2").
+     * @param level The scoring level filter as a <code>ScoringHeight</code> (e.g. <code>ScoringHeight.L2</code>).
      * @return A list of matching <code>ScoringLocation</code> objects.
      */
-    public List<ScoringLocation> getAvailableByLevel(String level) {
+    public List<ScoringLocation> getAvailableByLevel(ScoringHeight level) {
+
+        // Get the string form of the scoring height.
+        String levelString = level.toString();
+
+        // Get the blocked locations by scoring height.
         List<ScoringLocation> result = new ArrayList<>();
         for (ScoringLocation loc : availableLocations) {
+            if (loc.level.equalsIgnoreCase(levelString)) {
+                result.add(loc);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * <p>
+     * (Deprecated) Retrieves all <strong>algae-blocked scoring locations</strong> for a given level,
+     * e.g., "L2".
+     * </p>
+     * <strong>Deprecated:</strong> This method is deprecated in favor of {@link #getBlockedByLevel(ScoringHeight)}
+     * which provides improved type safety and clarity by using the <code>ScoringHeight</code> type rather than a raw String.
+     * 
+     * @param level The desired level (e.g., "L3"). Use {@link #getBlockedByLevel(ScoringHeight)} instead.
+     * @return A list of blocked <code>ScoringLocation</code> objects at that level.
+     */
+    @Deprecated
+    public List<ScoringLocation> getBlockedByLevel(String level) {
+        List<ScoringLocation> result = new ArrayList<>();
+        for (ScoringLocation loc : algaeBlockedLocations) {
             if (loc.level.equalsIgnoreCase(level)) {
                 result.add(loc);
             }
@@ -619,13 +669,18 @@ public class OceanViewManager extends SubsystemBase {
      * e.g., "L2".
      * </p>
      *
-     * @param level The desired level (e.g., "L3").
+     * @param level The scoring level filter as a <code>ScoringHeight</code> (e.g. <code>ScoringHeight.L2</code>).
      * @return A list of blocked <code>ScoringLocation</code> objects at that level.
      */
-    public List<ScoringLocation> getBlockedByLevel(String level) {
+    public List<ScoringLocation> getBlockedByLevel(ScoringHeight level) {
+
+        // Get the string form of the scoring height.
+        String levelString = level.toString();
+
+        // Get the blocked locations by scoring height.
         List<ScoringLocation> result = new ArrayList<>();
         for (ScoringLocation loc : algaeBlockedLocations) {
-            if (loc.level.equalsIgnoreCase(level)) {
+            if (loc.level.equalsIgnoreCase(levelString)) {
                 result.add(loc);
             }
         }
@@ -634,17 +689,47 @@ public class OceanViewManager extends SubsystemBase {
 
     /**
      * <p>
-     * Returns both <strong>available</strong> and <strong>blocked</strong> scoring
+     * (Deprecated) Returns both <strong>available</strong> and <strong>blocked</strong> scoring
      * locations for the specified level in a single call.
      * </p>
+     * <p>
+     * <strong>Deprecated:</strong> This method is deprecated in favor of {@link #getAllLocationsByLevel(ScoringHeight)}
+     * which provides improved type safety and clarity by using the <code>ScoringHeight</code> type rather than a raw String.
+     * </p>
      *
-     * @param level The level filter (e.g. "L2").
+     * @param level The level filter as a String (e.g. "L2"). Use {@link #getAllLocationsByLevel(ScoringHeight)} instead.
      * @return A map with two keys: "available" and "blocked", each mapping to a list of <code>ScoringLocation</code>.
      */
+    @Deprecated
     public Map<String, List<ScoringLocation>> getAllLocationsByLevel(String level) {
         Map<String, List<ScoringLocation>> result = new HashMap<>();
         result.put("available", getAvailableByLevel(level));
         result.put("blocked",   getBlockedByLevel(level));
+        return result;
+    }
+
+    /**
+     * <p>
+     * Returns both <strong>available</strong> and <strong>blocked</strong> scoring locations for the specified level
+     * in a single call.
+     * </p>
+     * <p>
+     * This is the recommended method to use as it accepts a <code>ScoringHeight</code> parameter, which enhances type safety
+     * and reduces errors compared to the deprecated String‑based method.
+     * </p>
+     *
+     * @param level The scoring level filter as a <code>ScoringHeight</code> (e.g. <code>ScoringHeight.L2</code>).
+     * @return A map with two keys: "available" and "blocked", each mapping to a list of <code>ScoringLocation</code>.
+     */
+    public Map<String, List<ScoringLocation>> getAllLocationsByLevel(ScoringHeight level) {
+
+        // Get the string form of the scoring height.
+        String levelString = level.toString();
+        
+        // Get all scoring locations by the scoring level.
+        Map<String, List<ScoringLocation>> result = new HashMap<>();
+        result.put("available", getAvailableByLevel(levelString));
+        result.put("blocked",   getBlockedByLevel(levelString));
         return result;
     }
 }
