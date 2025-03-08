@@ -28,7 +28,9 @@ import frc.robot.Constants.NarwhalConstants.NarwhalWristConstants;
  */
 public class NarwhalWrist extends SubsystemBase {
     public NarwhalWristState currentState;
-    
+    private double currentTargetAngle; // in radians
+
+    /** In radians */
     public final SparkMax wrist;
     private final SparkMaxConfig wristConfig;
     private final SparkClosedLoopController wristMotorPIDController;
@@ -58,8 +60,8 @@ public class NarwhalWrist extends SubsystemBase {
         // configs for the encoder
         // NOTE FOR THE ENCODER: WHEN VIEWED FROM THE RIGHT, THE ANGLE OF THE WRIST IS BASED ON A UNIT CIRCLE WITH 0 DEGREES POINTING STRAIGHT UP
         wristConfig.encoder
-            .positionConversionFactor(NarwhalWristConstants.ROTATIONS_TO_RADIANS)
-            .velocityConversionFactor(NarwhalWristConstants.ROTATIONS_TO_RADIANS/60.0); // dividing by 60 accounts for RPM to Radians/Sec
+            .positionConversionFactor(NarwhalWristConstants.ENCODER_FACTOR)
+            .velocityConversionFactor(NarwhalWristConstants.ENCODER_FACTOR/60.0); // dividing by 60 accounts for RPM to Radians/Sec
         
             // creating the spark max controller
         wrist = new SparkMax(NarwhalWristConstants.WRIST_MOTOR_CAN_ID, MotorType.kBrushless);
@@ -67,15 +69,6 @@ public class NarwhalWrist extends SubsystemBase {
 
         wristMotorPIDController = wrist.getClosedLoopController();
         currentState = NarwhalWristState.STOPPED;
-    }
-
-    /**
-     * Get the wrist position and detect if the position is within the WRIST_ANGLE_TOLERANCE to the INTAKE_ANGLE
-     * @return true if the wrist is within the angle tolerance to the intake angle, otherwise false.
-     */
-    public boolean readyToIntake(){
-        double current_position = wrist.getAbsoluteEncoder().getPosition();
-        return Math.abs(current_position - NarwhalWristConstants.INTAKE_ANGLE.getRadians()) < NarwhalWristConstants.WRIST_ANGLE_TOLERANCE;
     }
 
     /**
@@ -87,6 +80,7 @@ public class NarwhalWrist extends SubsystemBase {
         double targetAngleRadians = targetAngle.getRadians();
         wristMotorPIDController.setReference(targetAngleRadians, ControlType.kPosition);
         currentState = NarwhalWristState.CUSTOM;
+        currentTargetAngle = targetAngleRadians;
     }
 
     /**
@@ -141,8 +135,16 @@ public class NarwhalWrist extends SubsystemBase {
      * Set the wrist motor to 0 percent output (assumes idle-mode is breaking).
      */
     public void stop() {
-        wrist.set(0); // TODO: test that this works & properly disables the PID
+        wrist.set(0);
         currentState = NarwhalWristState.STOPPED; // must be after the set function because the set function will default to CUSTOM state
+    }
+
+    /**
+     * Set the wrist motor to the climb angle (defined in constants) & update status.
+     */
+    public void goToClimbAngle(){
+        setCurrentMotorAngle(NarwhalWristConstants.CLIMB_ANGLE);
+        currentState = NarwhalWristState.CLIMB;
     }
 
     /**
@@ -159,8 +161,28 @@ public class NarwhalWrist extends SubsystemBase {
      * 
      * @return The current angle of the wrist, as a {@link Rotation2d}.
      */
-    public Rotation2d getCurrentAngle() {
-        return Rotation2d.fromRadians(wrist.getAbsoluteEncoder().getPosition());
+    public Rotation2d getCurrentTargetAngle() {
+        return Rotation2d.fromRadians(wrist.getEncoder().getPosition());
+    }
+
+    /**
+     * Check if the wrist is at the intake angle & not stopped. Note that this method does not account for the wrist being in motion, and checks with a tolerance.
+     * 
+     * @return True if the wrist is at the intake angle, false otherwise.
+     */
+    public boolean isAtTargetPosition(){
+        double current_position = wrist.getEncoder().getPosition();
+        return Math.abs(current_position - currentTargetAngle) < NarwhalWristConstants.WRIST_ANGLE_TOLERANCE.getRadians() && currentState != NarwhalWristState.STOPPED;
+    }
+
+    /**
+     * Check if the wrist is at the intake angle. Note that this method does not account for the wrist being in motion, and checks with a tolerance.
+     * 
+     * @return True if the wrist is at the intake angle, false otherwise.
+     */
+    public boolean readyToIntake(){
+        double current_position = wrist.getEncoder().getPosition();
+        return Math.abs(current_position - NarwhalWristConstants.INTAKE_ANGLE.getRadians()) < NarwhalWristConstants.WRIST_ANGLE_TOLERANCE.getRadians();
     }
     
     @Override
