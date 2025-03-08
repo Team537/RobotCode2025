@@ -13,6 +13,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants;
 import frc.robot.util.upper_assembly.narwhal.NarwhalIntakeOuttakeState;
@@ -29,6 +30,9 @@ import frc.robot.util.upper_assembly.narwhal.NarwhalIntakeOuttakeState;
 public class NarwhalIntakeOuttake extends SubsystemBase {
     public NarwhalIntakeOuttakeState currentState;
     
+    /** Limit switch to keep track of if a coral has been intaked */
+    private final DigitalInput intakeSensor;
+
     private final SparkMax intakeOuttakeMotor;
     private final SparkMaxConfig intakeOuttakeMotorConfig;
     private final SparkClosedLoopController intakeOuttakeMotorPIDController;
@@ -37,6 +41,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
      * Creates a new instance of the NarwhalIntakeOuttake class, setting up all necessary hardware in the process.
      */
     public NarwhalIntakeOuttake() {
+        intakeSensor = new DigitalInput(NarwhalIntakeOuttakeConstants.CORAL_LIMIT_SWITCH_PORT);
 
         // Create a new spark max to control the intake.
         intakeOuttakeMotorConfig = new SparkMaxConfig();
@@ -107,6 +112,14 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
         double current_position = intakeOuttakeMotor.getEncoder().getPosition(); // get its current position
         intakeOuttakeMotorPIDController.setReference(current_position, ControlType.kPosition); // set its current position as a PID target value so the motor holds its position
         currentState = NarwhalIntakeOuttakeState.ACTIVE_HOLDING; // must be after the stop function because the set function will default to CUSTOM state
+    }
+
+    /**
+     * Will return true when pressed, and false when not pressed
+     * @return boolean
+     */
+    public boolean isCoralSensorTriggered(){
+        return !intakeSensor.get(); // negated so that true means it is pressed, and false means it is not
     }
     
     @Override

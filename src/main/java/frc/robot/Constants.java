@@ -265,18 +265,28 @@ public final class Constants {
         public static final double UPPER_ASSEMBLY_MOI = 0.0; //Kg m^2
 
         public static class NarwhalIntakeOuttakeConstants {
+            // Sensor IDs
+            public static final int CORAL_LIMIT_SWITCH_PORT = 0; // Should be 0-9
+
+            // Motor IDs
             public static final int INTAKE_OUTTAKE_MOTOR_CAN_ID = 12;
             public static final int INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT = 40;
-            // Settings for % of max power to use on intake and outtake
-            public static final double INTAKE_MOTOR_PERCENT = 0.3; // between -1.0 and 1.0
-            public static final double OUTTAKE_MOTOR_PERCENT = -0.5; // between -1.0 and 1.0
 
+            // Settings for % of max power to use on intake and outtake
+            public static final double INTAKE_MOTOR_PERCENT = -0.3; // between -1.0 and 1.0
+            public static final double OUTTAKE_MOTOR_PERCENT = 0.5; // between -1.0 and 1.0
+
+            // PID configurations
             public static final double POSITION_PID_P = 0.7;
             public static final double POSITION_PID_I = 0;
             public static final double POSITION_PID_D = 0.2;
 
             public static final double PID_MAX_OUTPUT = 0.5;
             public static final double PID_MIN_OUTPUT = -0.5;
+
+            // Coral intake detection delay - used in the CoralIntakeCommand for auto to prevent the command from ending too early
+            public static final double CORAL_INTAKE_DETECTION_DELAY = 0.1; // seconds
+            public static final double CORAL_OUTTAKE_DETECTION_DELAY = 0.35; // seconds
         }
 
         public static class NarwhalWristConstants {
@@ -285,7 +295,7 @@ public final class Constants {
 
             // Calculating encoder conversion factor
             public static final double GEAR_REDUCTION = 20;
-            public static final double ROTATIONS_TO_RADIANS = Math.PI * 2 / GEAR_REDUCTION; // Wrist target angles (radians) are multiplied by this to get the motor target position           
+            public static final double ENCODER_FACTOR = Math.PI * 2 / GEAR_REDUCTION; // Wrist target angles (radians) are multiplied by this to get the motor target position           
             
             // PID configurations
             public static final double POSITION_PID_P = 0.3;
@@ -295,27 +305,28 @@ public final class Constants {
             public static final double PID_OUTPUT_RANGE_MIN = -0.35;        
 
             // Set position for wrist angles (Angle is relative to the world, with 0 being the down position and rotating away from 0 being positive)
-            public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4.85); // -pi/4 TODO: update these placeholder values
+            public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4.85);
             public static final Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d L2_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.08 * Math.PI);
-            public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(3 * Math.PI / 2); // pi/2 TODO: update these placeholder values
+            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromRadians(3 * Math.PI / 2); // This is the angle the wrist should be at when climbing
+            public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(3 * Math.PI / 2);
             
             /** The angle tolerance for the wrist to be considered at a specific state. */
-            public static final double WRIST_ANGLE_TOLERANCE = 0.3;
+            public static final Rotation2d WRIST_ANGLE_TOLERANCE = Rotation2d.fromRadians(0.89 * Math.PI);
         }
 
         public static class NarwhalClimberConstants {
-            public static final int CLIMBER_CAN_ID = 15;
+            public static final int CLIMBER_CAN_ID = 13;
 
             public static final boolean IS_CLIMBER_INVERTED = false;
 
             public static final double GEAR_REDUCTION = 125.0;
             public static final double PULLY_REDUCTION = 10.0;
-            public static final double CLIMBER_ANGLE_TO_MOTOR_ANGLE = GEAR_REDUCTION * PULLY_REDUCTION;
+            public static final double CLIMBER_ANGLE_TO_MOTOR_ANGLE = GEAR_REDUCTION * PULLY_REDUCTION; // technically not a 1 to 1 conversion because of how the climber arm and winch are linked
 
-            public static final double PID_P = 5;
+            public static final double PID_P = 8.5;
             public static final double PID_I = 0;
             public static final double PID_D = 0.1;
             public static final double PID_F = 1.9;
@@ -323,12 +334,15 @@ public final class Constants {
             public static final double CLIMBER_PID_MIN_OUTPUT = -0.3;
             public static final double CLIMBER_PID_MAX_OUTPUT = 0.3;
             
-            public static final Rotation2d DEPLOYED_ANGLE = Rotation2d.fromDegrees(30);
-            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(-5);
+            public static final Rotation2d DEPLOYED_ANGLE = Rotation2d.fromDegrees(40);
+            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(-13.5);
+
+            /** The angle tolerance for the climber to be considered at a specific state. */
+            public static final Rotation2d CLIMBER_ANGLE_TOLERANCE = Rotation2d.fromDegrees(3);
         }
 
         public static class NarwhalElevatorConstants {
-            public static final int ELEVATOR_LEAD_MOTOR_CAN_ID = 13;
+            public static final int ELEVATOR_LEAD_MOTOR_CAN_ID = 15;
             public static final int ELEVATOR_LEAD_MOTOR_CURRENT_LIMIT = 40;
 
             public static final int ELEVATOR_FOLLOWER_CAN_ID = 16;
@@ -357,6 +371,7 @@ public final class Constants {
             public static final double L4_ELEVATOR_HEIGHT = 1.7; // Meters
             public static final double INTAKE_ELEVATOR_HEIGHT_METERS = 0.05; // Meters
             public static final boolean MOTOR_INVERTED = true;
+            public static final double ELEVATOR_POSITION_TOLERANCE = 0.05; // Meters
         }
     }
 
@@ -466,7 +481,7 @@ public final class Constants {
         // Pipeline settings
         public static final int APRIL_TAG_PIPELINE = 0;
         public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = AprilTagFieldLayout
-                .loadField(AprilTagFields.k2025Reefscape);
+                .loadField(AprilTagFields.k2025ReefscapeAndyMark);
 
         // Odometry Detection Strategy
         public static final PhotonPoseEstimator.PoseStrategy POSE_STRATEGY = PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
@@ -483,5 +498,9 @@ public final class Constants {
         public static final int DASHBOARD_PORT_NUMBER = 5000;
         public static final int UDP_PORT_NUMBER = 5400;
         public static final int TCP_PORT_NUMBER = 5300;
+
+        // Time Synchronization
+        public static final int TIME_SYNC_PORT_NUMBER = 6000;
+        public static final int DEFAULT_NUM_SAMPLES = 10;
     }
 }
