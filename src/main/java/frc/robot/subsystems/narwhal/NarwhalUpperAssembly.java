@@ -7,6 +7,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import frc.robot.commands.narwhal.NarwhalClimbCommand;
+import frc.robot.commands.narwhal.NarwhalCoralIntakeCommand;
+import frc.robot.commands.narwhal.NarwhalCoralScoreCommand;
 import frc.robot.commands.narwhal.NarwhalManualClimberCommand;
 import frc.robot.commands.narwhal.NarwhalManualElevatorCommand;
 import frc.robot.commands.narwhal.NarwhalManualIntakeOuttakeCommand;
@@ -28,26 +31,28 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
         narwhalClimber = new NarwhalClimber();
     }
 
-    public Command getCoralIntakeCommand(Supplier<Pose2d> robotPoseSupplier) {
-        return new RunCommand(
-            () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
-            this
-        );
-    }
-    
 
     public Command getCoralIntakeCommand() {
-        return new RunCommand(
-            () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
-            this
+        NarwhalCoralIntakeCommand narwhalCoralIntakeCommand = new NarwhalCoralIntakeCommand(
+            narwhalElevator, 
+            narwhalWrist, 
+            narwhalIntakeOuttake, 
+            robotInClimbPositionSupplier
         );
+        narwhalCoralIntakeCommand.addRequirements(this);
+        return narwhalCoralIntakeCommand;
     }
 
     public Command getCoralScoreCommand(ScoringHeight scoringHeight) {
-        return new RunCommand(
-            () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
-            this
+        NarwhalCoralScoreCommand narwhalCoralScoreCommand = new NarwhalCoralScoreCommand(
+            narwhalElevator, 
+            narwhalWrist, 
+            narwhalIntakeOuttake, 
+            robotInClimbPositionSupplier,
+            scoringHeight
         );
+        narwhalCoralScoreCommand.addRequirements(this);
+        return narwhalCoralScoreCommand;
     }
 
     public Command getRemoveAlgaeCommand() {
@@ -58,10 +63,14 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
     }
 
     public Command getClimbCommand() {
-        return new RunCommand(
-            () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
-            this
+        NarwhalClimbCommand narwhalClimbCommand = new NarwhalClimbCommand(
+            narwhalElevator, 
+            narwhalWrist, 
+            narwhalClimber, 
+            robotInClimbPositionSupplier
         );
+        narwhalClimbCommand.addRequirements(this);
+        return narwhalClimbCommand;
     }
 
     public Command getManualCommand(XboxController controller) {
@@ -80,6 +89,8 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
         return manualParallelCommandGroup;
     }
 
-    public void disable() {}
+    public void disable() {
+
+    }
 
 }

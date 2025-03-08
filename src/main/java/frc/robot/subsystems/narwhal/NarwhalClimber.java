@@ -60,7 +60,7 @@ public class NarwhalClimber extends SubsystemBase {
                 NarwhalClimberConstants.PID_D,
                 NarwhalClimberConstants.PID_F)
             .outputRange(
-                -NarwhalClimberConstants.CLIMBER_PID_MIN_OUTPUT, 
+                NarwhalClimberConstants.CLIMBER_PID_MIN_OUTPUT, 
                 NarwhalClimberConstants.CLIMBER_PID_MAX_OUTPUT
             );
         
@@ -104,7 +104,7 @@ public class NarwhalClimber extends SubsystemBase {
      * Check if the climber is at the Climbing angle
      */
     public boolean isAtClimbAngle(){
-        double current_position = climber.getAbsoluteEncoder().getPosition();
+        double current_position = climber.getEncoder().getPosition();
         return Math.abs(current_position - NarwhalClimberConstants.CLIMB_ANGLE.getRotations()) < NarwhalClimberConstants.CLIMBER_ANGLE_TOLERANCE.getRotations();
     }
 
@@ -112,7 +112,7 @@ public class NarwhalClimber extends SubsystemBase {
      * Check if the climber is at the Deploy angle
      */
     public boolean isAtDeployAngle(){
-        double current_position = climber.getAbsoluteEncoder().getPosition();
+        double current_position = climber.getEncoder().getPosition();
         return Math.abs(current_position - NarwhalClimberConstants.DEPLOYED_ANGLE.getRotations()) < NarwhalClimberConstants.CLIMBER_ANGLE_TOLERANCE.getRotations();
     }
 

@@ -162,7 +162,7 @@ public class NarwhalWrist extends SubsystemBase {
      * @return The current angle of the wrist, as a {@link Rotation2d}.
      */
     public Rotation2d getCurrentTargetAngle() {
-        return Rotation2d.fromRadians(wrist.getAbsoluteEncoder().getPosition());
+        return Rotation2d.fromRadians(wrist.getEncoder().getPosition());
     }
 
     /**
@@ -171,7 +171,7 @@ public class NarwhalWrist extends SubsystemBase {
      * @return True if the wrist is at the intake angle, false otherwise.
      */
     public boolean isAtTargetPosition(){
-        double current_position = wrist.getAbsoluteEncoder().getPosition();
+        double current_position = wrist.getEncoder().getPosition();
         return Math.abs(current_position - currentTargetAngle) < NarwhalWristConstants.WRIST_ANGLE_TOLERANCE.getRadians() && currentState != NarwhalWristState.STOPPED;
     }
 
@@ -181,7 +181,7 @@ public class NarwhalWrist extends SubsystemBase {
      * @return True if the wrist is at the intake angle, false otherwise.
      */
     public boolean readyToIntake(){
-        double current_position = wrist.getAbsoluteEncoder().getPosition();
+        double current_position = wrist.getEncoder().getPosition();
         return Math.abs(current_position - NarwhalWristConstants.INTAKE_ANGLE.getRadians()) < NarwhalWristConstants.WRIST_ANGLE_TOLERANCE.getRadians();
     }
     

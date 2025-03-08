@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.narwhal.NarwhalClimber;
 import frc.robot.subsystems.narwhal.NarwhalElevator;
 import frc.robot.subsystems.narwhal.NarwhalWrist;
+import frc.robot.util.upper_assembly.narwhal.NarwhalClimberState;
 
 
 /** 
@@ -40,10 +41,10 @@ public class NarwhalClimbCommand extends Command{
         narwhalWrist.goToClimbAngle();
 
         // If the robot is ready to climb, climb, otherwise move the climber arm to the deploy position
-        if(readyToClimbSupplier.get() && narwhalClimber.isAtDeployAngle() && narwhalElevator.isAtTargetPosition() && narwhalWrist.isAtTargetPosition()){
+        if(readyToClimbSupplier.get() && narwhalClimber.isAtDeployAngle() && narwhalWrist.isAtTargetPosition() && narwhalElevator.isAtTargetPosition()){
             narwhalClimber.climb();
         }
-        else {
+        else if (narwhalClimber.currentState != NarwhalClimberState.CLIMBING && !narwhalClimber.isAtDeployAngle()){
             narwhalClimber.goToDeploy();
         }
     }

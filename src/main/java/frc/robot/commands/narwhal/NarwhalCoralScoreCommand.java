@@ -39,6 +39,7 @@ public class NarwhalCoralScoreCommand extends Command{
         this.narwhalWrist = narwhalWrist;
         this.narwhalIntakeOuttake = narwhalIntakeOuttake;
         this.readyToScoreSupplier = readyToScoreSupplier;
+        this.targetScoringHeight = targetScoringHeight;
         addRequirements(narwhalElevator, narwhalWrist, narwhalIntakeOuttake);
 
         outtakeDelayTimer = new Timer();
@@ -78,7 +79,7 @@ public class NarwhalCoralScoreCommand extends Command{
         }
         
         // If the robot is ready to score, score the Coral, otherwise do nothing with the intake/outtake
-        if(readyToScoreSupplier.get()  && narwhalElevator.isAtTargetPosition() && narwhalWrist.isAtTargetPosition()){
+        if(readyToScoreSupplier.get() && narwhalElevator.isAtTargetPosition() && narwhalWrist.isAtTargetPosition()){
             narwhalIntakeOuttake.outtake();
         }
 

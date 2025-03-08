@@ -114,8 +114,12 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
         currentState = NarwhalIntakeOuttakeState.ACTIVE_HOLDING; // must be after the stop function because the set function will default to CUSTOM state
     }
 
+    /**
+     * Will return true when pressed, and false when not pressed
+     * @return boolean
+     */
     public boolean isCoralSensorTriggered(){
-        return intakeSensor.get();
+        return !intakeSensor.get(); // negated so that true means it is pressed, and false means it is not
     }
     
     @Override
