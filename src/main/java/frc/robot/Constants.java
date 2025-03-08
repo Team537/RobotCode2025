@@ -12,6 +12,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -472,11 +473,13 @@ public final class Constants {
     public static class VisionConstants {
 
         // Camera Settings
-        public static final String FRONT_CAMERA_NAME = "Front_Camera";
-        public static final String SLIDE_CAMERA_NAME = "Side_Camera";
+        public static final String FRONT_CAMERA_NAME = "Arducam_OV9782_USB_Camera"; //
+        public static final String RIGHT_CAMERA_NAME = "Right_Arducam_OV9782";
+        public static final String LEFT_CAMERA_NAME  = "Left_Arducam_OV9782";
 
         public static final Transform3d FRONT_CAMERA_OFFSET = new Transform3d(); // TODO: Fill in actual values.
-        public static final Transform3d SLIDE_CAMERA_OFFSET = new Transform3d(); // TODO: Fill in actual values.
+        public static final Transform3d RIGHT_CAMERA_OFFSET = new Transform3d(0.219837, 0.1762252, 0.65913, new Rotation3d(0, 0, Math.PI / 2.0 )); // TODO: Fill in actual values.
+        public static final Transform3d LEFT_CAMERA_OFFSET = new Transform3d(-0.219837, 0.1760728, 0.65913, new Rotation3d(0, 0, Math.PI / 2.0)); // TODO: Fill in actual values.
 
         // Pipeline settings
         public static final int APRIL_TAG_PIPELINE = 0;
