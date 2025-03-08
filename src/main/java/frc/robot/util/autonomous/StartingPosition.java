@@ -2,12 +2,11 @@ package frc.robot.util.autonomous;
 
 /**
  * <h2> StartingPosition </h2>
- * An enum value used to represent which autonomous routine we will be preforming. This is ued inside of {@code} RobotContainer}
- * to determine which commands to schedule during autonomous. Below is the current list of supported autonomous routines:
+ * An enum value used to represent which starting position the robot will be in when the match starts
  * <ul>
- *  <li> <b>LEFT_HIGH_SCORE</b> </li>
- *  <li> <b>RIGHT_HIGH_SCORE</b> </li>
- *  <li> <b>CENTER_HIGH_SCORE</b> </li>
+ *  <li> <b>LEFT</b> </li>
+ *  <li> <b>RIGHT</b> </li>
+ *  <li> <b>CENTER</b> </li>
  * </ul>
  * <hr>
  * @author Cameron Myhre
