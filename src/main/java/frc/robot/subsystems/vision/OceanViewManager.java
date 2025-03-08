@@ -7,7 +7,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.OceanViewConstants;
 import frc.robot.network.TCPSender;
+import frc.robot.network.TimeSyncClient;
 import frc.robot.network.UDPReceiver;
+import frc.robot.util.upper_assembly.ScoringHeight;
 import frc.robot.util.vision.ScoringLocation;
 
 import java.io.IOException;
@@ -150,6 +152,21 @@ public class OceanViewManager extends SubsystemBase {
     private final TCPSender tcpSender;
 
     /**
+     * The server used to synchronize time between the raspberry PI and the RIO.
+     */
+    private final TimeSyncClient timeSyncClient;
+
+    /**
+     * The difference between the raspberry pi`s time and the RIO`s time, in nanoseconds.
+     */
+    private final double averageOffsetTimeNs;
+
+    /**
+     * The average latency between a round UDP trip, in nanoseconds.
+     */
+    private final double averageRoundTripTImeNs;
+
+    /**
      *<p> The <strong>supplier method</strong> for getting the robots position. Used
      * to send the robot's position to the PI for operational use </p>
      */
@@ -170,6 +187,12 @@ public class OceanViewManager extends SubsystemBase {
         this.udpReceiver  = udpReceiver;
         this.tcpSender    = tcpSender;
         this.poseSupplier = poseSupplier;
+
+        // Synchronize Time
+        this.timeSyncClient = new TimeSyncClient(OceanViewConstants.PI_IP, OceanViewConstants.TIME_SYNC_PORT_NUMBER, OceanViewConstants.DEFAULT_NUM_SAMPLES);
+        double[] timeSyncData = this.timeSyncClient.synchronizeTime();
+        this.averageOffsetTimeNs = timeSyncData[0];
+        this.averageRoundTripTImeNs = timeSyncData[1];
     }
 
     // ------------------------------------------------------------------------
@@ -241,33 +264,43 @@ public class OceanViewManager extends SubsystemBase {
      * </p>
      */
     private void fetchDetectionData() {
-        // Retrieve a Map<String, Object> representing the entire JSON
+        // Retrieve the JSON data from the UDPReceiver as a Map.
         Map<String, Object> jsonData = udpReceiver.getTargetData();
-
-        // Clear old data from the previous cycle
+    
+        // Clear old data from the previous cycle.
         availableLocations.clear();
         algaeBlockedLocations.clear();
         algaePositions.clear();
-
-        // If there's no data, we can't parse anything
+    
         if (jsonData == null || jsonData.isEmpty()) {
             System.out.println("[OceanViewManager] No data or empty JSON. Skipping parse.");
             return;
         }
-
-        // Parse each major JSON key
-        parseLocationArray(jsonData, "available",     availableLocations);
-        parseLocationArray(jsonData, "algae_blocked", algaeBlockedLocations);
+        
+        // Retrieve the raw timestamp (in nanoseconds) from the JSON.
+        Object tsObj = jsonData.get("timestamp");
+        long packetTimestamp = (tsObj instanceof Number) ? ((Number) tsObj).longValue() : 0;
+        
+        // Adjust the timestamp using the average offset computed from the time sync.
+        // For example, if averageOffsetTimeNs is the difference (RIO time - Pi time), then:
+        long adjustedTimestamp = packetTimestamp + (long) averageOffsetTimeNs;
+        
+        // Optionally, print for debugging:
+        System.out.println("[OceanViewManager] Raw timestamp: " + packetTimestamp +
+                           ", Adjusted timestamp: " + adjustedTimestamp);
+        
+        // Parse each major JSON key and pass the adjusted timestamp.
+        parseLocationArray(jsonData, "available", availableLocations, adjustedTimestamp);
+        parseLocationArray(jsonData, "algae_blocked", algaeBlockedLocations, adjustedTimestamp);
         parseAlgaePositions(jsonData, "algae_positions", algaePositions);
-
-        // Optional debug logs
+    
+        // Optional debug logs.
         System.out.println("[OceanViewManager] Data updated:");
         System.out.printf("  Available: %d, Blocked: %d, AlgaePts: %d%n",
             availableLocations.size(),
             algaeBlockedLocations.size(),
-            algaePositions.size()
-        );
-    }
+            algaePositions.size());
+    }    
 
     // ------------------------------------------------------------------------
     // JSON Parsing Helpers
@@ -291,52 +324,50 @@ public class OceanViewManager extends SubsystemBase {
      * @param jsonData   The overall JSON map from the Pi.
      * @param key        The array key, e.g. "available" or "algae_blocked".
      * @param outputList The list to store parsed <code>ScoringLocation</code> objects.
+     * @param timestamp  The time the data was detected, in RIO time.
      */
     @SuppressWarnings("unchecked")
-    private void parseLocationArray(Map<String, Object> jsonData, String key, List<ScoringLocation> outputList) {
-        
-        // Extract the raw array
+    private void parseLocationArray(Map<String, Object> jsonData, String key, List<ScoringLocation> outputList, long timestamp) {
+        // Extract the raw array.
         Object rawObj = jsonData.get(key);
         if (!(rawObj instanceof List)) {
-            return; // Key not present or not a list, skip
+            return; // Key not present or not a list, skip.
         }
-
         List<Object> rawList = (List<Object>) rawObj;
 
-        // Iterate over each element in the list
+        // Iterate over each element in the list.
         for (Object o : rawList) {
             if (!(o instanceof Map)) {
-                continue; // Not the expected structure, skip
+                continue; // Not the expected structure, skip.
             }
-
-            // Each element is a map with "branch", "level", and "position"
             Map<String, Object> locMap = (Map<String, Object>) o;
             String branch = safeGetString(locMap, "branch", "UnknownBranch");
             String level  = safeGetString(locMap, "level",  "UnknownLevel");
 
-            // Nested position
+            // Nested position map.
             Map<String, Object> posMap = (Map<String, Object>) locMap.get("position");
             if (posMap == null) {
-                continue; // If no position map is found, skip
+                continue; // If no position map is found, skip.
             }
 
-            // Extract x, y, z
+            // Extract x, y, z.
             double x = safeGetDouble(posMap, "x", 0.0);
             double y = safeGetDouble(posMap, "y", 0.0);
             double z = safeGetDouble(posMap, "z", 0.0);
 
-            // Apply exponential smoothing
+            // Apply exponential smoothing.
             String id = branch + "-" + level;
             Transform3d smoothed = smoothPosition(id, x, y, z);
 
-            // Add to outputList
-            ScoringLocation location = new ScoringLocation(branch, level, smoothed);
+            // Create ScoringLocation including the packet timestamp.
+            ScoringLocation location = new ScoringLocation(branch, level, smoothed, timestamp);
             outputList.add(location);
 
-            // Also store in rolling memory
+            // Store in rolling memory.
             storeInDetectionHistory(id, smoothed);
         }
     }
+
 
     /**
      * <p>
@@ -501,8 +532,8 @@ public class OceanViewManager extends SubsystemBase {
     }
 
     // ------------------------------------------------------------------------
-    // Safe Accessors
-    // ------------------------------------------------------------------------
+    //   Safe Accessors
+    // ------------------------------------------------------------------------ 
 
     /**
      * Retrieves a string from a map. If the key is missing or not a string, returns defaultVal.
@@ -566,16 +597,65 @@ public class OceanViewManager extends SubsystemBase {
 
     /**
      * <p>
+     * (Deprecated) Retrieves all <strong>available scoring locations</strong> for a given level,
+     * such as "L2", "L3", or "L4".
+     * </p>
+     * <strong>Deprecated:</strong> This method is deprecated in favor of {@link #getAvailableByLevel(ScoringHeight)}
+     * which provides improved type safety and clarity by using the <code>ScoringHeight</code> type rather than a raw String.
+     * 
+     * @param level The desired level (e.g., "L2"). {@link #getAvailableByLevel(ScoringHeight)}
+     * @return A list of matching <code>ScoringLocation</code> objects.
+     */
+    @Deprecated
+    public List<ScoringLocation> getAvailableByLevel(String level) {
+        List<ScoringLocation> result = new ArrayList<>();
+        for (ScoringLocation loc : availableLocations) {
+            if (loc.level.equalsIgnoreCase(level)) {
+                result.add(loc);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * <p>
      * Retrieves all <strong>available scoring locations</strong> for a given level,
      * such as "L2", "L3", or "L4".
      * </p>
      *
-     * @param level The desired level (e.g., "L2").
+     * @param level The scoring level filter as a <code>ScoringHeight</code> (e.g. <code>ScoringHeight.L2</code>).
      * @return A list of matching <code>ScoringLocation</code> objects.
      */
-    public List<ScoringLocation> getAvailableByLevel(String level) {
+    public List<ScoringLocation> getAvailableByLevel(ScoringHeight level) {
+
+        // Get the string form of the scoring height.
+        String levelString = level.toString();
+
+        // Get the blocked locations by scoring height.
         List<ScoringLocation> result = new ArrayList<>();
         for (ScoringLocation loc : availableLocations) {
+            if (loc.level.equalsIgnoreCase(levelString)) {
+                result.add(loc);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * <p>
+     * (Deprecated) Retrieves all <strong>algae-blocked scoring locations</strong> for a given level,
+     * e.g., "L2".
+     * </p>
+     * <strong>Deprecated:</strong> This method is deprecated in favor of {@link #getBlockedByLevel(ScoringHeight)}
+     * which provides improved type safety and clarity by using the <code>ScoringHeight</code> type rather than a raw String.
+     * 
+     * @param level The desired level (e.g., "L3"). Use {@link #getBlockedByLevel(ScoringHeight)} instead.
+     * @return A list of blocked <code>ScoringLocation</code> objects at that level.
+     */
+    @Deprecated
+    public List<ScoringLocation> getBlockedByLevel(String level) {
+        List<ScoringLocation> result = new ArrayList<>();
+        for (ScoringLocation loc : algaeBlockedLocations) {
             if (loc.level.equalsIgnoreCase(level)) {
                 result.add(loc);
             }
@@ -589,13 +669,18 @@ public class OceanViewManager extends SubsystemBase {
      * e.g., "L2".
      * </p>
      *
-     * @param level The desired level (e.g., "L3").
+     * @param level The scoring level filter as a <code>ScoringHeight</code> (e.g. <code>ScoringHeight.L2</code>).
      * @return A list of blocked <code>ScoringLocation</code> objects at that level.
      */
-    public List<ScoringLocation> getBlockedByLevel(String level) {
+    public List<ScoringLocation> getBlockedByLevel(ScoringHeight level) {
+
+        // Get the string form of the scoring height.
+        String levelString = level.toString();
+
+        // Get the blocked locations by scoring height.
         List<ScoringLocation> result = new ArrayList<>();
         for (ScoringLocation loc : algaeBlockedLocations) {
-            if (loc.level.equalsIgnoreCase(level)) {
+            if (loc.level.equalsIgnoreCase(levelString)) {
                 result.add(loc);
             }
         }
@@ -604,17 +689,47 @@ public class OceanViewManager extends SubsystemBase {
 
     /**
      * <p>
-     * Returns both <strong>available</strong> and <strong>blocked</strong> scoring
+     * (Deprecated) Returns both <strong>available</strong> and <strong>blocked</strong> scoring
      * locations for the specified level in a single call.
      * </p>
+     * <p>
+     * <strong>Deprecated:</strong> This method is deprecated in favor of {@link #getAllLocationsByLevel(ScoringHeight)}
+     * which provides improved type safety and clarity by using the <code>ScoringHeight</code> type rather than a raw String.
+     * </p>
      *
-     * @param level The level filter (e.g. "L2").
+     * @param level The level filter as a String (e.g. "L2"). Use {@link #getAllLocationsByLevel(ScoringHeight)} instead.
      * @return A map with two keys: "available" and "blocked", each mapping to a list of <code>ScoringLocation</code>.
      */
+    @Deprecated
     public Map<String, List<ScoringLocation>> getAllLocationsByLevel(String level) {
         Map<String, List<ScoringLocation>> result = new HashMap<>();
         result.put("available", getAvailableByLevel(level));
         result.put("blocked",   getBlockedByLevel(level));
+        return result;
+    }
+
+    /**
+     * <p>
+     * Returns both <strong>available</strong> and <strong>blocked</strong> scoring locations for the specified level
+     * in a single call.
+     * </p>
+     * <p>
+     * This is the recommended method to use as it accepts a <code>ScoringHeight</code> parameter, which enhances type safety
+     * and reduces errors compared to the deprecated String‑based method.
+     * </p>
+     *
+     * @param level The scoring level filter as a <code>ScoringHeight</code> (e.g. <code>ScoringHeight.L2</code>).
+     * @return A map with two keys: "available" and "blocked", each mapping to a list of <code>ScoringLocation</code>.
+     */
+    public Map<String, List<ScoringLocation>> getAllLocationsByLevel(ScoringHeight level) {
+
+        // Get the string form of the scoring height.
+        String levelString = level.toString();
+        
+        // Get all scoring locations by the scoring level.
+        Map<String, List<ScoringLocation>> result = new HashMap<>();
+        result.put("available", getAvailableByLevel(levelString));
+        result.put("blocked",   getBlockedByLevel(levelString));
         return result;
     }
 }
