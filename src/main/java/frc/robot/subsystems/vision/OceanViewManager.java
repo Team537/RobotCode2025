@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.OceanViewConstants;
 import frc.robot.network.TCPSender;
+import frc.robot.network.TimeSyncClient;
 import frc.robot.network.UDPReceiver;
 import frc.robot.util.upper_assembly.ScoringHeight;
 import frc.robot.util.vision.ScoringLocation;
@@ -151,6 +152,21 @@ public class OceanViewManager extends SubsystemBase {
     private final TCPSender tcpSender;
 
     /**
+     * The server used to synchronize time between the raspberry PI and the RIO.
+     */
+    private final TimeSyncClient timeSyncClient;
+
+    /**
+     * The difference between the raspberry pi`s time and the RIO`s time, in nanoseconds.
+     */
+    private final double averageOffsetTimeNs;
+
+    /**
+     * The average latency between a round UDP trip, in nanoseconds.
+     */
+    private final double averageRoundTripTImeNs;
+
+    /**
      *<p> The <strong>supplier method</strong> for getting the robots position. Used
      * to send the robot's position to the PI for operational use </p>
      */
@@ -171,6 +187,12 @@ public class OceanViewManager extends SubsystemBase {
         this.udpReceiver  = udpReceiver;
         this.tcpSender    = tcpSender;
         this.poseSupplier = poseSupplier;
+
+        // Synchronize Time
+        this.timeSyncClient = new TimeSyncClient(OceanViewConstants.PI_IP, OceanViewConstants.TIME_SYNC_PORT_NUMBER, OceanViewConstants.DEFAULT_NUM_SAMPLES);
+        double[] timeSyncData = this.timeSyncClient.synchronizeTime();
+        this.averageOffsetTimeNs = timeSyncData[0];
+        this.averageRoundTripTImeNs = timeSyncData[1];
     }
 
     // ------------------------------------------------------------------------
@@ -242,33 +264,43 @@ public class OceanViewManager extends SubsystemBase {
      * </p>
      */
     private void fetchDetectionData() {
-        // Retrieve a Map<String, Object> representing the entire JSON
+        // Retrieve the JSON data from the UDPReceiver as a Map.
         Map<String, Object> jsonData = udpReceiver.getTargetData();
-
-        // Clear old data from the previous cycle
+    
+        // Clear old data from the previous cycle.
         availableLocations.clear();
         algaeBlockedLocations.clear();
         algaePositions.clear();
-
-        // If there's no data, we can't parse anything
+    
         if (jsonData == null || jsonData.isEmpty()) {
             System.out.println("[OceanViewManager] No data or empty JSON. Skipping parse.");
             return;
         }
-
-        // Parse each major JSON key
-        parseLocationArray(jsonData, "available",     availableLocations);
-        parseLocationArray(jsonData, "algae_blocked", algaeBlockedLocations);
+        
+        // Retrieve the raw timestamp (in nanoseconds) from the JSON.
+        Object tsObj = jsonData.get("timestamp");
+        long packetTimestamp = (tsObj instanceof Number) ? ((Number) tsObj).longValue() : 0;
+        
+        // Adjust the timestamp using the average offset computed from the time sync.
+        // For example, if averageOffsetTimeNs is the difference (RIO time - Pi time), then:
+        long adjustedTimestamp = packetTimestamp + (long) averageOffsetTimeNs;
+        
+        // Optionally, print for debugging:
+        System.out.println("[OceanViewManager] Raw timestamp: " + packetTimestamp +
+                           ", Adjusted timestamp: " + adjustedTimestamp);
+        
+        // Parse each major JSON key and pass the adjusted timestamp.
+        parseLocationArray(jsonData, "available", availableLocations, adjustedTimestamp);
+        parseLocationArray(jsonData, "algae_blocked", algaeBlockedLocations, adjustedTimestamp);
         parseAlgaePositions(jsonData, "algae_positions", algaePositions);
-
-        // Optional debug logs
+    
+        // Optional debug logs.
         System.out.println("[OceanViewManager] Data updated:");
         System.out.printf("  Available: %d, Blocked: %d, AlgaePts: %d%n",
             availableLocations.size(),
             algaeBlockedLocations.size(),
-            algaePositions.size()
-        );
-    }
+            algaePositions.size());
+    }    
 
     // ------------------------------------------------------------------------
     // JSON Parsing Helpers
@@ -292,52 +324,50 @@ public class OceanViewManager extends SubsystemBase {
      * @param jsonData   The overall JSON map from the Pi.
      * @param key        The array key, e.g. "available" or "algae_blocked".
      * @param outputList The list to store parsed <code>ScoringLocation</code> objects.
+     * @param timestamp  The time the data was detected, in RIO time.
      */
     @SuppressWarnings("unchecked")
-    private void parseLocationArray(Map<String, Object> jsonData, String key, List<ScoringLocation> outputList) {
-        
-        // Extract the raw array
+    private void parseLocationArray(Map<String, Object> jsonData, String key, List<ScoringLocation> outputList, long timestamp) {
+        // Extract the raw array.
         Object rawObj = jsonData.get(key);
         if (!(rawObj instanceof List)) {
-            return; // Key not present or not a list, skip
+            return; // Key not present or not a list, skip.
         }
-
         List<Object> rawList = (List<Object>) rawObj;
 
-        // Iterate over each element in the list
+        // Iterate over each element in the list.
         for (Object o : rawList) {
             if (!(o instanceof Map)) {
-                continue; // Not the expected structure, skip
+                continue; // Not the expected structure, skip.
             }
-
-            // Each element is a map with "branch", "level", and "position"
             Map<String, Object> locMap = (Map<String, Object>) o;
             String branch = safeGetString(locMap, "branch", "UnknownBranch");
             String level  = safeGetString(locMap, "level",  "UnknownLevel");
 
-            // Nested position
+            // Nested position map.
             Map<String, Object> posMap = (Map<String, Object>) locMap.get("position");
             if (posMap == null) {
-                continue; // If no position map is found, skip
+                continue; // If no position map is found, skip.
             }
 
-            // Extract x, y, z
+            // Extract x, y, z.
             double x = safeGetDouble(posMap, "x", 0.0);
             double y = safeGetDouble(posMap, "y", 0.0);
             double z = safeGetDouble(posMap, "z", 0.0);
 
-            // Apply exponential smoothing
+            // Apply exponential smoothing.
             String id = branch + "-" + level;
             Transform3d smoothed = smoothPosition(id, x, y, z);
 
-            // Add to outputList
-            ScoringLocation location = new ScoringLocation(branch, level, smoothed);
+            // Create ScoringLocation including the packet timestamp.
+            ScoringLocation location = new ScoringLocation(branch, level, smoothed, timestamp);
             outputList.add(location);
 
-            // Also store in rolling memory
+            // Store in rolling memory.
             storeInDetectionHistory(id, smoothed);
         }
     }
+
 
     /**
      * <p>
