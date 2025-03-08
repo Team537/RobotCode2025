@@ -47,7 +47,7 @@ public class PhotonVisionCamera extends SubsystemBase {
         );
         
         // Fall back to a second strategy if only one tag is visible
-        photonPoseEstimator.setMultiTagFallbackStrategy(VisionConstants.FALLBACK_STRATEGY);
+        // photonPoseEstimator.setMultiTagFallbackStrategy(VisionConstants.FALLBACK_STRATEGY);
     }
 
     /**
@@ -57,7 +57,7 @@ public class PhotonVisionCamera extends SubsystemBase {
     public void update(Pose2d currentBestGuess) {
 
         // Update the reference pose for better solvePNP
-        photonPoseEstimator.setReferencePose(currentBestGuess);
+        // photonPoseEstimator.setReferencePose(currentBestGuess);
 
         // Grab *all* the new pipeline results since our last call
         List<PhotonPipelineResult> allResults = camera.getAllUnreadResults();

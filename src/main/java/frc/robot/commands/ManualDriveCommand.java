@@ -8,12 +8,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.util.autonomous.Alliance;
 import frc.robot.util.math.Vector2d;
 
 public abstract class ManualDriveCommand extends Command {
     
     protected final DriveSubsystem driveSubsystem;
     protected final XboxController controller;
+    protected final Alliance alliance;
 
     /**
      * The rotational offset of the driver
@@ -76,10 +78,13 @@ public abstract class ManualDriveCommand extends Command {
      * @param driveSubsystem The robot's drive subsystem.
      * @param controller The controller used by the driver.
      */
-    public ManualDriveCommand(DriveSubsystem driveSubsystem, XboxController controller) {
+    public ManualDriveCommand(DriveSubsystem driveSubsystem, XboxController controller, Alliance alliance) {
         this.driveSubsystem = driveSubsystem;
         this.controller = controller;
+        this.alliance = alliance;
         addRequirements(driveSubsystem);
+        
+        driverRotationalOffset = alliance.getDriverRotationalOffset();
     }
 
     /**
@@ -98,6 +103,7 @@ public abstract class ManualDriveCommand extends Command {
      * @param useTargetRotation Whether or not the robot should aim for a target rotation.
      * @param useAbsoluteRotation Whether the robot should target an absolute orientation or a relative offset.
      * @param throttle A multiplier for controlling the max speed of the robot. Ranges from 0 (minimum speed) to 1 (maximum speed).
+     * @param fieldCentric
      */
     protected void manualDrive(
         Vector2d linearVelocity, 
@@ -107,7 +113,8 @@ public abstract class ManualDriveCommand extends Command {
         Rotation2d targetRotationOffset, 
         boolean useTargetRotation, 
         boolean useAbsoluteRotation, 
-        double throttle
+        double throttle,
+        boolean fieldCentric
     ) {
         // The final velocities that will be used for driving the robot
         Vector2d finalLinearVelocity;
@@ -119,7 +126,12 @@ public abstract class ManualDriveCommand extends Command {
             targetTranslationActive = false;
 
             // Rotate and curve the input for smoother control
-            linearVelocity = linearVelocity.rotateBy(driverRotationalOffset.times(-1.0)); // Adjust for driver orientation
+            if (fieldCentric) {
+                linearVelocity = linearVelocity.rotateBy(driverRotationalOffset.times(-1.0)); // Adjust for driver orientation
+            } else {
+                linearVelocity = linearVelocity.rotateBy(driveSubsystem.getRobotPose().getRotation().times(-1.0));
+            }
+
             double linearSpeed = linearVelocity.magnitude();
             linearVelocity = linearVelocity.normalize().scale(Math.pow(linearSpeed,OperatorConstants.LINEAR_INPUT_CURVE_POWER));
 
@@ -131,32 +143,41 @@ public abstract class ManualDriveCommand extends Command {
                 linearVelocity = new Vector2d(0, 0);
             }
 
-            // Lock the robot's position if no movement is commanded
             // TODO: test and fix this, delete the "false && " to activate
-            /*
-            if (false && linearVelocity.magnitude() < 1e-3 && driveSubsystem.getCommandedLinearVelocity().magnitude() < 1e-3) {
-                if (!xyLockActive) {
+            if (linearVelocity.magnitude() < 1e-3) {
+                
+                if (!xyLockActive && driveSubsystem.getCommandedLinearVelocity().magnitude() < 1e-3) {
                     xyLockActive = true;
                     xyLockTranslation = driveSubsystem.getRobotPose().getTranslation();
                 }
-                xyLockActive = true;
-                finalLinearVelocity = driveSubsystem.getLinearFeedback(xyLockTranslation).scale(DriveConstants.LINEAR_MAX_SPEED);
+
+                if (xyLockActive) {
+                    finalLinearVelocity = driveSubsystem.getLinearFeedback(xyLockTranslation).scale(DriveConstants.LINEAR_MAX_SPEED);
+                } else {
+                    finalLinearVelocity = new Vector2d(0.0,0.0);
+                }
+                
             } else {
+
+                xyLockActive = false;
+
                 // Apply throttle for speed control
                 double linearThrottleMultiplier = OperatorConstants.THROTTLE_LINEAR_MIN_SPEED + throttle * 
                     (OperatorConstants.THROTTLE_LINEAR_MAX_SPEED - OperatorConstants.THROTTLE_LINEAR_MIN_SPEED);
                 finalLinearVelocity = linearVelocity.scale(linearThrottleMultiplier);
             }
-            */
 
-            // Apply throttle for speed control
-            double linearThrottleMultiplier = OperatorConstants.THROTTLE_LINEAR_MIN_SPEED + throttle * 
-                (OperatorConstants.THROTTLE_LINEAR_MAX_SPEED - OperatorConstants.THROTTLE_LINEAR_MIN_SPEED);
-            finalLinearVelocity = linearVelocity.scale(linearThrottleMultiplier);
         } else {
 
+            xyLockActive = false;
+
             // Target translation is active
-            targetTranslationOffset.rotateBy(driverRotationalOffset.times(-1.0)); // Adjust for driver orientation
+            if (fieldCentric) {
+                targetTranslationOffset = targetTranslationOffset.rotateBy(driverRotationalOffset.times(-1.0));
+            } else {
+                targetTranslationOffset = targetTranslationOffset.rotateBy(driveSubsystem.getRobotPose().getRotation().times(-1.0));
+            }
+            
             if (!targetTranslationActive) {
 
                 // Initialize the origin for target translation
@@ -189,27 +210,27 @@ public abstract class ManualDriveCommand extends Command {
 
             // Lock the robot's orientation if no rotation is commanded
 
-            // TODO: test and fix this, delete the "false && " to activate
-            /*
-            if (false && Math.abs(rotationalVelocity) < 1e-3 && Math.abs(driveSubsystem.getCommandedRotationalVelocity()) < 1e-3) {
-                if (!thetaLockActive) {
+            if (Math.abs(rotationalVelocity) < 1e-3) {
+                if (!thetaLockActive & Math.abs(driveSubsystem.getCommandedRotationalVelocity()) < 1e-3) {
                     thetaLockActive = true;
                     thetaLockRotation = driveSubsystem.getRobotPose().getRotation();
                 }
-                thetaLockActive = true;
-                finalRotationalVelocity = driveSubsystem.getRotationalFeedback(thetaLockRotation) * DriveConstants.ROTATIONAL_MAX_SPEED;
+                
+                if (thetaLockActive) {
+                    finalRotationalVelocity = driveSubsystem.getRotationalFeedback(thetaLockRotation) * DriveConstants.ROTATIONAL_MAX_SPEED;
+                } else {
+                    finalRotationalVelocity = 0.0;
+                }
             } else {
+
+                thetaLockActive = false;
+
                 // Apply throttle for rotational speed control
                 double rotationalThrottleMultiplier = OperatorConstants.THROTTLE_ROTATIONAL_MIN_SPEED + throttle * 
                     (OperatorConstants.THROTTLE_ROTATIONAL_MAX_SPEED - OperatorConstants.THROTTLE_ROTATIONAL_MIN_SPEED);
                 finalRotationalVelocity = rotationalVelocity * rotationalThrottleMultiplier;
             }
-             */
-            
-            // Apply throttle for rotational speed control
-            double rotationalThrottleMultiplier = OperatorConstants.THROTTLE_ROTATIONAL_MIN_SPEED + throttle * 
-                (OperatorConstants.THROTTLE_ROTATIONAL_MAX_SPEED - OperatorConstants.THROTTLE_ROTATIONAL_MIN_SPEED);
-            finalRotationalVelocity = rotationalVelocity * rotationalThrottleMultiplier;
+
         } else {
 
             // Target rotation is active

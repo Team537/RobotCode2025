@@ -26,8 +26,10 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Defaults;
@@ -35,8 +37,11 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.SquidConstants;
 import frc.robot.commands.DriveToPoseCommand;
+import frc.robot.commands.XboxManualDriveCommand;
 import frc.robot.util.math.DeltaTime;
+import frc.robot.util.swerve.DriveState;
 import frc.robot.util.swerve.DrivingMotorType;
+import frc.robot.util.autonomous.Alliance;
 import frc.robot.util.autonomous.Obstacle;
 import frc.robot.util.swerve.TurningMotorType;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
@@ -146,6 +151,9 @@ public class DriveSubsystem extends SubsystemBase {
     private List<Supplier<List<Obstacle>>> pathfindingObstaclesSuppliers = new ArrayList<>();
     private List<Obstacle> pathfindingObstacles = new ArrayList<>();
     private List<Pair<Translation2d, Translation2d>> translatedPathfindingObstacles = new ArrayList<>();
+
+    private DriveState state = DriveState.MANUAL;
+    private boolean inScorePose = false;
 
     //////////////////////////////////////////////////////////////////////////////
     // Constructor
@@ -273,7 +281,7 @@ public class DriveSubsystem extends SubsystemBase {
 
         // --- Swerve and Auto-Builder Configuration ---
         RobotConfig swerveConfig = new RobotConfig(robotMass, robotMOI, moduleConfig, DriveConstants.MODULE_POSITIONS.toArray(new Translation2d[0]));
-        constraints = new PathConstraints(maxDriveVelocity, maxTranslationalAcceleration, maxAngularVelocity, maxAngularAcceleration);
+        constraints = new PathConstraints(0.5 * maxDriveVelocity, maxTranslationalAcceleration, maxAngularVelocity, maxAngularAcceleration);
 
         AutoBuilder.configure(
                 this::getRobotPose,                  // Supplier for current pose
@@ -382,11 +390,24 @@ public class DriveSubsystem extends SubsystemBase {
      * @return a Command that, when executed, will pathfind to the target pose
      */
     public Command getPathfindingCommand(Pose2d pose) {
-        return new SequentialCommandGroup(
-            AutoBuilder.pathfindToPose(pose, constraints, 0.0),
-            getDriveToPoseCommand(pose)
-        );
+        return new InstantCommand(() -> {inScorePose = false;})
+            .andThen(AutoBuilder.pathfindToPose(pose, constraints, 0.0))
+            .andThen(getDriveToPoseCommand(pose))
+            .andThen(new InstantCommand(() -> {inScorePose = true;}));
     }
+
+    public boolean getInScorePose() {
+        return inScorePose;
+    }
+
+    ///////////////////////////////////////////////////////////////////////// /////
+    // Manual Command Methods
+    //////////////////////////////////////////////////////////////////////////////
+    
+    public Command getManualCommand(XboxController controller, Alliance alliance) {
+        return new XboxManualDriveCommand(this, controller, alliance);
+    }
+
 
     //////////////////////////////////////////////////////////////////////////////
     // Sensor and Pose Estimation Methods

@@ -11,7 +11,7 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.network.TCPSender;
 import frc.robot.network.UDPReceiver;
-import frc.robot.commands.XboxParkerManualDriveCommand;
+import frc.robot.commands.XboxManualDriveCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
@@ -23,12 +23,16 @@ import frc.robot.util.autonomous.AutonomousRoutine;
 import frc.robot.util.swerve.DrivingMotorType;
 import frc.robot.util.upper_assembly.UpperAssemblyFactory;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
-
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -56,9 +60,6 @@ public class RobotContainer {
     @SuppressWarnings("unused") // The class is used due to how WPILib treats and stores subsystems.
     private OceanViewManager oceanViewManager;
 
-    // Commands
-    Command manualDriveCommand = new XboxParkerManualDriveCommand(driveSubsystem, xBoxController);
-
     // Smart Dashboard Inputs
     private final SendableChooser<AutonomousRoutine> autonomousSelector = new SendableChooser<>();
     private final SendableChooser<Alliance> allianceSelector = new SendableChooser<>();
@@ -75,7 +76,7 @@ public class RobotContainer {
         setupOceanViewManager();
 
         // Add cameras to the VisionOdometry object.
-        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, new Transform3d()));
+        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, new Transform3d(-0.2159, 0, 0, new Rotation3d(0, 0, -Math.PI))));
         visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.RIGHT_CAMERA_NAME, VisionConstants.RIGHT_CAMERA_OFFSET));
         visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.LEFT_CAMERA_NAME, VisionConstants.LEFT_CAMERA_OFFSET)); 
 
@@ -180,12 +181,20 @@ public class RobotContainer {
         upperAssembly = UpperAssemblyFactory.createUpperAssembly(upperAssemblyType);
     }
 
+    public void scheduleAutonomous() {
+        CommandScheduler.getInstance().cancelAll();
+        driveSubsystem.setRobotPose(new Pose2d(16.9675350189209, 1.3218339681625366, new Rotation2d(-0.9189286430807454)));
+    }
+
     /**
      * Schedules commands used exclusively during TeleOp.
      */
     public void scheduleTeleOp() {
         // The Drive Command
-        driveSubsystem.setDefaultCommand(manualDriveCommand);
-        upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
+        upperAssembly.setRobotInScoringPositionSupplier(driveSubsystem::getInScorePose);
+        driveSubsystem.setDefaultCommand(driveSubsystem.getManualCommand(xBoxController, Alliance.RED));
+        Command command = driveSubsystem.getPathfindingCommand(new Pose2d(new Translation2d(11.845,4.179),new Rotation2d(Math.PI)));
+        command.schedule();
+        //upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
     }
 }

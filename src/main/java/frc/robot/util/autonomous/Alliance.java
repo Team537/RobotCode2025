@@ -1,5 +1,8 @@
 package frc.robot.util.autonomous;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.Constants.OperatorConstants;
+
 /**
  * <h2> Alliance </h2>
  * An enum value used to keep track of which alliance the robot is currently on. Supports <b>RED</b>, <b>BLUE</b>,
@@ -14,7 +17,18 @@ package frc.robot.util.autonomous;
  * @see {@link frc.robot.RobotContainer}
 */
 public enum Alliance {
-    RED,
-    BLUE,
-    DEMO; // Not used during competition! This is only for showcasing our robot code at events!
+    RED(OperatorConstants.RED_ALLIANCE_OFFSET),
+    BLUE(OperatorConstants.BLUE_ALLIANCE_OFFSET),
+    DEMO(OperatorConstants.DEMO_ALLIANCE_OFFSET); // Not used during competition! This is only for showcasing our robot code at events!
+
+    private Rotation2d driverRotationalOffset;
+
+    Alliance(Rotation2d driverRotationalOffset) {
+        this.driverRotationalOffset = driverRotationalOffset;
+    }
+
+    public Rotation2d getDriverRotationalOffset() {
+        return driverRotationalOffset;
+    }
+
 }

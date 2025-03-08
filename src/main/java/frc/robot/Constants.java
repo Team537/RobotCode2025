@@ -11,8 +11,10 @@ import org.photonvision.PhotonPoseEstimator;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -66,9 +68,9 @@ public final class Constants {
         public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; // Radians per
                                                                                                         // second
         public static final double XBOX_CONTROLLER_JOYSTICK_DEADMAND_RADIUS = 0.01;
-        public static final double XBOX_CONTROLLER_TARGET_MIN_RADIUS = 2.0; // Meters
-        public static final double XBOX_CONTROLLER_TARGET_MAX_RADIUS = 0.5; // Meters
-        public static final double XBOX_CONTROLLER_ROTATIONAL_TARGET_ACTIVATION_ZONE = 0.8;
+        public static final double XBOX_CONTROLLER_TARGET_RADIUS = 2.0; // Meters
+        public static final double XBOX_CONTROLLER_TARGET_THROTTLE_RADIUS = 0.5; // Meters
+        public static final double XBOX_CONTROLLER_ROTATIONAL_TARGET_ACTIVATION_ZONE = 0.99;
         public static final double XBOX_CONTROLLER_ROTATIONAL_TARGET_DEACTIVATION_ZONE = 0.7;
     }
 
@@ -82,7 +84,7 @@ public final class Constants {
 
         // Robot Features
         public static final double DRIVETRAIN_MASS = 39.5; //Kg
-        public static final double DRIVETRAIN_MOI = 1.227; //Kg meters
+        public static final double DRIVETRAIN_MOI = 2.285; //Kg meters
         public static final double GRAVITY_ACCELERATION = 9.81; // Meters / sec^2
 
         public static final double TRANSLATION_THRESHOLD = 0.05; // Meters
@@ -262,8 +264,8 @@ public final class Constants {
      */
     public static class NarwhalConstants {
 
-        public static final double UPPER_ASSEMBLY_MASS = 0.0; //Kg
-        public static final double UPPER_ASSEMBLY_MOI = 0.0; //Kg m^2
+        public static final double UPPER_ASSEMBLY_MASS = 17.2; //Kg
+        public static final double UPPER_ASSEMBLY_MOI = 0.995; //Kg m^2
 
         public static class NarwhalIntakeOuttakeConstants {
             // Sensor IDs
@@ -386,6 +388,9 @@ public final class Constants {
 
         public static final double UPPER_ASSEMBLY_MASS = 0.0;
         public static final double UPPER_ASSEMBLY_MOI = 0.0; //Kg m^2
+        public static final Transform2d INTAKING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.5,0.0),new Rotation2d(Math.PI));
+        public static final Transform2d SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.5,0.0),new Rotation2d(0));
+        public static final Transform2d CLIMB_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.5,0.0),new Rotation2d(Math.PI));
 
         public static class SquidManipulatorConstants {
 
@@ -473,7 +478,7 @@ public final class Constants {
     public static class VisionConstants {
 
         // Camera Settings
-        public static final String FRONT_CAMERA_NAME = "Arducam_OV9782_USB_Camera"; //
+        public static final String FRONT_CAMERA_NAME = "Arducam_OV2311_USB_Camera"; //
         public static final String RIGHT_CAMERA_NAME = "Right_Arducam_OV9782";
         public static final String LEFT_CAMERA_NAME  = "Left_Arducam_OV9782";
 
@@ -505,5 +510,13 @@ public final class Constants {
         // Time Synchronization
         public static final int TIME_SYNC_PORT_NUMBER = 6000;
         public static final int DEFAULT_NUM_SAMPLES = 10;
+    }
+
+    public static class FieldConstants {
+
+        public static final List<Pose2d> BLUE_ALLIANCE_LEFT_INTAKE_POSITIONS = List.of(
+            new Pose2d(new Translation2d(0.0,0.0),new Rotation2d(-0.9425))
+        );
+
     }
 }
