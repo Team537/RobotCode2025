@@ -8,7 +8,7 @@
         "layouts": [
           {
             "title": "Front Camera",
-            "x": 1664.0,
+            "x": 768.0,
             "y": 128.0,
             "width": 256.0,
             "height": 256.0,
@@ -52,7 +52,7 @@
           },
           {
             "title": "Side_Camera",
-            "x": 1664.0,
+            "x": 768.0,
             "y": 384.0,
             "width": 256.0,
             "height": 256.0,
@@ -98,9 +98,9 @@
         "containers": [
           {
             "title": "Field",
-            "x": 256.0,
+            "x": 0.0,
             "y": 128.0,
-            "width": 1408.0,
+            "width": 768.0,
             "height": 640.0,
             "type": "Field",
             "properties": {
@@ -118,9 +118,9 @@
           },
           {
             "title": "FMSInfo",
-            "x": 512.0,
+            "x": 0.0,
             "y": 0.0,
-            "width": 896.0,
+            "width": 640.0,
             "height": 128.0,
             "type": "FMSInfo",
             "properties": {
@@ -129,9 +129,59 @@
             }
           },
           {
+            "title": "X Position",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/X Position",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Y Position",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Y Position",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Theta Rotation",
+            "x": 896.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Theta Rotation",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Autonomous",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
             "title": "Autonomous Routine",
-            "x": 0.0,
-            "y": 512.0,
+            "x": 512.0,
+            "y": 0.0,
             "width": 256.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
@@ -142,9 +192,22 @@
             }
           },
           {
-            "title": "Alliance",
+            "title": "Drive Motor",
+            "x": 256.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/SendableChooser[4]",
+              "period": 0.06,
+              "sort_options": false
+            }
+          },
+          {
+            "title": "Starting Position",
             "x": 0.0,
-            "y": 128.0,
+            "y": 0.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Split Button Chooser",
@@ -154,9 +217,9 @@
             }
           },
           {
-            "title": "Upper Assembly",
-            "x": 0.0,
-            "y": 256.0,
+            "title": "Alliance",
+            "x": 256.0,
+            "y": 0.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Split Button Chooser",
@@ -166,25 +229,19 @@
             }
           },
           {
-            "title": "Chassis Type",
+            "title": "Upper Assembly",
             "x": 0.0,
-            "y": 384.0,
+            "y": 256.0,
             "width": 256.0,
             "height": 128.0,
-            "type": "Split Button Chooser",
+            "type": "ComboBox Chooser",
             "properties": {
               "topic": "/SmartDashboard/SendableChooser[3]",
-              "period": 0.06
+              "period": 0.06,
+              "sort_options": false
             }
           }
         ]
-      }
-    },
-    {
-      "name": "Autonomous",
-      "grid_layout": {
-        "layouts": [],
-        "containers": []
       }
     }
   ]
