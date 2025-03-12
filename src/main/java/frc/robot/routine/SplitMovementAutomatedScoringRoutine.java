@@ -11,13 +11,13 @@ import frc.robot.util.autonomous.Alliance;
 import frc.robot.util.autonomous.StartingPosition;
 import frc.robot.util.upper_assembly.ScoringHeight;
 
-public class SimpleAutomatedScoringRoutine implements IRoutine {
+public class SplitMovementAutomatedScoringRoutine implements IRoutine {
     private final Alliance alliance;
     private final DriveSubsystem driveSubsystem;
     private final StartingPosition startingPosition;
     private final UpperAssembly upperAssembly;
 
-    public SimpleAutomatedScoringRoutine(Alliance alliance, StartingPosition startingPosition, DriveSubsystem driveSubsystem, UpperAssembly upperAssembly) {
+    public SplitMovementAutomatedScoringRoutine(Alliance alliance, StartingPosition startingPosition, DriveSubsystem driveSubsystem, UpperAssembly upperAssembly) {
         this.alliance = alliance;
         this.driveSubsystem = driveSubsystem;
         this.startingPosition = startingPosition;
