@@ -85,6 +85,11 @@ public class NarwhalCoralScoreCommand extends Command{
 
         // Start the outtake delay timer if the Coral sensor is no longer triggered and the outtake delay timer isn't already running
         if(!narwhalIntakeOuttake.isCoralSensorTriggered()){
+            // Reset for travel
+            narwhalElevator.goToIntakeHeight();
+            narwhalWrist.goToIntakeAngle();
+
+            // Give things a bit of time to complete
             if (!outtakeDelayTimer.isRunning()){
                 outtakeDelayTimer.start();
             }
