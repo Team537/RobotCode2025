@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OceanViewConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
@@ -155,6 +156,13 @@ public class RobotContainer {
         SmartDashboard.putData(allianceSelector);
         SmartDashboard.putData(upperAssemblySelector);
         SmartDashboard.putData(drivingMotorSelector);
+
+        SmartDashboard.putNumber("MAX TRANS VEL", 0.75);
+        SmartDashboard.putNumber("MAX TRANS ACCEL", 0.5);
+        SmartDashboard.putNumber("MAX ROT VEL", 0.25);
+        SmartDashboard.putNumber("MAX ROT ACCEL", 0.5);
+        SmartDashboard.putNumber("COF", DriveConstants.WHEEL_COEFFICIENT_FRICTION);
+
     }
 
     /**
@@ -191,6 +199,7 @@ public class RobotContainer {
      */
     public void scheduleTeleOp() {
         // The Drive Command
+        driveSubsystem.setConfigs();
         upperAssembly.setRobotInScoringPositionSupplier(driveSubsystem::getInScorePose);
         driveSubsystem.setDefaultCommand(driveSubsystem.getManualCommand(xBoxController, Alliance.RED));
         Command command = driveSubsystem.getPathfindingCommand(new Pose2d(new Translation2d(11.845,4.179),new Rotation2d(Math.PI)));

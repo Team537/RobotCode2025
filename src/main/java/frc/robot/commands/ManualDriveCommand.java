@@ -151,7 +151,7 @@ public abstract class ManualDriveCommand extends Command {
                     xyLockTranslation = driveSubsystem.getRobotPose().getTranslation();
                 }
 
-                if (xyLockActive) {
+                if (false && xyLockActive) {
                     finalLinearVelocity = driveSubsystem.getLinearFeedback(xyLockTranslation).scale(DriveConstants.LINEAR_MAX_SPEED);
                 } else {
                     finalLinearVelocity = new Vector2d(0.0,0.0);
@@ -216,7 +216,7 @@ public abstract class ManualDriveCommand extends Command {
                     thetaLockRotation = driveSubsystem.getRobotPose().getRotation();
                 }
                 
-                if (thetaLockActive) {
+                if (false && thetaLockActive) {
                     finalRotationalVelocity = driveSubsystem.getRotationalFeedback(thetaLockRotation) * DriveConstants.ROTATIONAL_MAX_SPEED;
                 } else {
                     finalRotationalVelocity = 0.0;

@@ -46,6 +46,7 @@ public class VisionOdometry extends SubsystemBase {
 
         // Display the field on the screen for debugging purposes.
         this.field2d = new Field2d();
+    
         SmartDashboard.putData("Field", field2d);
     }
 

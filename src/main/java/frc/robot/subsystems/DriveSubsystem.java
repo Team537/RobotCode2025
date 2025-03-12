@@ -245,7 +245,7 @@ public class DriveSubsystem extends SubsystemBase {
         ModuleConfig moduleConfig = new ModuleConfig(
                 DriveConstants.WHEEL_RADIUS,
                 maxDriveVelocity,
-                DriveConstants.WHEEL_COEFFICIENT_FRICTION,
+                wheelCOF, //TODO: set this back
                 motorType,
                 motorReduction,
                 currentLimit,
@@ -281,7 +281,7 @@ public class DriveSubsystem extends SubsystemBase {
 
         // --- Swerve and Auto-Builder Configuration ---
         RobotConfig swerveConfig = new RobotConfig(robotMass, robotMOI, moduleConfig, DriveConstants.MODULE_POSITIONS.toArray(new Translation2d[0]));
-        constraints = new PathConstraints(0.5 * maxDriveVelocity, maxTranslationalAcceleration, maxAngularVelocity, maxAngularAcceleration);
+        constraints = new PathConstraints(maxTranslationalVelocityMultiplier * maxDriveVelocity, maxTranslationalAccelerationMultiplier * maxTranslationalAcceleration, maxRotationalVelocityMultiplier * maxAngularVelocity, maxRotationalAccelerationMultiplier * maxAngularAcceleration);
 
         AutoBuilder.configure(
                 this::getRobotPose,                  // Supplier for current pose
@@ -621,6 +621,13 @@ public class DriveSubsystem extends SubsystemBase {
     //////////////////////////////////////////////////////////////////////////////
     // Periodic Update Method
     //////////////////////////////////////////////////////////////////////////////
+    
+
+    double maxTranslationalVelocityMultiplier = 1.0;
+    double maxTranslationalAccelerationMultiplier = 1.0;
+    double maxRotationalVelocityMultiplier = 1.0;
+    double maxRotationalAccelerationMultiplier = 1.0;
+    double wheelCOF = 1.0;
 
     /**
      * Periodically updates the drive subsystem.
@@ -645,11 +652,18 @@ public class DriveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Y Position",getRobotPose().getY());
         SmartDashboard.putNumber("Theta Rotation", getRobotPose().getRotation().getRadians());
 
+        maxTranslationalVelocityMultiplier = SmartDashboard.getNumber("MAX TRANS VEL", 0.75);
+        maxTranslationalAccelerationMultiplier = SmartDashboard.getNumber("MAX TRANS ACCEL", 0.5);
+        maxRotationalVelocityMultiplier = SmartDashboard.getNumber("MAX ROT VEL", 0.25);
+        maxRotationalAccelerationMultiplier = SmartDashboard.getNumber("MAX ROT ACCEL", 0.5);
+        wheelCOF = SmartDashboard.getNumber("COF", DriveConstants.WHEEL_COEFFICIENT_FRICTION);
+
+
         // Refresh dynamic pathfinding obstacles.
-        pathfindingObstacles.clear();
+        /*pathfindingObstacles.clear();
         pathfindingObstaclesSuppliers.forEach(supplier -> pathfindingObstacles.addAll(supplier.get()));
         translatedPathfindingObstacles = translatePathfindingObstacles(pathfindingObstacles);
-        Pathfinding.setDynamicObstacles(translatedPathfindingObstacles, getRobotPose().getTranslation());
+        Pathfinding.setDynamicObstacles(translatedPathfindingObstacles, getRobotPose().getTranslation());*/
     }
 
 }

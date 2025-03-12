@@ -141,7 +141,7 @@ public final class Constants {
 
         public static final double WHEEL_RADIUS = 0.0381; // Meters
         public static final double WHEEL_CIRCUMFERENCE = WHEEL_RADIUS * 2.0 * Math.PI; // Meters
-        public static final double WHEEL_COEFFICIENT_FRICTION = 1.0;
+        public static final double WHEEL_COEFFICIENT_FRICTION = 0.6;
     
         // Motion Constraints
         public static final double LINEAR_MAX_SPEED = 4.8; // m/s

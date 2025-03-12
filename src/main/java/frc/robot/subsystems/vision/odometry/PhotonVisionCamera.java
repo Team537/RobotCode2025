@@ -47,7 +47,7 @@ public class PhotonVisionCamera extends SubsystemBase {
         );
         
         // Fall back to a second strategy if only one tag is visible
-        // photonPoseEstimator.setMultiTagFallbackStrategy(VisionConstants.FALLBACK_STRATEGY);
+        photonPoseEstimator.setMultiTagFallbackStrategy(VisionConstants.FALLBACK_STRATEGY);
     }
 
     /**
