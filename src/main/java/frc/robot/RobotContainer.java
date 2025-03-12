@@ -19,8 +19,10 @@ import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
 import frc.robot.subsystems.vision.OceanViewManager;
 import frc.robot.subsystems.vision.odometry.PhotonVisionCamera;
 import frc.robot.subsystems.vision.odometry.VisionOdometry;
+import frc.robot.util.EnumPrettifier;
 import frc.robot.util.autonomous.Alliance;
 import frc.robot.util.autonomous.AutonomousRoutine;
+import frc.robot.util.autonomous.StartingPosition;
 import frc.robot.util.swerve.DrivingMotorType;
 import frc.robot.util.upper_assembly.UpperAssemblyFactory;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
@@ -54,15 +56,17 @@ public class RobotContainer {
     // Subsystems
     private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
+
     private UpperAssemblyBase upperAssembly = UpperAssemblyFactory.createUpperAssembly(Constants.Defaults.DEFAULT_UPPER_ASSEMBLY);
-    
+
     private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
-    
+
     @SuppressWarnings("unused") // The class is used due to how WPILib treats and stores subsystems.
     private OceanViewManager oceanViewManager;
 
     // Smart Dashboard Inputs
     private final SendableChooser<AutonomousRoutine> autonomousSelector = new SendableChooser<>();
+    private final SendableChooser<StartingPosition> positionSelector = new SendableChooser<>();
     private final SendableChooser<Alliance> allianceSelector = new SendableChooser<>();
 
     private final SendableChooser<UpperAssemblyType> upperAssemblySelector = new SendableChooser<>();
@@ -138,43 +142,38 @@ public class RobotContainer {
      * This method sets up the dashboard so that the drivers can configure the robots settings.
      */
     private void setupSmartDashboard() {
-            
-        // Setup Autonomous Routine Selection
-        autonomousSelector.setDefaultOption("LEFT_HIGH_SCORE", AutonomousRoutine.LEFT_HIGH_SCORE);
-        for (AutonomousRoutine autonomousRoutine : AutonomousRoutine.values()) {
-            autonomousSelector.addOption(autonomousRoutine.toString(), autonomousRoutine);
-        }
-
-        // Setup Alliance Selection
-        allianceSelector.setDefaultOption("RED", Alliance.RED);
-        for (Alliance alliance : Alliance.values()) {
-            allianceSelector.addOption(alliance.toString(), alliance);
-        }
+        // Setup dropdowns from enumeration values
+        EnumPrettifier.setupSendableChooserFromEnum(this.autonomousSelector, AutonomousRoutine.class, AutonomousRoutine.DEFAULT);
+        EnumPrettifier.setupSendableChooserFromEnum(this.positionSelector, StartingPosition.class, StartingPosition.LEFT);
+        EnumPrettifier.setupSendableChooserFromEnum(this.allianceSelector, Alliance.class, Alliance.RED);
+        EnumPrettifier.setupSendableChooserFromEnum(this.upperAssemblySelector, UpperAssemblyType.class, UpperAssemblyType.NARWHAL);
+        EnumPrettifier.setupSendableChooserFromEnum(this.drivingMotorSelector, DrivingMotorType.class, DrivingMotorType.KRAKEN_X60);
 
         // Add the selectors to the dashboard.
-        SmartDashboard.putData(autonomousSelector);
-        SmartDashboard.putData(allianceSelector);
-        SmartDashboard.putData(upperAssemblySelector);
-        SmartDashboard.putData(drivingMotorSelector);
+        SmartDashboard.putData(this.autonomousSelector);
+        SmartDashboard.putData(this.positionSelector);
+        SmartDashboard.putData(this.allianceSelector);
+        SmartDashboard.putData(this.upperAssemblySelector);
+        SmartDashboard.putData(this.drivingMotorSelector);
 
         SmartDashboard.putNumber("MAX TRANS VEL", 0.75);
         SmartDashboard.putNumber("MAX TRANS ACCEL", 0.5);
         SmartDashboard.putNumber("MAX ROT VEL", 0.25);
         SmartDashboard.putNumber("MAX ROT ACCEL", 0.5);
         SmartDashboard.putNumber("COF", DriveConstants.WHEEL_COEFFICIENT_FRICTION);
-
     }
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
      */
     public Command getAutonomousCommand() {
-
         // Get and display the currently selected autonomous routine.
         AutonomousRoutine selectedAutonomousRoutine = autonomousSelector.getSelected();
         Alliance selectedAlliance = allianceSelector.getSelected();
         SmartDashboard.putString("Selected Autonomous", selectedAutonomousRoutine.toString());
         SmartDashboard.putString("Selected Alliance", selectedAlliance.toString());
+
+        this.upperAssembly = UpperAssemblyFactory.createUpperAssembly(this.upperAssemblySelector.getSelected());
 
         // An example command will be run in autonomous
         return Autos.exampleAuto(exampleSubsystem);
@@ -200,8 +199,9 @@ public class RobotContainer {
     public void scheduleTeleOp() {
         // The Drive Command
         driveSubsystem.setConfigs();
+        driveSubsystem.setDefaultCommand(driveSubsystem.getManualCommand(xBoxController, this.allianceSelector.getSelected()));
         upperAssembly.setRobotInScoringPositionSupplier(driveSubsystem::getInScorePose);
-        driveSubsystem.setDefaultCommand(driveSubsystem.getManualCommand(xBoxController, Alliance.RED));
+
         Command command = driveSubsystem.getPathfindingCommand(new Pose2d(new Translation2d(11.845,4.179),new Rotation2d(Math.PI)));
         command.schedule();
         //upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
