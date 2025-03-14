@@ -22,15 +22,14 @@ public class NarwhalManualIntakeOuttakeCommand extends Command {
     }
 
     @Override
-    public void execute(){
-
+    public void execute() {
         // Right bumper (intake) = intake
-        if(xboxController.getRightBumperButton()){
+        if (xboxController.getRightBumperButton()) {
             narwhalIntakeOuttake.intake();
         }
 
         // X button (outtake) = outtake
-        else if (xboxController.getXButton()){
+        else if (xboxController.getXButton()) {
             narwhalIntakeOuttake.outtake();
         }
 
