@@ -30,8 +30,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Configs.Narwhal;
 import frc.robot.Constants.Defaults;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.NarwhalConstants;
@@ -154,6 +156,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     private DriveState state = DriveState.MANUAL;
     private boolean inScorePose = false;
+    private boolean narwhalCanRaiseLift = false;
 
     //////////////////////////////////////////////////////////////////////////////
     // Constructor
@@ -390,14 +393,27 @@ public class DriveSubsystem extends SubsystemBase {
      * @return a Command that, when executed, will pathfind to the target pose
      */
     public Command getPathfindingCommand(Pose2d pose) {
-        return new InstantCommand(() -> {inScorePose = false;})
-            .andThen(AutoBuilder.pathfindToPose(pose, constraints, 0.0))
-            .andThen(getDriveToPoseCommand(pose))
-            .andThen(new InstantCommand(() -> {inScorePose = true;}));
+        Command command = new InstantCommand(() -> {inScorePose = false;narwhalCanRaiseLift = false;})
+            .andThen(
+                AutoBuilder.pathfindToPose(pose, constraints, 0.0)
+                .andThen(getDriveToPoseCommand(pose))
+            // ).deadlineFor(
+            //     new RunCommand(
+            //         () -> {
+            //             narwhalCanRaiseLift = getRobotPose().getTranslation().getDistance(pose.getTranslation()) <= DriveConstants.NARWHAL_CAN_RAISE_LIFT_DISTANCE;
+            //         }
+            //     )
+            )
+            .andThen(new InstantCommand(() -> {narwhalCanRaiseLift = true;inScorePose = true;}));
+        return command;
     }
 
     public boolean getInScorePose() {
-        return inScorePose;
+        return inScorePose && state == DriveState.SCORING;
+    }
+
+    public boolean getNarwhalCanRaiseLift() {
+        return narwhalCanRaiseLift;
     }
 
     ///////////////////////////////////////////////////////////////////////// /////
@@ -657,7 +673,6 @@ public class DriveSubsystem extends SubsystemBase {
         maxRotationalVelocityMultiplier = SmartDashboard.getNumber("MAX ROT VEL", 0.25);
         maxRotationalAccelerationMultiplier = SmartDashboard.getNumber("MAX ROT ACCEL", 0.5);
         wheelCOF = SmartDashboard.getNumber("COF", DriveConstants.WHEEL_COEFFICIENT_FRICTION);
-
 
         // Refresh dynamic pathfinding obstacles.
         /*pathfindingObstacles.clear();

@@ -17,6 +17,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.NarwhalConstants.NarwhalElevatorConstants;
 import frc.robot.util.NarwhalElevatorState;
+import frc.robot.util.upper_assembly.ScoringHeight;
 
 
 public class NarwhalElevator extends SubsystemBase {
@@ -75,10 +76,10 @@ public class NarwhalElevator extends SubsystemBase {
     
     /**
      * Function to go to a specific height in meters. Measured from the zero position. 
-     * @param meters positive - 0.0 is bottomed out. values are automatically clamped between MIN_HEIGHT_METERS and MAX_HEIGHT_METERS
+     * @param height positive - 0.0 is bottomed out. values are automatically clamped between MIN_HEIGHT_METERS and MAX_HEIGHT_METERS
      */
-    public void setHeight(double meters){
-        double target_height = Math.min(Math.max(meters, NarwhalElevatorConstants.MIN_HEIGHT_METERS), NarwhalElevatorConstants.MAX_HEIGHT_METERS); // Clamps the height to [MAX_HEIGHT_METERS, MIN_HEIGHT_METERS]
+    public void setHeight(double height){
+        double target_height = Math.min(Math.max(height, NarwhalElevatorConstants.MIN_HEIGHT_METERS), NarwhalElevatorConstants.MAX_HEIGHT_METERS); // Clamps the height to [MAX_HEIGHT_METERS, MIN_HEIGHT_METERS]
         leadElevatorPID.setReference(target_height, ControlType.kPosition); // Runs using percent output of duty cycle
         currentState = NarwhalElevatorState.CUSTOM;
 
@@ -102,35 +103,32 @@ public class NarwhalElevator extends SubsystemBase {
     }
 
     /**
-     * Goes to the height for scoring L1 defined by {@link NarwhalElevatorConstants#L1_ELEVATOR_HEIGHT}
+     * Goes to the specified scoring height.
+     *
+     * @param height The target scoring height.
      */
-    public void goToScoreHeightL1(){
-        setHeight(NarwhalElevatorConstants.L1_ELEVATOR_HEIGHT);
-        currentState = NarwhalElevatorState.L1;
-    }
-
-    /**
-     * Goes to the height for scoring L2 defined by {@link NarwhalElevatorConstants#L2_ELEVATOR_HEIGHT}
-     */
-    public void goToScoreHeightL2(){
-        setHeight(NarwhalElevatorConstants.L2_ELEVATOR_HEIGHT);
-        currentState = NarwhalElevatorState.L2;
-    }
-
-    /**
-     * Goes to the height for scoring L3 defined by {@link NarwhalElevatorConstants#L3_ELEVATOR_HEIGHT}
-     */
-    public void goToScoreHeightL3(){
-        setHeight(NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT);
-        currentState = NarwhalElevatorState.L3;
-    }
-
-    /**
-     * Goes to the height for scoring L4 defined by {@link NarwhalElevatorConstants#L4_ELEVATOR_HEIGHT} :)
-     */
-    public void goToScoreHeightL4(){
-        setHeight(NarwhalElevatorConstants.L4_ELEVATOR_HEIGHT);
-        currentState = NarwhalElevatorState.L4;
+    public void goToScoreHeight(ScoringHeight height) {
+        switch (height) {
+            case L1:
+                setHeight(NarwhalElevatorConstants.L1_ELEVATOR_HEIGHT);
+                currentState = NarwhalElevatorState.L1;
+                break;
+            case L2:
+                setHeight(NarwhalElevatorConstants.L2_ELEVATOR_HEIGHT);
+                currentState = NarwhalElevatorState.L2;
+                break;
+            case L3:
+                setHeight(NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT);
+                currentState = NarwhalElevatorState.L3;
+                break;
+            case L4:
+                setHeight(NarwhalElevatorConstants.L4_ELEVATOR_HEIGHT);
+                currentState = NarwhalElevatorState.L4;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown scoring height: " + height);
+        }
+        
     }
 
     /**

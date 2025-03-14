@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.narwhal.NarwhalElevator;
+import frc.robot.util.upper_assembly.ScoringHeight;
 
 public class NarwhalManualElevatorCommand extends Command {
     private final NarwhalElevator narwhalElevator;
@@ -35,19 +36,19 @@ public class NarwhalManualElevatorCommand extends Command {
         }
         // Back button = move to L1 height
         else if(xboxController.getBackButton()){
-            narwhalElevator.goToScoreHeightL1();
+            narwhalElevator.goToScoreHeight(ScoringHeight.L1);
         }
         // A button = move to L2 height
         else if(xboxController.getAButton()){
-            narwhalElevator.goToScoreHeightL2();
+            narwhalElevator.goToScoreHeight(ScoringHeight.L2);
         }
         // B button = move to L3 height
         else if(xboxController.getBButton()){
-            narwhalElevator.goToScoreHeightL3();
+            narwhalElevator.goToScoreHeight(ScoringHeight.L3);
         }
         // Y button = move to L4 height
         else if(xboxController.getYButton()){
-            narwhalElevator.goToScoreHeightL4();
+            narwhalElevator.goToScoreHeight(ScoringHeight.L4);
         }
     }
 }

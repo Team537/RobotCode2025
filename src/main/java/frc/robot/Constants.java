@@ -87,8 +87,10 @@ public final class Constants {
         public static final double DRIVETRAIN_MOI = 2.285; //Kg meters
         public static final double GRAVITY_ACCELERATION = 9.81; // Meters / sec^2
 
-        public static final double TRANSLATION_THRESHOLD = 0.05; // Meters
-        public static final double ROTATION_THRESHOLD = 0.08; // Radians
+        public static final double TRANSLATION_THRESHOLD = 0.03; // Meters
+        public static final double ROTATION_THRESHOLD = 0.04; // Radians
+
+        public static final double NARWHAL_CAN_RAISE_LIFT_DISTANCE = 1.0; // Meters
     
         // Angular Offsets for Swerve Modules
         public static final Rotation2d FRONT_LEFT_MODULE_ANGULAR_OFFSET = new Rotation2d(-0.5 * Math.PI);
@@ -315,6 +317,7 @@ public final class Constants {
             public static final Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.08 * Math.PI);
             public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromRadians(3 * Math.PI / 2); // This is the angle the wrist should be at when climbing
             public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(3 * Math.PI / 2);
+            public static final Rotation2d TRANSIT_ANGLE = Rotation2d.fromRadians(0.5 * Math.PI);
             
             /** The angle tolerance for the wrist to be considered at a specific state. */
             public static final Rotation2d WRIST_ANGLE_TOLERANCE = Rotation2d.fromRadians(0.89 * Math.PI);

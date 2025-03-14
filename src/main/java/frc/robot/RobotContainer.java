@@ -15,6 +15,7 @@ import frc.robot.network.UDPReceiver;
 import frc.robot.commands.XboxManualDriveCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.narwhal.NarwhalUpperAssembly;
 import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
 import frc.robot.subsystems.vision.OceanViewManager;
 import frc.robot.subsystems.vision.odometry.PhotonVisionCamera;
@@ -22,6 +23,7 @@ import frc.robot.subsystems.vision.odometry.VisionOdometry;
 import frc.robot.util.autonomous.Alliance;
 import frc.robot.util.autonomous.AutonomousRoutine;
 import frc.robot.util.swerve.DrivingMotorType;
+import frc.robot.util.upper_assembly.ScoringHeight;
 import frc.robot.util.upper_assembly.UpperAssemblyFactory;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -191,7 +193,7 @@ public class RobotContainer {
 
     public void scheduleAutonomous() {
         CommandScheduler.getInstance().cancelAll();
-        driveSubsystem.setRobotPose(new Pose2d(16.9675350189209, 1.3218339681625366, new Rotation2d(-0.9189286430807454)));
+        driveSubsystem.setRobotPose(new Pose2d(17.123, 1.605, new Rotation2d(0.0)));
     }
 
     /**
@@ -201,9 +203,14 @@ public class RobotContainer {
         // The Drive Command
         driveSubsystem.setConfigs();
         upperAssembly.setRobotInScoringPositionSupplier(driveSubsystem::getInScorePose);
+        if (upperAssembly instanceof NarwhalUpperAssembly) {
+            ((NarwhalUpperAssembly)upperAssembly).setCanRaiseLiftSupplier(driveSubsystem::getNarwhalCanRaiseLift);
+        }
         driveSubsystem.setDefaultCommand(driveSubsystem.getManualCommand(xBoxController, Alliance.RED));
-        Command command = driveSubsystem.getPathfindingCommand(new Pose2d(new Translation2d(11.845,4.179),new Rotation2d(Math.PI)));
-        command.schedule();
-        //upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
+        Command driveCommand = driveSubsystem.getPathfindingCommand(new Pose2d(new Translation2d(11.845,4.179),new Rotation2d(0.0)));
+        upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
+        Command upperAssemblyCommand = upperAssembly.getCoralScoreCommand(ScoringHeight.L4);
+        driveCommand.schedule();
+        upperAssemblyCommand.schedule();
     }
 }

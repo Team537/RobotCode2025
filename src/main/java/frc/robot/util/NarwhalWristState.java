@@ -28,6 +28,9 @@ public enum NarwhalWristState {
 
     /** In position to climb */
     CLIMB,
+
+    /** In position to move with a coral */
+    TRANSIT,
     
     /** Narwhal Wrist power is set to zero */
     STOPPED, 

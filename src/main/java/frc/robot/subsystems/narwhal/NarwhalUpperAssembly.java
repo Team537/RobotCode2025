@@ -1,5 +1,6 @@
 package frc.robot.subsystems.narwhal;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -7,6 +8,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Constants.NarwhalConstants;
+import frc.robot.Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants;
 import frc.robot.commands.narwhal.NarwhalClimbCommand;
 import frc.robot.commands.narwhal.NarwhalCoralIntakeCommand;
 import frc.robot.commands.narwhal.NarwhalCoralScoreCommand;
@@ -14,29 +19,39 @@ import frc.robot.commands.narwhal.NarwhalManualClimberCommand;
 import frc.robot.commands.narwhal.NarwhalManualElevatorCommand;
 import frc.robot.commands.narwhal.NarwhalManualIntakeOuttakeCommand;
 import frc.robot.commands.narwhal.NarwhalManualWristCommand;
+import frc.robot.commands.narwhal.NarwhalOuttakeCommand;
+import frc.robot.commands.narwhal.NarwhalScorePositionCommand;
+import frc.robot.commands.narwhal.NarwhalStopOuttakeCommand;
+import frc.robot.commands.narwhal.NarwhalTransitPositionCommand;
 import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
 import frc.robot.util.upper_assembly.ScoringHeight;
 
 public class NarwhalUpperAssembly extends UpperAssemblyBase {
-    private final NarwhalIntakeOuttake narwhalIntakeOuttake;
-    private final NarwhalWrist narwhalWrist;
-    private final NarwhalElevator narwhalElevator;
-    private final NarwhalClimber narwhalClimber;
+
+    private Supplier<Boolean> canRaiseLiftSupplier = ()->{return true;};
+    private final NarwhalIntakeOuttake intakeOuttake;
+    private final NarwhalWrist wrist;
+    private final NarwhalElevator elevator;
+    private final NarwhalClimber climber;
 
     public NarwhalUpperAssembly(){
         super();
-        narwhalIntakeOuttake = new NarwhalIntakeOuttake();
-        narwhalWrist = new NarwhalWrist();
-        narwhalElevator = new NarwhalElevator();
-        narwhalClimber = new NarwhalClimber();
+        intakeOuttake = new NarwhalIntakeOuttake();
+        wrist = new NarwhalWrist();
+        elevator = new NarwhalElevator();
+        climber = new NarwhalClimber();
+    }
+
+    public void setCanRaiseLiftSupplier(Supplier<Boolean> supplier) {
+        canRaiseLiftSupplier = supplier;
     }
 
 
     public Command getCoralIntakeCommand() {
         NarwhalCoralIntakeCommand narwhalCoralIntakeCommand = new NarwhalCoralIntakeCommand(
-            narwhalElevator, 
-            narwhalWrist, 
-            narwhalIntakeOuttake, 
+            elevator, 
+            wrist, 
+            intakeOuttake, 
             robotInClimbPositionSupplier
         );
         narwhalCoralIntakeCommand.addRequirements(this);
@@ -44,7 +59,28 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
     }
 
     public Command getCoralScoreCommand(ScoringHeight scoringHeight) {
-        NarwhalCoralScoreCommand narwhalCoralScoreCommand = new NarwhalCoralScoreCommand(
+
+        Command command = 
+            (
+                (
+                    new NarwhalTransitPositionCommand(elevator,wrist)
+                    .until(canRaiseLiftSupplier::get)
+                ).andThen(
+                    new NarwhalScorePositionCommand(elevator,wrist,scoringHeight)
+                ).andThen(
+                    new WaitUntilCommand(robotInScoringPositionSupplier::get)
+                ).andThen(
+                    new NarwhalOuttakeCommand(intakeOuttake)
+                ).andThen(
+                    new WaitCommand(NarwhalIntakeOuttakeConstants.CORAL_INTAKE_DETECTION_DELAY)
+                ).andThen(
+                    new NarwhalStopOuttakeCommand(intakeOuttake)
+                )
+            ).handleInterrupt(intakeOuttake::hold);   
+        command.addRequirements(this);
+        return command;
+
+        /*NarwhalCoralScoreCommand narwhalCoralScoreCommand = new NarwhalCoralScoreCommand(
             narwhalElevator, 
             narwhalWrist, 
             narwhalIntakeOuttake, 
@@ -52,7 +88,8 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
             scoringHeight
         );
         narwhalCoralScoreCommand.addRequirements(this);
-        return narwhalCoralScoreCommand;
+        return narwhalCoralScoreCommand;*/
+
     }
 
     public Command getRemoveAlgaeCommand() {
@@ -64,9 +101,9 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
 
     public Command getClimbCommand() {
         NarwhalClimbCommand narwhalClimbCommand = new NarwhalClimbCommand(
-            narwhalElevator, 
-            narwhalWrist, 
-            narwhalClimber, 
+            elevator, 
+            wrist, 
+            climber, 
             robotInClimbPositionSupplier
         );
         narwhalClimbCommand.addRequirements(this);
@@ -74,10 +111,10 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
     }
 
     public Command getManualCommand(XboxController controller) {
-        NarwhalManualIntakeOuttakeCommand narwhalManualIntakeOuttakeCommand = new NarwhalManualIntakeOuttakeCommand(narwhalIntakeOuttake, controller);
-        NarwhalManualWristCommand narwhalManualWristCommand = new NarwhalManualWristCommand(narwhalWrist, controller);
-        NarwhalManualElevatorCommand narwhalManualElevatorCommand = new NarwhalManualElevatorCommand(narwhalElevator, controller, narwhalWrist::readyToIntake);
-        NarwhalManualClimberCommand narwhalManualClimberCommand = new NarwhalManualClimberCommand(narwhalClimber, controller);
+        NarwhalManualIntakeOuttakeCommand narwhalManualIntakeOuttakeCommand = new NarwhalManualIntakeOuttakeCommand(intakeOuttake, controller);
+        NarwhalManualWristCommand narwhalManualWristCommand = new NarwhalManualWristCommand(wrist, controller);
+        NarwhalManualElevatorCommand narwhalManualElevatorCommand = new NarwhalManualElevatorCommand(elevator, controller, wrist::readyToIntake);
+        NarwhalManualClimberCommand narwhalManualClimberCommand = new NarwhalManualClimberCommand(climber, controller);
 
         ParallelCommandGroup manualParallelCommandGroup = new ParallelCommandGroup(
             narwhalManualIntakeOuttakeCommand,
