@@ -397,12 +397,12 @@ public class DriveSubsystem extends SubsystemBase {
             .andThen(
                 AutoBuilder.pathfindToPose(pose, constraints, 0.0)
                 .andThen(getDriveToPoseCommand(pose))
-            // ).deadlineFor(
-            //     new RunCommand(
-            //         () -> {
-            //             narwhalCanRaiseLift = getRobotPose().getTranslation().getDistance(pose.getTranslation()) <= DriveConstants.NARWHAL_CAN_RAISE_LIFT_DISTANCE;
-            //         }
-            //     )
+            ).deadlineFor(
+                new RunCommand(
+                    () -> {
+                        narwhalCanRaiseLift = getRobotPose().getTranslation().getDistance(pose.getTranslation()) <= DriveConstants.NARWHAL_CAN_RAISE_LIFT_DISTANCE;
+                    }
+                )
             )
             .andThen(new InstantCommand(() -> {narwhalCanRaiseLift = true;inScorePose = true;}));
         return command;
@@ -413,6 +413,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public boolean getNarwhalCanRaiseLift() {
+        System.out.println(narwhalCanRaiseLift);
         return narwhalCanRaiseLift;
     }
 
@@ -679,6 +680,13 @@ public class DriveSubsystem extends SubsystemBase {
         pathfindingObstaclesSuppliers.forEach(supplier -> pathfindingObstacles.addAll(supplier.get()));
         translatedPathfindingObstacles = translatePathfindingObstacles(pathfindingObstacles);
         Pathfinding.setDynamicObstacles(translatedPathfindingObstacles, getRobotPose().getTranslation());*/
+    }
+
+    DeltaTime testTime = new DeltaTime();
+
+    @Override
+    public void simulationPeriodic() {
+        setRobotPose(getRobotPose().exp(ChassisSpeeds.fromFieldRelativeSpeeds(commandedVelocities, getRobotPose().getRotation()).toTwist2d(testTime.getDeltaTime())));
     }
 
 }

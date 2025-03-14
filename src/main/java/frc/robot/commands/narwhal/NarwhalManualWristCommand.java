@@ -17,7 +17,7 @@ public class NarwhalManualWristCommand extends Command {
     public NarwhalManualWristCommand(NarwhalWrist narwhalWrist, XboxController xboxController){
         this.xBoxController = xboxController;
         this.narwhalWrist = narwhalWrist;
-        addRequirements(narwhalWrist);
+        //addRequirements(narwhalWrist);
     }
 
     @Override

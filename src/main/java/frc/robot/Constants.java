@@ -57,7 +57,7 @@ public final class Constants {
         // Position offsets, used to determine the orientation of the driver
         public static final Rotation2d BLUE_ALLIANCE_OFFSET = new Rotation2d(-0.5 * Math.PI);
         public static final Rotation2d RED_ALLIANCE_OFFSET = new Rotation2d(0.5 * Math.PI);
-        public static final Rotation2d DEMO_ALLIANCE_OFFSET = new Rotation2d(-0.5 * Math.PI);
+        public static final Rotation2d DEMO_ALLIANCE_OFFSET = new Rotation2d(0.0);
 
         // Controller Constants
         public static final double LINEAR_INPUT_CURVE_POWER = 2.5;
@@ -143,7 +143,7 @@ public final class Constants {
 
         public static final double WHEEL_RADIUS = 0.0381; // Meters
         public static final double WHEEL_CIRCUMFERENCE = WHEEL_RADIUS * 2.0 * Math.PI; // Meters
-        public static final double WHEEL_COEFFICIENT_FRICTION = 0.6;
+        public static final double WHEEL_COEFFICIENT_FRICTION = 1.0;
     
         // Motion Constraints
         public static final double LINEAR_MAX_SPEED = 4.8; // m/s

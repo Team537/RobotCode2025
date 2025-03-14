@@ -18,7 +18,7 @@ public class NarwhalManualIntakeOuttakeCommand extends Command {
     public NarwhalManualIntakeOuttakeCommand(NarwhalIntakeOuttake narwhalIntakeOuttake, XboxController xboxController){
         this.narwhalIntakeOuttake = narwhalIntakeOuttake;
         this.xboxController = xboxController;
-        addRequirements(narwhalIntakeOuttake);
+        //addRequirements(narwhalIntakeOuttake);
     }
 
     @Override

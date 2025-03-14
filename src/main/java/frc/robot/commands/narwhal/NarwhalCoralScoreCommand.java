@@ -40,7 +40,7 @@ public class NarwhalCoralScoreCommand extends Command{
         this.narwhalIntakeOuttake = narwhalIntakeOuttake;
         this.readyToScoreSupplier = readyToScoreSupplier;
         this.targetScoringHeight = targetScoringHeight;
-        addRequirements(narwhalElevator, narwhalWrist, narwhalIntakeOuttake);
+        //addRequirements(narwhalElevator, narwhalWrist, narwhalIntakeOuttake);
 
         outtakeDelayTimer = new Timer();
     }

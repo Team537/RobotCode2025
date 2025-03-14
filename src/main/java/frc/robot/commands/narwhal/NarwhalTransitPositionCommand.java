@@ -26,6 +26,7 @@ public class NarwhalTransitPositionCommand extends Command {
     public void execute() {
         elevator.goToMinimumHeight();
         wrist.goToTransitAngle();
+        System.out.println("FLOOD");
     }
 
     @Override

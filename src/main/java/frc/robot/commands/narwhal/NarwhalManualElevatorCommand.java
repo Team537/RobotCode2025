@@ -25,7 +25,7 @@ public class NarwhalManualElevatorCommand extends Command {
         this.narwhalElevator = narwhalElevator;
         this.xboxController = controller;
         this.narwhalWristReadyToIntakeSupplier = narwhalWristReadyToIntakeSupplier;
-        addRequirements(narwhalElevator);
+        //addRequirements(narwhalElevator);
     }
 
     @Override

@@ -127,7 +127,7 @@ public abstract class ManualDriveCommand extends Command {
 
             // Rotate and curve the input for smoother control
             if (fieldCentric) {
-                linearVelocity = linearVelocity.rotateBy(driverRotationalOffset.times(-1.0)); // Adjust for driver orientation
+                linearVelocity = linearVelocity.rotateBy(driverRotationalOffset.times(1.0)); // Adjust for driver orientation
             } else {
                 linearVelocity = linearVelocity.rotateBy(driveSubsystem.getRobotPose().getRotation().times(-1.0));
             }
@@ -173,7 +173,7 @@ public abstract class ManualDriveCommand extends Command {
 
             // Target translation is active
             if (fieldCentric) {
-                targetTranslationOffset = targetTranslationOffset.rotateBy(driverRotationalOffset.times(-1.0));
+                targetTranslationOffset = targetTranslationOffset.rotateBy(driverRotationalOffset.times(1.0));
             } else {
                 targetTranslationOffset = targetTranslationOffset.rotateBy(driveSubsystem.getRobotPose().getRotation().times(-1.0));
             }
@@ -234,7 +234,7 @@ public abstract class ManualDriveCommand extends Command {
         } else {
 
             // Target rotation is active
-            targetRotationOffset.rotateBy(driverRotationalOffset.times(-1.0)); // Adjust for driver orientation
+            targetRotationOffset.rotateBy(driverRotationalOffset.times(1.0)); // Adjust for driver orientation
 
             if (!useAbsoluteRotation) {
                 // Targeting a relative rotation

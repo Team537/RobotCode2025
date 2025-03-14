@@ -4,7 +4,9 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -76,18 +78,19 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
                     new NarwhalStopOuttakeCommand(intakeOuttake)
                 )
             ).handleInterrupt(intakeOuttake::hold);   
-        command.addRequirements(this);
-        return command;
+        command.addRequirements(this);    
+        return command.finallyDo(() -> SmartDashboard.putBoolean("test",true));
 
         /*NarwhalCoralScoreCommand narwhalCoralScoreCommand = new NarwhalCoralScoreCommand(
-            narwhalElevator, 
-            narwhalWrist, 
-            narwhalIntakeOuttake, 
+            elevator, 
+            wrist, 
+            intakeOuttake, 
             robotInClimbPositionSupplier,
             scoringHeight
         );
+        //Command narwhalCoralScoreCommand = new RunCommand(() -> System.out.println("FLOOOOOOD"));
         narwhalCoralScoreCommand.addRequirements(this);
-        return narwhalCoralScoreCommand;*/
+        return narwhalCoralScoreCommand.finallyDo(() -> SmartDashboard.putBoolean("test",true))*/
 
     }
 

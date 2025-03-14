@@ -34,10 +34,12 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -192,7 +194,21 @@ public class RobotContainer {
 
     public void scheduleAutonomous() {
         CommandScheduler.getInstance().cancelAll();
+        driveSubsystem.setConfigs();
         driveSubsystem.setRobotPose(new Pose2d(17.123, 1.605, new Rotation2d(0.0)));
+
+        upperAssembly.setRobotInScoringPositionSupplier(driveSubsystem::getInScorePose);
+        if (upperAssembly instanceof NarwhalUpperAssembly) {
+            ((NarwhalUpperAssembly)upperAssembly).setCanRaiseLiftSupplier(driveSubsystem::getNarwhalCanRaiseLift);
+        }
+
+        Command driveCommand = driveSubsystem.getPathfindingCommand(new Pose2d(new Translation2d(11.845,4.179),new Rotation2d(Math.PI)));
+        Command upperAssemblyCommand = upperAssembly.getCoralScoreCommand(ScoringHeight.L4);
+
+        SmartDashboard.putBoolean("test",false);
+        driveCommand.alongWith(upperAssemblyCommand).schedule();
+
+
     }
 
     /**
@@ -200,6 +216,7 @@ public class RobotContainer {
      */
     public void scheduleTeleOp() {
         // The Drive Command
+        CommandScheduler.getInstance().cancelAll();
         driveSubsystem.setConfigs();
         driveSubsystem.setDefaultCommand(driveSubsystem.getManualCommand(xBoxController, this.allianceSelector.getSelected()));
         upperAssembly.setRobotInScoringPositionSupplier(driveSubsystem::getInScorePose);
@@ -209,8 +226,7 @@ public class RobotContainer {
         driveSubsystem.setDefaultCommand(driveSubsystem.getManualCommand(xBoxController, Alliance.RED));
         Command driveCommand = driveSubsystem.getPathfindingCommand(new Pose2d(new Translation2d(11.845,4.179),new Rotation2d(0.0)));
         upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
-        Command upperAssemblyCommand = upperAssembly.getCoralScoreCommand(ScoringHeight.L4);
-        driveCommand.schedule();
-        upperAssemblyCommand.schedule();
+        
+        
     }
 }
