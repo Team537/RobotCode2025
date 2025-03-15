@@ -19,7 +19,7 @@
     <rule ref="category/java/codestyle.xml" >
         <exclude name="LongVariable" />
         <exclude name="OnlyOneReturn" />
-        <exclude name="LocalVariableCouldBeFinal " />
+        <exclude name="LocalVariableCouldBeFinal" />
 
     </rule>
     <rule ref="category/java/design.xml" />

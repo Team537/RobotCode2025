@@ -59,9 +59,20 @@
   ],
   "CodeGPT.apiKey": "OpenAI",
   "cSpell.words": [
+    "Brushless",
+    "CANID",
+    "descore",
+    "GSON",
+    "Holonomic",
     "Huibregtse",
+    "intaking",
     "odometry",
+    "OUTTAKING",
+    "pathfind",
+    "pathfinding",
+    "Setpoint",
     "Tele",
+    "teleop",
     "teleoperated"
   ]
 }
