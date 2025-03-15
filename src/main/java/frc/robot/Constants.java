@@ -335,8 +335,8 @@ public final class Constants {
             public static final double CLIMBER_PID_MIN_OUTPUT = -0.3;
             public static final double CLIMBER_PID_MAX_OUTPUT = 0.3;
             
-            public static final Rotation2d DEPLOYED_ANGLE = Rotation2d.fromDegrees(40);
-            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(-13.5);
+            public static final Rotation2d DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(580);
+            public static final Rotation2d CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(45);
 
             /** The angle tolerance for the climber to be considered at a specific state. */
             public static final Rotation2d CLIMBER_ANGLE_TOLERANCE = Rotation2d.fromDegrees(3);
