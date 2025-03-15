@@ -31,7 +31,7 @@ public class NarwhalManualElevatorCommand extends Command {
     @Override
     public void execute() {
         // when the intake command is called & the wrist has moved into position for intaking, go to intake angle.
-        if(xboxController.getRightBumperButtonPressed() && narwhalWristReadyToIntakeSupplier.get()) {
+        if(xboxController.getRightBumperButton()) {
             narwhalElevator.goToIntakeHeight();
         }
         // Back button = move to L1 height

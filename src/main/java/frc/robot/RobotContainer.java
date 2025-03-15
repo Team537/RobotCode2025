@@ -4,7 +4,10 @@
 
 package frc.robot;
 
+import frc.robot.Constants.Defaults;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.OceanViewConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
@@ -24,10 +27,15 @@ import frc.robot.util.EnumPrettifier;
 import frc.robot.util.autonomous.Alliance;
 import frc.robot.util.autonomous.AutonomousRoutine;
 import frc.robot.util.autonomous.StartingPosition;
+import frc.robot.util.field.AlgaeRemovalPosition;
+import frc.robot.util.field.CoralStationSide;
+import frc.robot.util.field.ReefScoringLocation;
 import frc.robot.util.swerve.DrivingMotorType;
 import frc.robot.util.upper_assembly.ScoringHeight;
 import frc.robot.util.upper_assembly.UpperAssemblyFactory;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -160,7 +168,7 @@ public class RobotContainer {
         SmartDashboard.putData(this.upperAssemblySelector);
         SmartDashboard.putData(this.drivingMotorSelector);
 
-        SmartDashboard.putNumber("MAX TRANS VEL", 0.75);
+        SmartDashboard.putNumber("MAX TRANS VEL", 0.25);
         SmartDashboard.putNumber("MAX TRANS ACCEL", 0.5);
         SmartDashboard.putNumber("MAX ROT VEL", 0.25);
         SmartDashboard.putNumber("MAX ROT ACCEL", 0.5);
@@ -195,18 +203,23 @@ public class RobotContainer {
     public void scheduleAutonomous() {
         CommandScheduler.getInstance().cancelAll();
         driveSubsystem.setConfigs();
-        driveSubsystem.setRobotPose(new Pose2d(17.123, 1.605, new Rotation2d(0.0)));
+        driveSubsystem.setRobotPose(new Pose2d(10.303, 3.85, new Rotation2d(0.0)));
+        driveSubsystem.setUpperAssembly(Defaults.DEFAULT_UPPER_ASSEMBLY);
 
         upperAssembly.setRobotInScoringPositionSupplier(driveSubsystem::getInScorePose);
         if (upperAssembly instanceof NarwhalUpperAssembly) {
             ((NarwhalUpperAssembly)upperAssembly).setCanRaiseLiftSupplier(driveSubsystem::getNarwhalCanRaiseLift);
         }
 
-        Command driveCommand = driveSubsystem.getPathfindingCommand(new Pose2d(new Translation2d(11.845,4.179),new Rotation2d(Math.PI)));
+        Command driveCommand1 = driveSubsystem.getScoringCommand(Alliance.RED,ReefScoringLocation.H);
+        Command driveCommand2 = driveSubsystem.getAlgaeRemovalCommand(Alliance.RED,AlgaeRemovalPosition.GH);
+        Command driveCommand3 = driveSubsystem.getIntakeCommand(Alliance.RED,CoralStationSide.LEFT,2);
+        Command driveCommand4 = driveSubsystem.getScoringCommand(Alliance.RED,ReefScoringLocation.J);
         Command upperAssemblyCommand = upperAssembly.getCoralScoreCommand(ScoringHeight.L4);
 
         SmartDashboard.putBoolean("test",false);
-        driveCommand.alongWith(upperAssemblyCommand).schedule();
+        //driveCommand.alongWith(upperAssemblyCommand).schedule();
+        driveCommand1.andThen(driveCommand2).andThen(driveCommand3).andThen(driveCommand4).schedule();
 
 
     }
@@ -218,15 +231,12 @@ public class RobotContainer {
         // The Drive Command
         CommandScheduler.getInstance().cancelAll();
         driveSubsystem.setConfigs();
-        driveSubsystem.setDefaultCommand(driveSubsystem.getManualCommand(xBoxController, this.allianceSelector.getSelected()));
         upperAssembly.setRobotInScoringPositionSupplier(driveSubsystem::getInScorePose);
         if (upperAssembly instanceof NarwhalUpperAssembly) {
             ((NarwhalUpperAssembly)upperAssembly).setCanRaiseLiftSupplier(driveSubsystem::getNarwhalCanRaiseLift);
         }
-        driveSubsystem.setDefaultCommand(driveSubsystem.getManualCommand(xBoxController, Alliance.RED));
-        Command driveCommand = driveSubsystem.getPathfindingCommand(new Pose2d(new Translation2d(11.845,4.179),new Rotation2d(0.0)));
         upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
-        
-        
+        driveSubsystem.setDefaultCommand(driveSubsystem.getManualCommand(xBoxController, Alliance.RED));
+
     }
 }

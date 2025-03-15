@@ -211,7 +211,7 @@ public abstract class ManualDriveCommand extends Command {
             // Lock the robot's orientation if no rotation is commanded
 
             if (Math.abs(rotationalVelocity) < 1e-3) {
-                if (!thetaLockActive & Math.abs(driveSubsystem.getCommandedRotationalVelocity()) < 1e-3) {
+                if (!thetaLockActive && Math.abs(driveSubsystem.getCommandedRotationalVelocity()) < 1e-3) {
                     thetaLockActive = true;
                     thetaLockRotation = driveSubsystem.getRobotPose().getRotation();
                 }

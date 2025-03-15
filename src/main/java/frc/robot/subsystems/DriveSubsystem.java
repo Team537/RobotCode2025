@@ -16,6 +16,7 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -25,6 +26,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -36,6 +39,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs.Narwhal;
 import frc.robot.Constants.Defaults;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.FieldConstants.CoralStationConstants;
+import frc.robot.Constants.FieldConstants.ReefConstants;
 import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.SquidConstants;
 import frc.robot.commands.DriveToPoseCommand;
@@ -45,6 +50,9 @@ import frc.robot.util.swerve.DriveState;
 import frc.robot.util.swerve.DrivingMotorType;
 import frc.robot.util.autonomous.Alliance;
 import frc.robot.util.autonomous.Obstacle;
+import frc.robot.util.field.AlgaeRemovalPosition;
+import frc.robot.util.field.CoralStationSide;
+import frc.robot.util.field.ReefScoringLocation;
 import frc.robot.util.swerve.TurningMotorType;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
 import frc.robot.util.math.Vector2d;
@@ -96,6 +104,14 @@ public class DriveSubsystem extends SubsystemBase {
     //////////////////////////////////////////////////////////////////////////////
     // Sensors and Controllers
     //////////////////////////////////////////////////////////////////////////////
+    double[] driveStandardDeviationCoefficients = {
+        0.006611986432, 0.3500199104, 0
+    };
+    double[] visionStandardDeviationCoefficients = { // PLACEHOLDER
+        0.0025, 0.0025, 0
+    };
+    Matrix<N3, N1> driveStandardDeviation = new Matrix<>(N3.instance, N1.instance, driveStandardDeviationCoefficients);
+    Matrix<N3, N1> visionStandardDeviation = new Matrix<>(N3.instance, N1.instance, visionStandardDeviationCoefficients);
 
     /** Gyroscope sensor for obtaining the robot's heading. */
     private Pigeon2 gyroscope = new Pigeon2(DriveConstants.GYROSCOPE_DEVICE_ID);
@@ -123,7 +139,9 @@ public class DriveSubsystem extends SubsystemBase {
             DriveConstants.DRIVE_KINEMATICS,
             getGyroscopeHeading(),
             getSwerveModulePositions(),
-            new Pose2d()
+            new Pose2d(),
+            driveStandardDeviation,
+            visionStandardDeviation
     );
 
     //////////////////////////////////////////////////////////////////////////////
@@ -156,6 +174,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     private DriveState state = DriveState.MANUAL;
     private boolean inScorePose = false;
+    private boolean inIntakePose = false;
+    private boolean inAlgaeRemovePose = false;
     private boolean narwhalCanRaiseLift = false;
 
     //////////////////////////////////////////////////////////////////////////////
@@ -387,14 +407,165 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
+     * Creates a scoring command using a specific scoring location.
+     *
+     * @param alliance the alliance (e.g. Alliance.BLUE or Alliance.RED)
+     * @param location the ReefScoringLocation (for example, A, B, C, etc.)
+     * @return a Command that will drive the robot to the scoring pose.
+     */
+    public Command getScoringCommand(Alliance alliance, ReefScoringLocation location) {
+        Pose2d targetPose;
+        // Choose the appropriate scoring pose based on alliance and location.
+        if (alliance == Alliance.BLUE) {
+            switch (location) {
+                case A: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_A; break;
+                case B: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_B; break;
+                case C: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_C; break;
+                case D: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_D; break;
+                case E: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_E; break;
+                case F: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_F; break;
+                case G: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_G; break;
+                case H: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_H; break;
+                case I: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_I; break;
+                case J: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_J; break;
+                case K: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_K; break;
+                case L: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_L; break;
+                default: throw new IllegalArgumentException("Invalid scoring location: " + location);
+            }
+        } else { // Alliance.RED
+            switch (location) {
+                case A: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_A; break;
+                case B: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_B; break;
+                case C: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_C; break;
+                case D: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_D; break;
+                case E: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_E; break;
+                case F: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_F; break;
+                case G: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_G; break;
+                case H: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_H; break;
+                case I: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_I; break;
+                case J: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_J; break;
+                case K: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_K; break;
+                case L: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_L; break;
+                default: throw new IllegalArgumentException("Invalid scoring location: " + location);
+            }
+        }
+
+        if (upperAssemblyType == UpperAssemblyType.NARWHAL) {
+            targetPose = targetPose.transformBy(NarwhalConstants.SCORING_RELATIVE_TRANSFORM);
+        }
+
+        return 
+            (
+                new InstantCommand(() -> {state = DriveState.SCORING;inScorePose = false;})
+            ).andThen(
+                getPathfindingCommand(targetPose) 
+            ).andThen(
+                new InstantCommand(() -> {inScorePose = true;})
+            );
+            
+    }
+
+    /**
+     * Creates an algae removal command using a specific algae removal position.
+     *
+     * @param alliance the alliance (e.g. Alliance.BLUE or Alliance.RED)
+     * @param position the AlgaeRemovalPosition (for example, AB, CD, EF, GH, IJ, or KL)
+     * @return a Command that will drive the robot to the algae removal pose.
+     */
+    public Command getAlgaeRemovalCommand(Alliance alliance, AlgaeRemovalPosition position) {
+        Pose2d targetPose;
+        // Choose the appropriate algae removal pose.
+        if (alliance == Alliance.BLUE) {
+            switch (position) {
+                case AB: targetPose = ReefConstants.BLUE_ALGAE_REMOVAL_POSITION_AB; break;
+                case CD: targetPose = ReefConstants.BLUE_ALGAE_REMOVAL_POSITION_CD; break;
+                case EF: targetPose = ReefConstants.BLUE_ALGAE_REMOVAL_POSITION_EF; break;
+                case GH: targetPose = ReefConstants.BLUE_ALGAE_REMOVAL_POSITION_GH; break;
+                case IJ: targetPose = ReefConstants.BLUE_ALGAE_REMOVAL_POSITION_IJ; break;
+                case KL: targetPose = ReefConstants.BLUE_ALGAE_REMOVAL_POSITION_KL; break;
+                default: throw new IllegalArgumentException("Invalid algae removal position: " + position);
+            }
+        } else { // Alliance.RED
+            switch (position) {
+                case AB: targetPose = ReefConstants.RED_ALGAE_REMOVAL_POSITION_AB; break;
+                case CD: targetPose = ReefConstants.RED_ALGAE_REMOVAL_POSITION_CD; break;
+                case EF: targetPose = ReefConstants.RED_ALGAE_REMOVAL_POSITION_EF; break;
+                case GH: targetPose = ReefConstants.RED_ALGAE_REMOVAL_POSITION_GH; break;
+                case IJ: targetPose = ReefConstants.RED_ALGAE_REMOVAL_POSITION_IJ; break;
+                case KL: targetPose = ReefConstants.RED_ALGAE_REMOVAL_POSITION_KL; break;
+                default: throw new IllegalArgumentException("Invalid algae removal position: " + position);
+            }
+        }
+
+        if (upperAssemblyType == UpperAssemblyType.NARWHAL) {
+            targetPose = targetPose.transformBy(NarwhalConstants.ALGAE_REMOVAL_RELATIVE_TRANSFORM);
+        }
+
+        return 
+            (
+                new InstantCommand(() -> {state = DriveState.REMOVING;inAlgaeRemovePose = false;})
+            ).andThen(
+                getPathfindingCommand(targetPose) 
+            ).andThen(
+                new InstantCommand(() -> {inAlgaeRemovePose = true;})
+            );
+    }
+
+    /**
+     * Creates an intake command using a specific CoralStationSide and slot index.
+     *
+     * @param alliance the alliance (e.g. Alliance.BLUE or Alliance.RED)
+     * @param side the CoralStationSide (for example, LEFT or RIGHT)
+     * @param slot the slot index (an int used to pick from a pre‐defined list of intake poses)
+     * @return a Command that will drive the robot to the intake pose.
+     */
+    public Command getIntakeCommand(Alliance alliance, CoralStationSide side, int slot) {
+        Pose2d targetPose;
+        // For intake we assume that you have lists (or arrays) of intake positions defined in ReefConstants.
+        if (alliance == Alliance.BLUE) {
+            if (side == CoralStationSide.LEFT) {
+                targetPose = CoralStationConstants.BLUE_CORAL_INTAKE_LEFT.get(slot);
+            } else if (side == CoralStationSide.RIGHT) {
+                targetPose = CoralStationConstants.BLUE_CORAL_INTAKE_RIGHT.get(slot);
+            } else {
+                throw new IllegalArgumentException("Invalid CoralStationSide: " + side);
+            }
+        } else { // Alliance.RED
+            if (side == CoralStationSide.LEFT) {
+                targetPose = CoralStationConstants.RED_CORAL_INTAKE_LEFT.get(slot);
+            } else if (side == CoralStationSide.RIGHT) {
+                targetPose = CoralStationConstants.RED_CORAL_INTAKE_RIGHT.get(slot);
+            } else {
+                throw new IllegalArgumentException("Invalid CoralStationSide: " + side);
+            }
+        }
+
+        if (upperAssemblyType == UpperAssemblyType.NARWHAL) {
+            targetPose = targetPose.transformBy(NarwhalConstants.INTAKING_RELATIVE_TRANSFORM);
+        }
+
+
+        return 
+            (
+                new InstantCommand(() -> {state = DriveState.INTAKING;inIntakePose = false;})
+            ).andThen(
+                getPathfindingCommand(targetPose) 
+            ).andThen(
+                new InstantCommand(() -> {inIntakePose = true;})
+            );
+    }
+
+    /**
      * Generates a command that uses pathfinding to drive the robot to a specified pose.
      *
      * @param pose the target Pose2d to reach
      * @return a Command that, when executed, will pathfind to the target pose
      */
     public Command getPathfindingCommand(Pose2d pose) {
-        Command command = new InstantCommand(() -> {inScorePose = false;narwhalCanRaiseLift = false;})
-            .andThen(
+        Command command =
+            (
+                new InstantCommand(() -> narwhalCanRaiseLift = false)
+            ).andThen(
                 AutoBuilder.pathfindToPose(pose, constraints, 0.0)
                 .andThen(getDriveToPoseCommand(pose))
             ).deadlineFor(
@@ -404,16 +575,52 @@ public class DriveSubsystem extends SubsystemBase {
                     }
                 )
             )
-            .andThen(new InstantCommand(() -> {narwhalCanRaiseLift = true;inScorePose = true;}));
+            .andThen(new InstantCommand(() -> {narwhalCanRaiseLift = true;}));
         return command;
     }
 
+    /**
+     * Returns whether the robot has reached the scoring pose.
+     * This flag is true only when the robot is in the scoring pose and
+     * the drive state is {@code DriveState.SCORING}.
+     *
+     * @return {@code true} if the robot is in the scoring pose and the state is SCORING, {@code false} otherwise.
+     */
     public boolean getInScorePose() {
         return inScorePose && state == DriveState.SCORING;
     }
 
+    /**
+     * Returns whether the robot has reached the algae removal pose.
+     * This flag is true only when the robot is in the algae removal pose and
+     * the drive state is {@code DriveState.REMOVING}.
+     *
+     * @return {@code true} if the robot is in the algae removal pose and the state is REMOVING, {@code false} otherwise.
+     */
+    public boolean getInRemovePose() {
+        return inAlgaeRemovePose && state == DriveState.REMOVING;
+    }
+
+    /**
+     * Returns whether the robot has reached the intake pose.
+     * This flag is true only when the robot is in the intake pose and
+     * the drive state is {@code DriveState.INTAKING}.
+     *
+     * @return {@code true} if the robot is in the intake pose and the state is INTAKING, {@code false} otherwise.
+     */
+    public boolean getInIntakePose() {
+        return inIntakePose && state == DriveState.INTAKING;
+    }
+
+    /**
+     * Provides additional information for the Narwhal upper assembly.
+     * This method indicates whether the lift can be raised without risking tipping.
+     * The value is typically used as a safeguard to ensure that the lift is raised
+     * only when the robot is near the target pose.
+     *
+     * @return {@code true} if the narwhal upper assembly is allowed to raise the lift, {@code false} otherwise.
+     */
     public boolean getNarwhalCanRaiseLift() {
-        System.out.println(narwhalCanRaiseLift);
         return narwhalCanRaiseLift;
     }
 

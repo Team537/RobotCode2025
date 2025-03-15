@@ -64,8 +64,8 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
         Command command = 
             (
                 (
-                    new NarwhalTransitPositionCommand(elevator,wrist)
-                    .until(canRaiseLiftSupplier::get)
+                    new WaitUntilCommand(canRaiseLiftSupplier::get)
+                    .deadlineFor(new NarwhalTransitPositionCommand(elevator,wrist))
                 ).andThen(
                     new NarwhalScorePositionCommand(elevator,wrist,scoringHeight)
                 ).andThen(
@@ -79,7 +79,7 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
                 )
             ).handleInterrupt(intakeOuttake::hold);   
         command.addRequirements(this);    
-        return command.finallyDo(() -> SmartDashboard.putBoolean("test",true));
+        return command;
 
         /*NarwhalCoralScoreCommand narwhalCoralScoreCommand = new NarwhalCoralScoreCommand(
             elevator, 
@@ -88,7 +88,6 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
             robotInClimbPositionSupplier,
             scoringHeight
         );
-        //Command narwhalCoralScoreCommand = new RunCommand(() -> System.out.println("FLOOOOOOD"));
         narwhalCoralScoreCommand.addRequirements(this);
         return narwhalCoralScoreCommand.finallyDo(() -> SmartDashboard.putBoolean("test",true))*/
 
