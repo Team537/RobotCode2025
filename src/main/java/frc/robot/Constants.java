@@ -322,10 +322,7 @@ public final class Constants {
             public static final int CLIMBER_CAN_ID = 13;
 
             public static final boolean IS_CLIMBER_INVERTED = false;
-
-            public static final double GEAR_REDUCTION = 125.0;
-            public static final double PULLY_REDUCTION = 10.0;
-            public static final double CLIMBER_ANGLE_TO_MOTOR_ANGLE = GEAR_REDUCTION * PULLY_REDUCTION; // technically not a 1 to 1 conversion because of how the climber arm and winch are linked
+            public static final double WINCH_GEAR_REDUCTION = 125.0;
 
             public static final double PID_P = 8.5;
             public static final double PID_I = 0;

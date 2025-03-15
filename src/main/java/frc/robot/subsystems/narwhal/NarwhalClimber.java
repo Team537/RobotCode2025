@@ -50,7 +50,7 @@ public class NarwhalClimber extends SubsystemBase {
 
         // Adjust the encoder settings.
         climberConfig.encoder
-            .positionConversionFactor(1.0/NarwhalClimberConstants.CLIMBER_ANGLE_TO_MOTOR_ANGLE);
+            .positionConversionFactor(1.0/NarwhalClimberConstants.WINCH_GEAR_REDUCTION);
 
         // Update motor PID values.
         climberConfig.closedLoop
