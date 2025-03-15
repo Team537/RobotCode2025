@@ -188,4 +188,18 @@ public class RobotContainer {
         driveSubsystem.setDefaultCommand(manualDriveCommand);
         upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
     }
+
+
+    //////////////////////////////////////////////////////////////////////////////
+    // Periodic Update Methods
+    //////////////////////////////////////////////////////////////////////////////
+    
+    /**
+     * Updates the robot's odometry. This calls the {@code DriveSubsystem}'s {@code updateOdometry()} method and 
+     * the {@code VisionOdometry}'s {@code updateVisionPositionData()} method. 
+     */
+    public void updateOdometry() {
+        this.driveSubsystem.updateOdometry();
+        this.visionOdometry.updateVisionPositionData();
+    }
 }
