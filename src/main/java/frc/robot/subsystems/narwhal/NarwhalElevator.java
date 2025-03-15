@@ -132,6 +132,31 @@ public class NarwhalElevator extends SubsystemBase {
     }
 
     /**
+     * Goes to the algae descore position
+     * @param isTopRow True if the algae is in the top row, false if it is in the bottom row
+     * @param isDown True if the manipulator should be pressing down on the algae, false if it should just be above the algae
+     */
+    public void goToAlgaeDescorePosition(boolean isTopRow, boolean isDown){
+        double targetHeight;
+
+        // Set the target height based on the row
+        if (isTopRow){
+            targetHeight = NarwhalElevatorConstants.ALGAE_DESCORE_HEIGHT_METERS_TOP_ROW;
+        } else {
+            targetHeight = NarwhalElevatorConstants.ALGAE_DESCORE_HEIGHT_METERS_BOTTOM_ROW;
+        }
+
+        // Apply an offset if the manipulator should be pressing down on the algae
+        if (isDown){
+            targetHeight += NarwhalElevatorConstants.ALGAE_DESCORE_HEIGHT_METERS_DOWN_OFFSET;
+        }
+
+        setHeight(targetHeight);
+
+        currentState = NarwhalElevatorState.ALGAE_DESCORE;
+    }
+
+    /**
      * Checks if the elevator is at the target position. Note: this method does not account for velocity and uses a tolerance.
      * 
      * @return Returns true if the elevator is at the target position

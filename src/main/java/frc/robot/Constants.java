@@ -332,7 +332,7 @@ public final class Constants {
             public static final Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.1 * Math.PI);
             public static final Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.08 * Math.PI);
             public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromRadians(3 * Math.PI / 2); // This is the angle the wrist should be at when climbing
-            public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(3 * Math.PI / 2);
+            public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d TRANSIT_ANGLE = Rotation2d.fromRadians(0.5 * Math.PI);
             
             /** The angle tolerance for the wrist to be considered at a specific state. */
@@ -394,6 +394,9 @@ public final class Constants {
             public static final double INTAKE_ELEVATOR_HEIGHT_METERS = 0.05; // Meters
             public static final boolean MOTOR_INVERTED = true;
             public static final double ELEVATOR_POSITION_TOLERANCE = 0.05; // Meters
+            public static final double ALGAE_DESCORE_HEIGHT_METERS_TOP_ROW = -0.4; // Meters (negative to go down)
+            public static final double ALGAE_DESCORE_HEIGHT_METERS_BOTTOM_ROW = 0.7; // Meters
+            public static final double ALGAE_DESCORE_HEIGHT_METERS_DOWN_OFFSET = 1.7; // Meters
         }
     }
 

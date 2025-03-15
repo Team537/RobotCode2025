@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants;
+import frc.robot.commands.narwhal.NarwhalAlgaePreparePositionCommand;
+import frc.robot.commands.narwhal.NarwhalAlgaeRemoveCommand;
 import frc.robot.commands.narwhal.NarwhalClimbCommand;
 import frc.robot.commands.narwhal.NarwhalCoralIntakeCommand;
 import frc.robot.commands.narwhal.NarwhalCoralScoreCommand;
@@ -25,11 +27,16 @@ import frc.robot.commands.narwhal.NarwhalScorePositionCommand;
 import frc.robot.commands.narwhal.NarwhalStopOuttakeCommand;
 import frc.robot.commands.narwhal.NarwhalTransitPositionCommand;
 import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
+import frc.robot.util.field.AlgaeRemovalPosition;
 import frc.robot.util.upper_assembly.ScoringHeight;
 
 public class NarwhalUpperAssembly extends UpperAssemblyBase {
 
     private Supplier<Boolean> canRaiseLiftSupplier = ()->{return true;};
+    private Supplier<Boolean> canDescoreAlgaeSupplier = ()->{return true;};
+    
+    private boolean isReadyToDescoreAlgae = false;
+
     private final NarwhalIntakeOuttake intakeOuttake;
     private final NarwhalWrist wrist;
     private final NarwhalElevator elevator;
@@ -47,6 +54,13 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
         canRaiseLiftSupplier = supplier;
     }
 
+    public void setCanDescoreAlgaeSupplier(Supplier<Boolean> supplier) {
+        canDescoreAlgaeSupplier = supplier;
+    }
+
+    public boolean isReadyToDescoreAlgaeSupplier() {
+        return isReadyToDescoreAlgae;
+    }
 
     public Command getCoralIntakeCommand() {
         NarwhalCoralIntakeCommand narwhalCoralIntakeCommand = new NarwhalCoralIntakeCommand(
@@ -93,11 +107,41 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
 
     }
 
-    public Command getRemoveAlgaeCommand() {
-        return new RunCommand(
-            () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
-            this
-        );
+    public Command getRemoveAlgaeCommand(AlgaeRemovalPosition algaeRemovalPosition) {
+        /*
+        Will keep the upper assembly in transit position until the robot is ready to descore the algae.
+        Then it will move the manipulator into position to descore the algae and wait until it can descore the algae
+        Then it will move down to descore the algae and set the descored algae flag to true
+         */
+        Command removeAlgaeCommand = 
+            (
+                (
+                    new WaitUntilCommand(canRaiseLiftSupplier::get)
+                    .deadlineFor(new NarwhalTransitPositionCommand(elevator,wrist))
+                )
+                .andThen(
+                    new NarwhalAlgaePreparePositionCommand(elevator, wrist, algaeRemovalPosition.isTopRow())
+                )
+                .andThen(
+                    new WaitUntilCommand(canDescoreAlgaeSupplier::get)
+                )
+                .andThen(
+                    new NarwhalAlgaeRemoveCommand(elevator, wrist, algaeRemovalPosition.isTopRow())
+                    .alongWith(
+                        new InstantCommand(()->isReadyToDescoreAlgae = true) // Set the flag to true when the algae is descored
+                    )
+                )
+            ).handleInterrupt(
+                ()->{
+                    isReadyToDescoreAlgae = false;
+                    wrist.goToTransitAngle();
+                }
+            );
+            
+        removeAlgaeCommand.addRequirements(this);
+
+        // returns the remove algae command
+        return removeAlgaeCommand;
     }
 
     public Command getClimbCommand() {
