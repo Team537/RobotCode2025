@@ -129,7 +129,7 @@ public abstract class ManualDriveCommand extends Command {
             if (fieldCentric) {
                 linearVelocity = linearVelocity.rotateBy(driverRotationalOffset.times(1.0)); // Adjust for driver orientation
             } else {
-                linearVelocity = linearVelocity.rotateBy(driveSubsystem.getRobotPose().getRotation().times(-1.0));
+                linearVelocity = linearVelocity.rotateBy(driveSubsystem.getRobotPose().getRotation().times(1.0).rotateBy(new Rotation2d(0.5 * Math.PI)));
             }
 
             double linearSpeed = linearVelocity.magnitude();
@@ -175,7 +175,7 @@ public abstract class ManualDriveCommand extends Command {
             if (fieldCentric) {
                 targetTranslationOffset = targetTranslationOffset.rotateBy(driverRotationalOffset.times(1.0));
             } else {
-                targetTranslationOffset = targetTranslationOffset.rotateBy(driveSubsystem.getRobotPose().getRotation().times(-1.0));
+                targetTranslationOffset = targetTranslationOffset.rotateBy(driveSubsystem.getRobotPose().getRotation().times(1.0).rotateBy(new Rotation2d(0.5 * Math.PI)));
             }
             
             if (!targetTranslationActive) {

@@ -73,6 +73,18 @@ public interface UpperAssembly {
     public void setRobotInScoringPositionSupplier(Supplier<Boolean> supplier);
 
     /**
+     * Sets the supplier that provides a boolean indicating whether the robot is in the algae removing position.
+     * <p>
+     * This supplier should return {@code true} if the robot is correctly positioned for algae removing,
+     * and {@code false} otherwise.
+     * </p>
+     *
+     * @param supplier a {@link java.util.function.Supplier} that returns a {@code Boolean} value
+     *                 representing the robot's scoring position status.
+     */
+    public void setRobotInAlgaeRemovingPositionSupplier(Supplier<Boolean> supplier);
+
+    /**
      * Sets the supplier that provides a boolean indicating whether the robot is in the intaking position.
      * <p>
      * This supplier should return {@code true} if the robot is correctly positioned for intaking,

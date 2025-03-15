@@ -43,6 +43,7 @@ import frc.robot.Constants.FieldConstants.CoralStationConstants;
 import frc.robot.Constants.FieldConstants.ReefConstants;
 import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.SquidConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.DriveToPoseCommand;
 import frc.robot.commands.XboxManualDriveCommand;
 import frc.robot.util.math.DeltaTime;
@@ -140,8 +141,8 @@ public class DriveSubsystem extends SubsystemBase {
             getGyroscopeHeading(),
             getSwerveModulePositions(),
             new Pose2d(),
-            driveStandardDeviation,
-            visionStandardDeviation
+            DriveConstants.DRIVE_STANDARD_DEVIATION,
+            VisionConstants.VISION_STANDARD_DEVIATION
     );
 
     //////////////////////////////////////////////////////////////////////////////

@@ -218,8 +218,8 @@ public class RobotContainer {
         Command upperAssemblyCommand = upperAssembly.getCoralScoreCommand(ScoringHeight.L4);
 
         SmartDashboard.putBoolean("test",false);
-        //driveCommand.alongWith(upperAssemblyCommand).schedule();
-        driveCommand1.andThen(driveCommand2).andThen(driveCommand3).andThen(driveCommand4).schedule();
+        driveCommand1.alongWith(upperAssemblyCommand).schedule();
+        //driveCommand1.andThen(driveCommand2).andThen(driveCommand3).andThen(driveCommand4).schedule();
 
 
     }
@@ -236,7 +236,7 @@ public class RobotContainer {
             ((NarwhalUpperAssembly)upperAssembly).setCanRaiseLiftSupplier(driveSubsystem::getNarwhalCanRaiseLift);
         }
         upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
-        driveSubsystem.setDefaultCommand(driveSubsystem.getManualCommand(xBoxController, Alliance.RED));
+        driveSubsystem.setDefaultCommand(driveSubsystem.getManualCommand(xBoxController, Alliance.DEMO));
 
     }
 }

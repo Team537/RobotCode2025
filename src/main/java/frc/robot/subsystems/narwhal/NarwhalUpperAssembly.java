@@ -127,8 +127,4 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
         return manualParallelCommandGroup;
     }
 
-    public void disable() {
-
-    }
-
 }

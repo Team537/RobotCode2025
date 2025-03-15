@@ -12,6 +12,7 @@ import org.photonvision.PhotonPoseEstimator;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -19,6 +20,8 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import frc.robot.util.swerve.DrivingMotorType;
 import frc.robot.util.swerve.TurningMotorType;
@@ -63,7 +66,7 @@ public final class Constants {
         // Controller Constants
         public static final double LINEAR_INPUT_CURVE_POWER = 2.5;
         public static final double ROTATION_INPUT_CURVE_POWER = 2.5;
-        public static final double THROTTLE_LINEAR_MIN_SPEED = 2.0; // Meters per second
+        public static final double THROTTLE_LINEAR_MIN_SPEED = 2.0; // MeterFper second
         public static final double THROTTLE_LINEAR_MAX_SPEED = DriveConstants.LINEAR_MAX_SPEED; // Meters per second
         public static final double THROTTLE_ROTATIONAL_MIN_SPEED = 7.0; // Radians per second
         public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; // Radians per
@@ -92,6 +95,12 @@ public final class Constants {
         public static final double ROTATION_THRESHOLD = 0.07; // Radians
 
         public static final double NARWHAL_CAN_RAISE_LIFT_DISTANCE = 1.0; // Meters
+
+        public static final double[] DRIVE_STANDARD_DEVIATION_COEFFICIENTS = {
+            0.006611986432, 0.3500199104, 0
+        };
+        
+        public static final Matrix<N3, N1> DRIVE_STANDARD_DEVIATION = new Matrix<>(N3.instance, N1.instance, DRIVE_STANDARD_DEVIATION_COEFFICIENTS);
     
         // Angular Offsets for Swerve Modules
         public static final Rotation2d FRONT_LEFT_MODULE_ANGULAR_OFFSET = new Rotation2d(-0.5 * Math.PI);
@@ -160,7 +169,7 @@ public final class Constants {
 
         public static final double ROTATIONAL_KP = 1.2;
         public static final double ROTATIONAL_KI = 0.0;
-        public static final double ROTATIONAL_KD = 0.0;
+        public static final double ROTATIONAL_KD = 0.1;
 
         /*
          * ---------------------------------- DRIVING CONSTANTS ----------------------------------
@@ -272,7 +281,7 @@ public final class Constants {
 
         public static final Transform2d INTAKING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0),new Rotation2d(Math.PI));
         public static final Transform2d SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.1524,0.0),new Rotation2d(0));
-        public static final Transform2d ALGAE_REMOVAL_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0),new Rotation2d(Math.PI));
+        public static final Transform2d ALGAE_REMOVAL_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0),new Rotation2d(0.0));
         public static final Transform2d CLIMB_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0),new Rotation2d(Math.PI));
  
 
@@ -495,6 +504,11 @@ public final class Constants {
         public static final Transform3d FRONT_CAMERA_OFFSET = new Transform3d(); // TODO: Fill in actual values.
         public static final Transform3d RIGHT_CAMERA_OFFSET = new Transform3d(0.219837, 0.1762252, 0.65913, new Rotation3d(0, 0, Math.PI / 2.0 )); // TODO: Fill in actual values.
         public static final Transform3d LEFT_CAMERA_OFFSET = new Transform3d(-0.219837, 0.1760728, 0.65913, new Rotation3d(0, 0, Math.PI / 2.0)); // TODO: Fill in actual values.
+
+        public static final double[] VISION_STANDARD_DEVIATION_COEFFICIENTS = { // PLACEHOLDER
+            0.0025, 0.0025, 0
+        };
+        public static final Matrix<N3, N1> VISION_STANDARD_DEVIATION = new Matrix<>(N3.instance, N1.instance, VISION_STANDARD_DEVIATION_COEFFICIENTS);
 
         // Pipeline settings
         public static final int APRIL_TAG_PIPELINE = 0;

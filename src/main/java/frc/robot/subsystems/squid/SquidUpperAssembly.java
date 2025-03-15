@@ -54,6 +54,4 @@ public class SquidUpperAssembly extends UpperAssemblyBase {
         return manualCommand;
     }
 
-    public void disable() {}
-
 }
