@@ -301,9 +301,9 @@ public final class Constants {
             // PID configurations
             public static final double POSITION_PID_P = 0.3;
             public static final double POSITION_PID_I = 0;
-            public static final double POSITION_PID_D = 0.2;
-            public static final double PID_OUTPUT_RANGE_MAX = 0.35;
-            public static final double PID_OUTPUT_RANGE_MIN = -0.35;        
+            public static final double POSITION_PID_D = 0.4;
+            public static final double PID_OUTPUT_RANGE_MAX = 0.45;
+            public static final double PID_OUTPUT_RANGE_MIN = -0.45;        
 
             // Set position for wrist angles (Angle is relative to the world, with 0 being the down position and rotating away from 0 being positive)
             public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4.85);
