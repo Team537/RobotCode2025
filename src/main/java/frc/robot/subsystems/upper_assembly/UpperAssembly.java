@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.util.field.AlgaeRemovalPosition;
 import frc.robot.util.upper_assembly.ScoringHeight;
 
 /**
@@ -40,7 +41,7 @@ public interface UpperAssembly {
      * @param robotPoseSupplier A supplier to return the pose of the robot
      * @return A command that handles the removal of algae.
      */
-    public Command getRemoveAlgaeCommand();
+    public Command getRemoveAlgaeCommand(AlgaeRemovalPosition algaeRemovalPosition);
 
     /**
      * Creates a command to climb or elevate the robot.
