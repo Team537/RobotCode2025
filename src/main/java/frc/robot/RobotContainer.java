@@ -84,6 +84,8 @@ public class RobotContainer {
     private final SendableChooser<UpperAssemblyType> upperAssemblySelector = new SendableChooser<>();
     private final SendableChooser<DrivingMotorType> drivingMotorSelector = new SendableChooser<>();
 
+    private double delayTimeSeconds;
+
     Alliance selectedAlliance;
 
     /**
@@ -170,20 +172,7 @@ public class RobotContainer {
         SmartDashboard.putData(this.upperAssemblySelector);
         SmartDashboard.putData(this.drivingMotorSelector);
 
-    }
-
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     */
-    public Command getAutonomousCommand() {
-        // Get and display the currently selected autonomous routine.
-        AutonomousRoutine selectedAutonomousRoutine = autonomousSelector.getSelected();
-        Alliance selectedAlliance = allianceSelector.getSelected();
-        SmartDashboard.putString("Selected Autonomous", selectedAutonomousRoutine.toString());
-        SmartDashboard.putString("Selected Alliance", selectedAlliance.toString());
-
-        // An example command will be run in autonomous
-        return Autos.exampleAuto(exampleSubsystem);
+        SmartDashboard.putNumber("Auto Delay", this.delayTimeSeconds);
     }
 
     /**
@@ -196,6 +185,8 @@ public class RobotContainer {
     }
 
     public void scheduleAutonomous() {
+        this.delayTimeSeconds = SmartDashboard.getNumber("Auto Delay", this.delayTimeSeconds);
+        System.out.printf("@@@Parker@@@ this is where the delay value is: %f", this.delayTimeSeconds);
 
         AutonomousRoutine selectedAutonomousRoutine = autonomousSelector.getSelected();
         Alliance selectedAlliance = allianceSelector.getSelected();
