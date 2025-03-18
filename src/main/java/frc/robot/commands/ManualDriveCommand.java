@@ -103,6 +103,7 @@ public abstract class ManualDriveCommand extends Command {
      * @param useTargetRotation Whether or not the robot should aim for a target rotation.
      * @param useAbsoluteRotation Whether the robot should target an absolute orientation or a relative offset.
      * @param throttle A multiplier for controlling the max speed of the robot. Ranges from 0 (minimum speed) to 1 (maximum speed).
+     * @param slow
      * @param fieldCentric
      */
     protected void manualDrive(
@@ -114,6 +115,7 @@ public abstract class ManualDriveCommand extends Command {
         boolean useTargetRotation, 
         boolean useAbsoluteRotation, 
         double throttle,
+        double slow,
         boolean fieldCentric
     ) {
         // The final velocities that will be used for driving the robot

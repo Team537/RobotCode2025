@@ -79,7 +79,6 @@ public class DriveToPoseCommand extends Command {
         Pose2d currentPose = driveSubsystem.getRobotPose();
         double distanceError = currentPose.getTranslation().getDistance(targetPose.getTranslation());
         double rotationError = Math.abs(currentPose.getRotation().minus(targetPose.getRotation()).getRadians());
-        System.out.println(rotationError);
         return (distanceError < translationThreshold) && (rotationError < rotationThreshold);
     }
 

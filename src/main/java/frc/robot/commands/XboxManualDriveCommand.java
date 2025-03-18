@@ -10,6 +10,7 @@ import frc.robot.util.math.Vector2d;
 
 public class XboxManualDriveCommand extends ManualDriveCommand {
 
+
     boolean orientationOffsetTargetActive = false;
 
     /**
@@ -29,7 +30,7 @@ public class XboxManualDriveCommand extends ManualDriveCommand {
         // Calculate linear velocity based on the left stick input (x for strafe, y for forward/backward).
         // Apply a deadband to ignore small joystick movements and normalize the vector if it's too large.
         Vector2d linearVelocity = new Vector2d(controller.getLeftX(), -controller.getLeftY());
-        if (linearVelocity.magnitude() < OperatorConstants.XBOX_CONTROLLER_JOYSTICK_DEADMAND_RADIUS) {
+        if (linearVelocity.magnitude() < OperatorConstants.XBOX_CONTROLLER_JOYSTICK_DEADBAND_RADIUS) {
             linearVelocity = new Vector2d(0, 0); // Ignore small joystick movements
         } else if (linearVelocity.magnitude() > 1.0) {
             linearVelocity = linearVelocity.normalize(); // Normalize to keep within [-1, 1]
@@ -39,7 +40,7 @@ public class XboxManualDriveCommand extends ManualDriveCommand {
         // Calculate rotational velocity from the right stick's X-axis input.
         // Apply a deadband to ignore small movements and clamp the value to [-1, 1].
         double rotationalVelocity = -controller.getRightX();
-        if (Math.abs(rotationalVelocity) < OperatorConstants.XBOX_CONTROLLER_JOYSTICK_DEADMAND_RADIUS) {
+        if (Math.abs(rotationalVelocity) < OperatorConstants.XBOX_CONTROLLER_JOYSTICK_DEADBAND_RADIUS) {
             rotationalVelocity = 0.0; // Ignore small joystick movements
         } else if (Math.abs(rotationalVelocity) > 1.0) {
             rotationalVelocity = Math.signum(rotationalVelocity); // Clamp to [-1, 1]
@@ -83,8 +84,9 @@ public class XboxManualDriveCommand extends ManualDriveCommand {
         // --- Throttle Control ---
         // Throttle determines the overall speed of the robot, based on the right trigger's position (0 to 1).
         double throttle = controller.getRightTriggerAxis();
+        double slow = controller.getLeftTriggerAxis();
 
-        boolean fieldCentric = controller.getLeftTriggerAxis() < 1.0 - 1e-4;
+        boolean fieldCentric = !controller.getLeftBumperButton();
 
         // --- Call the Manual Drive Method ---
         // Pass all calculated values to the manualDrive method for execution.
@@ -97,6 +99,7 @@ public class XboxManualDriveCommand extends ManualDriveCommand {
             useTargetRotation,
             useAbsoluteRotation,
             throttle,
+            slow,
             fieldCentric
         );
 

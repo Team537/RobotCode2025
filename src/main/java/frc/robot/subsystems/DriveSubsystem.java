@@ -269,7 +269,7 @@ public class DriveSubsystem extends SubsystemBase {
         ModuleConfig moduleConfig = new ModuleConfig(
                 DriveConstants.WHEEL_RADIUS,
                 maxDriveVelocity,
-                wheelCOF, //TODO: set this back
+                DriveConstants.WHEEL_COEFFICIENT_FRICTION, //TODO: set this back
                 motorType,
                 motorReduction,
                 currentLimit,
@@ -305,7 +305,11 @@ public class DriveSubsystem extends SubsystemBase {
 
         // --- Swerve and Auto-Builder Configuration ---
         RobotConfig swerveConfig = new RobotConfig(robotMass, robotMOI, moduleConfig, DriveConstants.MODULE_POSITIONS.toArray(new Translation2d[0]));
-        constraints = new PathConstraints(maxTranslationalVelocityMultiplier * maxDriveVelocity, maxTranslationalAccelerationMultiplier * maxTranslationalAcceleration, maxRotationalVelocityMultiplier * maxAngularVelocity, maxRotationalAccelerationMultiplier * maxAngularAcceleration);
+        constraints = new PathConstraints(
+            DriveConstants.AUTO_DRIVING_TRANSLATIONAL_SPEED_SAFETY_FACTOR * maxDriveVelocity, 
+            DriveConstants.AUTO_DRIVING_TRANSLATIONAL_ACCELERATION_SAFETY_FACTOR * maxTranslationalAcceleration, 
+            DriveConstants.AUTO_DRIVING_ROTATIONAL_SPEED_SAFETY_FACTOR * maxAngularVelocity, 
+            DriveConstants.AUTO_DRIVING_ROTATIONAL_ACCELERATION_FACTOR * maxAngularAcceleration);
 
         AutoBuilder.configure(
                 this::getRobotPose,                  // Supplier for current pose
@@ -846,13 +850,6 @@ public class DriveSubsystem extends SubsystemBase {
     //////////////////////////////////////////////////////////////////////////////
     // Periodic Update Method
     //////////////////////////////////////////////////////////////////////////////
-    
-
-    double maxTranslationalVelocityMultiplier = 1.0;
-    double maxTranslationalAccelerationMultiplier = 1.0;
-    double maxRotationalVelocityMultiplier = 1.0;
-    double maxRotationalAccelerationMultiplier = 1.0;
-    double wheelCOF = 1.0;
 
     /**
      * Periodically updates the drive subsystem.
@@ -872,16 +869,6 @@ public class DriveSubsystem extends SubsystemBase {
 
         // Update the robot's estimated pose using current sensor readings.
         poseEstimator.update(getGyroscopeHeading(), getSwerveModulePositions());
-
-        SmartDashboard.putNumber("X Position",getRobotPose().getX());
-        SmartDashboard.putNumber("Y Position",getRobotPose().getY());
-        SmartDashboard.putNumber("Theta Rotation", getRobotPose().getRotation().getRadians());
-
-        maxTranslationalVelocityMultiplier = SmartDashboard.getNumber("MAX TRANS VEL", 0.75);
-        maxTranslationalAccelerationMultiplier = SmartDashboard.getNumber("MAX TRANS ACCEL", 0.5);
-        maxRotationalVelocityMultiplier = SmartDashboard.getNumber("MAX ROT VEL", 0.25);
-        maxRotationalAccelerationMultiplier = SmartDashboard.getNumber("MAX ROT ACCEL", 0.5);
-        wheelCOF = SmartDashboard.getNumber("COF", DriveConstants.WHEEL_COEFFICIENT_FRICTION);
 
         // Refresh dynamic pathfinding obstacles.
         /*pathfindingObstacles.clear();

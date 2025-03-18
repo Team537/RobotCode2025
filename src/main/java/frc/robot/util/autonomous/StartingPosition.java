@@ -1,5 +1,7 @@
 package frc.robot.util.autonomous;
 
+import edu.wpi.first.math.geometry.Pose2d;
+
 /**
  * <h2> StartingPosition </h2>
  * An enum value used to represent which starting position the robot will be in when the match starts
@@ -15,7 +17,14 @@ package frc.robot.util.autonomous;
  * @see {@link frc.robot.RobotContainer}
  */
 public enum StartingPosition {
-    LEFT,
-    CENTER,
-    RIGHT
+    LEFT(),
+    CENTER(),
+    RIGHT();
+
+    Pose2d pose;
+
+    StartingPosition(Pose2d pose) {
+        this.pose = pose;
+    }
+
 }

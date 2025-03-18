@@ -71,7 +71,7 @@ public final class Constants {
         public static final double THROTTLE_ROTATIONAL_MIN_SPEED = 7.0; // Radians per second
         public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; // Radians per
                                                                                                         // second
-        public static final double XBOX_CONTROLLER_JOYSTICK_DEADMAND_RADIUS = 0.01;
+        public static final double XBOX_CONTROLLER_JOYSTICK_DEADBAND_RADIUS = 0.01;
         public static final double XBOX_CONTROLLER_TARGET_RADIUS = 2.0; // Meters
         public static final double XBOX_CONTROLLER_TARGET_THROTTLE_RADIUS = 0.5; // Meters
         public static final double XBOX_CONTROLLER_ROTATIONAL_TARGET_ACTIVATION_ZONE = 0.99;
@@ -91,14 +91,19 @@ public final class Constants {
         public static final double DRIVETRAIN_MOI = 2.285; //Kg meters
         public static final double GRAVITY_ACCELERATION = 9.81; // Meters / sec^2
 
-        public static final double TRANSLATION_THRESHOLD = 0.03; // Meters
-        public static final double ROTATION_THRESHOLD = 0.07; // Radians
+        public static final double TRANSLATION_THRESHOLD = 0.05; // Meters
+        public static final double ROTATION_THRESHOLD = 0.20; // Radians
 
         public static final double NARWHAL_CAN_RAISE_LIFT_DISTANCE = 1.0; // Meters
 
         public static final double[] DRIVE_STANDARD_DEVIATION_COEFFICIENTS = {
             0.006611986432, 0.3500199104, 0
         };
+
+        public static final double AUTO_DRIVING_TRANSLATIONAL_SPEED_SAFETY_FACTOR = 0.25;
+        public static final double AUTO_DRIVING_TRANSLATIONAL_ACCELERATION_SAFETY_FACTOR = 0.5;
+        public static final double AUTO_DRIVING_ROTATIONAL_SPEED_SAFETY_FACTOR = 0.25;
+        public static final double AUTO_DRIVING_ROTATIONAL_ACCELERATION_FACTOR = 0.5;
         
         public static final Matrix<N3, N1> DRIVE_STANDARD_DEVIATION = new Matrix<>(N3.instance, N1.instance, DRIVE_STANDARD_DEVIATION_COEFFICIENTS);
     
@@ -319,20 +324,20 @@ public final class Constants {
             public static final double ENCODER_FACTOR = Math.PI * 2 / GEAR_REDUCTION; // Wrist target angles (radians) are multiplied by this to get the motor target position           
             
             // PID configurations
-            public static final double POSITION_PID_P = 0.3;
+            public static final double POSITION_PID_P = 0.2;
             public static final double POSITION_PID_I = 0;
-            public static final double POSITION_PID_D = 0.4;
+            public static final double POSITION_PID_D = 0.7;
             public static final double PID_OUTPUT_RANGE_MAX = 0.45;
-            public static final double PID_OUTPUT_RANGE_MIN = -0.45;        
+            public static final double PID_OUTPUT_RANGE_MIN = -0.4;        
 
             // Set position for wrist angles (Angle is relative to the world, with 0 being the down position and rotating away from 0 being positive)
             public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4.85);
             public static final Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d L2_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
-            public static final Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.1 * Math.PI);
+            public static final Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.03 * Math.PI);
             public static final Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.08 * Math.PI);
-            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromRadians(3 * Math.PI / 2); // This is the angle the wrist should be at when climbing
-            public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(3 * Math.PI / 2);
+            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI); // This is the angle the wrist should be at when climbing
+            public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d TRANSIT_ANGLE = Rotation2d.fromRadians(0.5 * Math.PI);
             
             /** The angle tolerance for the wrist to be considered at a specific state. */
@@ -345,8 +350,7 @@ public final class Constants {
             public static final boolean IS_CLIMBER_INVERTED = false;
 
             public static final double GEAR_REDUCTION = 125.0;
-            public static final double PULLY_REDUCTION = 10.0;
-            public static final double CLIMBER_ANGLE_TO_MOTOR_ANGLE = GEAR_REDUCTION * PULLY_REDUCTION; // technically not a 1 to 1 conversion because of how the climber arm and winch are linked
+            public static final double CLIMBER_ANGLE_TO_MOTOR_ANGLE = GEAR_REDUCTION; // technically not a 1 to 1 conversion because of how the climber arm and winch are linked
 
             public static final double PID_P = 8.5;
             public static final double PID_I = 0;
@@ -356,8 +360,8 @@ public final class Constants {
             public static final double CLIMBER_PID_MIN_OUTPUT = -0.3;
             public static final double CLIMBER_PID_MAX_OUTPUT = 0.3;
             
-            public static final Rotation2d DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(580);
-            public static final Rotation2d CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(45);
+            public static final Rotation2d DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(610);
+            public static final Rotation2d CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(180);
 
             /** The angle tolerance for the climber to be considered at a specific state. */
             public static final Rotation2d CLIMBER_ANGLE_TOLERANCE = Rotation2d.fromDegrees(3);
@@ -380,16 +384,16 @@ public final class Constants {
             // PID
             public static final double ELEVATOR_KP = 2.5;
             public static final double ELEVATOR_KI = 0;
-            public static final double ELEVATOR_KD = 0.2;
-            public static final double ELEVATOR_MIN_OUTPUT = -0.6;
-            public static final double ELEVATOR_MAX_OUTPUT = 0.6;
+            public static final double ELEVATOR_KD = 0.4;
+            public static final double ELEVATOR_MIN_OUTPUT = -1.0;
+            public static final double ELEVATOR_MAX_OUTPUT = 1.0;
 
             // Set positions for the length the elevator needs to extend to to score.
             public static final double MIN_HEIGHT_METERS = 0.0; // probably should leave at 0.0.
             public static final double MAX_HEIGHT_METERS = 2.1336; // stops the robot from ending itself
             public static final double L1_ELEVATOR_HEIGHT = 0.05; // Meters
             public static final double L2_ELEVATOR_HEIGHT = 0.07; // Meters
-            public static final double L3_ELEVATOR_HEIGHT = 0.62; // Meters
+            public static final double L3_ELEVATOR_HEIGHT = 0.45; // Meters
             public static final double L4_ELEVATOR_HEIGHT = 1.7; // Meters
             public static final double INTAKE_ELEVATOR_HEIGHT_METERS = 0.05; // Meters
             public static final boolean MOTOR_INVERTED = true;
@@ -705,7 +709,7 @@ public final class Constants {
             // Base pose for BLUE LEFT intake positions.
             // Index 0 is given as (1.70244, 7.57545) with the computed intake angle.
             private static final Pose2d BLUE_INTAKE_LEFT_BASE = new Pose2d(
-                    new Translation2d(1.70244, 7.57545), FIELD_INTAKE_ANGLE);
+                    new Translation2d(1.732, 7.540), FIELD_INTAKE_ANGLE);
 
             // Lists for the coral station intake poses.
             // The human player’s list is from indices 0 to 8 (left-to-right from the driver perspective).
@@ -723,8 +727,9 @@ public final class Constants {
                     BLUE_CORAL_INTAKE_LEFT.add(pose);
                 }
                 // Generate BLUE RIGHT intake positions by mirroring across the horizontal line at y = FIELD_ORIGIN.getY()
-                for (Pose2d pose : BLUE_CORAL_INTAKE_LEFT) {
-                    BLUE_CORAL_INTAKE_RIGHT.add(mirrorAcrossHorizontal(FIELD_ORIGIN.getY(), pose));
+                // Reverse the order so that the human player's indices run left-to-right.
+                for (int i = BLUE_CORAL_INTAKE_LEFT.size() - 1; i >= 0; i--) {
+                    BLUE_CORAL_INTAKE_RIGHT.add(mirrorAcrossHorizontal(FIELD_ORIGIN.getY(), BLUE_CORAL_INTAKE_LEFT.get(i)));
                 }
                 // Generate corresponding RED positions by rotating the blue positions 180° about FIELD_ORIGIN.
                 for (Pose2d pose : BLUE_CORAL_INTAKE_LEFT) {
@@ -735,6 +740,10 @@ public final class Constants {
                 }
             }
 
+        }
+
+        public static class StartingPositionConstants {
+            
         }
 
     }
