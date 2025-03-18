@@ -41,10 +41,4 @@ public class TimeWaitCommand extends Command {
     public boolean isFinished() {
         return System.nanoTime() >= completionTimeNanoseconds;
     }
-
-    // Called once the command ends or is interrupted.
-    @Override
-    public void end(boolean interrupted) {
-        // Cleanup, if necessary.
-    }
 }
