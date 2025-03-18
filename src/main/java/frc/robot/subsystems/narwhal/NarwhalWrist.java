@@ -15,8 +15,10 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.NarwhalElevatorState;
 import frc.robot.util.NarwhalWristState;
 import frc.robot.util.upper_assembly.ScoringHeight;
+import frc.robot.Constants.NarwhalConstants.NarwhalElevatorConstants;
 import frc.robot.Constants.NarwhalConstants.NarwhalWristConstants;
 
 /**
@@ -118,6 +120,16 @@ public class NarwhalWrist extends SubsystemBase {
             default:
                 throw new IllegalArgumentException("Unknown scoring height: " + height);
         }
+    }
+
+    /**
+     * Goes to the algae descore position
+     * @param isTopRow True if the algae is in the top row, false if it is in the bottom row
+     * @param isDown True if the manipulator should be pressing down on the algae, false if it should just be above the algae
+     */
+    public void goToAlgaeDescoreAngle(){
+        setCurrentMotorAngle(NarwhalWristConstants.ALGAE_ANGLE);
+        currentState = NarwhalWristState.ALGAE;
     }
 
     /**

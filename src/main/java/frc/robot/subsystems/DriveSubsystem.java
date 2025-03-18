@@ -521,7 +521,7 @@ public class DriveSubsystem extends SubsystemBase {
      *
      * @param alliance the alliance (e.g. Alliance.BLUE or Alliance.RED)
      * @param side the CoralStationSide (for example, LEFT or RIGHT)
-     * @param slot the slot index (an int used to pick from a pre‐defined list of intake poses)
+     * @param slot the slot index (an int used to pick from a pre-defined list of intake poses)
      * @return a Command that will drive the robot to the intake pose.
      */
     public Command getIntakeCommand(Alliance alliance, CoralStationSide side, int slot) {

@@ -398,6 +398,9 @@ public final class Constants {
             public static final double INTAKE_ELEVATOR_HEIGHT_METERS = 0.05; // Meters
             public static final boolean MOTOR_INVERTED = true;
             public static final double ELEVATOR_POSITION_TOLERANCE = 0.05; // Meters
+            public static final double ALGAE_DESCORE_HEIGHT_METERS_TOP_ROW = -0.4; // Meters (negative to go down)
+            public static final double ALGAE_DESCORE_HEIGHT_METERS_BOTTOM_ROW = 0.7; // Meters
+            public static final double ALGAE_DESCORE_HEIGHT_METERS_DOWN_OFFSET = 1.7; // Meters
         }
     }
 
