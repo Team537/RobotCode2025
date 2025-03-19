@@ -5,6 +5,7 @@
 package frc.robot;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.photonvision.PhotonPoseEstimator;
@@ -724,25 +725,36 @@ public final class Constants {
             public static List<Pose2d> RED_CORAL_INTAKE_RIGHT = new ArrayList<>();
 
             static {
+
+                List<Pose2d> blueCoralIntakeLeft = new ArrayList<>();
+                List<Pose2d> blueCoralIntakeRight = new ArrayList<>();
+                List<Pose2d> redCoralIntakeLeft = new ArrayList<>();
+                List<Pose2d> redCoralIntakeRight = new ArrayList<>();
                 // Generate BLUE LEFT intake positions using Transform2d.
                 // Each position is obtained by moving forward (local x) by i * spacing.
                 for (int i = 0; i < 9; i++) {
                     Pose2d pose = BLUE_INTAKE_LEFT_BASE.transformBy(
                             new Transform2d(new Translation2d(i * CORAL_INTAKE_SPACING, 0), new Rotation2d(0.5 * Math.PI)));
-                    BLUE_CORAL_INTAKE_LEFT.add(pose);
+                            blueCoralIntakeLeft.add(pose);
                 }
                 // Generate BLUE RIGHT intake positions by mirroring across the horizontal line at y = FIELD_ORIGIN.getY()
                 // Reverse the order so that the human player's indices run left-to-right.
-                for (int i = BLUE_CORAL_INTAKE_LEFT.size() - 1; i >= 0; i--) {
-                    BLUE_CORAL_INTAKE_RIGHT.add(mirrorAcrossHorizontal(FIELD_ORIGIN.getY(), BLUE_CORAL_INTAKE_LEFT.get(i)));
+                for (int i = blueCoralIntakeLeft.size() - 1; i >= 0; i--) {
+                    blueCoralIntakeRight.add(mirrorAcrossHorizontal(FIELD_ORIGIN.getY(), blueCoralIntakeLeft.get(i)));
                 }
                 // Generate corresponding RED positions by rotating the blue positions 180° about FIELD_ORIGIN.
                 for (Pose2d pose : BLUE_CORAL_INTAKE_LEFT) {
-                    RED_CORAL_INTAKE_LEFT.add(rotate180(pose));
+                    redCoralIntakeLeft.add(rotate180(pose));
                 }
                 for (Pose2d pose : BLUE_CORAL_INTAKE_RIGHT) {
-                    RED_CORAL_INTAKE_RIGHT.add(rotate180(pose));
+                    redCoralIntakeRight.add(rotate180(pose));
                 }
+
+                // Save the arrays in an immutable way.
+                BLUE_CORAL_INTAKE_LEFT = Collections.unmodifiableList(blueCoralIntakeLeft);
+                BLUE_CORAL_INTAKE_RIGHT = Collections.unmodifiableList(blueCoralIntakeLeft);
+                RED_CORAL_INTAKE_LEFT = Collections.unmodifiableList(redCoralIntakeLeft);
+                RED_CORAL_INTAKE_RIGHT = Collections.unmodifiableList(redCoralIntakeRight);
             }
 
         }
