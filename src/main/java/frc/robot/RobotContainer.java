@@ -56,20 +56,20 @@ public class RobotContainer {
 
     private UpperAssemblyBase upperAssembly = UpperAssemblyFactory.createUpperAssembly(Constants.Defaults.DEFAULT_UPPER_ASSEMBLY);
 
-    private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
+    private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator());
 
     @SuppressWarnings("unused") // The class is used due to how WPILib treats and stores subsystems.
     private OceanViewManager oceanViewManager;
 
     // Smart Dashboard Inputs
     private final SendableChooser<AutonomousRoutine> autonomousSelector = new SendableChooser<>();
-    private final SendableChooser<StartingPosition> positionSelector = new SendableChooser<>();
     private final SendableChooser<Alliance> allianceSelector = new SendableChooser<>();
 
     private final SendableChooser<UpperAssemblyType> upperAssemblySelector = new SendableChooser<>();
     private final SendableChooser<DrivingMotorType> drivingMotorSelector = new SendableChooser<>();
 
-    private double delayTimeSeconds;
+    private double delayTimeSeconds = 0;
+    private boolean startWithTushPush = false;
 
     /**
      * Creates a new RobotContainer object and sets up SmartDashboard an the button inputs.
@@ -142,21 +142,20 @@ public class RobotContainer {
      */
     private void setupSmartDashboard() {
         // Setup dropdowns from enumeration values
-        EnumPrettifier.setupSendableChooserFromEnum(this.autonomousSelector, AutonomousRoutine.class, AutonomousRoutine.DEFAULT);
-        EnumPrettifier.setupSendableChooserFromEnum(this.positionSelector, StartingPosition.class, StartingPosition.LEFT);
+        EnumPrettifier.setupSendableChooserFromEnum(this.autonomousSelector, AutonomousRoutine.class, AutonomousRoutine.CENTER);
         EnumPrettifier.setupSendableChooserFromEnum(this.allianceSelector, Alliance.class, Alliance.RED);
         EnumPrettifier.setupSendableChooserFromEnum(this.upperAssemblySelector, UpperAssemblyType.class, UpperAssemblyType.NARWHAL);
         EnumPrettifier.setupSendableChooserFromEnum(this.drivingMotorSelector, DrivingMotorType.class, DrivingMotorType.KRAKEN_X60);
 
         // Add the selectors to the dashboard.
         SmartDashboard.putData(this.autonomousSelector);
-        SmartDashboard.putData(this.positionSelector);
         SmartDashboard.putData(this.allianceSelector);
         SmartDashboard.putData(this.upperAssemblySelector);
         SmartDashboard.putData(this.drivingMotorSelector);
 
         // Add autonomous configuration options.
         SmartDashboard.putNumber("Auto Delay", this.delayTimeSeconds);
+        SmartDashboard.putBoolean("Tush Push Mode", this.startWithTushPush);
     }
 
     /**
@@ -172,12 +171,13 @@ public class RobotContainer {
      * Creates and schedules the selected autonomous routine. 
      */
     public void scheduleAutonomous() {
+        this.delayTimeSeconds = SmartDashboard.getNumber("Auto Delay", this.delayTimeSeconds);
+        this.startWithTushPush = SmartDashboard.getBoolean("Tush Push Mode", this.startWithTushPush);
+
 
         // Get and display the selected autonomous mode.
         AutonomousRoutine autonomousRoutine = autonomousSelector.getSelected();
         Alliance alliance = allianceSelector.getSelected();
-        SmartDashboard.putString("Selected Autonomous", autonomousRoutine.toString());
-        SmartDashboard.putString("Selected Alliance", alliance.toString());
 
         // Update the robot`s subsystems to be configured for the selected autonomous routine.
         driveSubsystem.setConfigs();

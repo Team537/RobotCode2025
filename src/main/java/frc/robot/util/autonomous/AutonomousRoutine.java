@@ -5,7 +5,9 @@ package frc.robot.util.autonomous;
  * An enum value used to represent which autonomous routine we will be performing. This is used inside of {@code RobotContainer}
  * to determine which commands to schedule during autonomous. Below is the current list of supported autonomous routines:
  * <ul>
- *  <li> <b>DEFAULT</b> </li>
+ *  <li> <b>LEFT</b> </li>
+ *  <li> <b>CENTER</b> </li>
+ *  <li> <b>RIGHT</b> </li>
  * </ul>
  * <hr>
  * @author Cameron Myhre
@@ -16,6 +18,5 @@ package frc.robot.util.autonomous;
 public enum AutonomousRoutine {
     LEFT,
     CENTER,
-    RIGHT,
-    DEFAULT;
+    RIGHT;
 }

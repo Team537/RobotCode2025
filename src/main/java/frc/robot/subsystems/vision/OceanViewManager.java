@@ -164,7 +164,7 @@ public class OceanViewManager extends SubsystemBase {
     /**
      * The average latency between a round UDP trip, in nanoseconds.
      */
-    private final double averageRoundTripTImeNs;
+    // private final double averageRoundTripTImeNs;
 
     /**
      *<p> The <strong>supplier method</strong> for getting the robots position. Used
@@ -192,7 +192,7 @@ public class OceanViewManager extends SubsystemBase {
         this.timeSyncClient = new TimeSyncClient(OceanViewConstants.PI_IP, OceanViewConstants.TIME_SYNC_PORT_NUMBER, OceanViewConstants.DEFAULT_NUM_SAMPLES);
         double[] timeSyncData = this.timeSyncClient.synchronizeTime();
         this.averageOffsetTimeNs = timeSyncData[0];
-        this.averageRoundTripTImeNs = timeSyncData[1];
+        // this.averageRoundTripTImeNs = timeSyncData[1];
     }
 
     // ------------------------------------------------------------------------

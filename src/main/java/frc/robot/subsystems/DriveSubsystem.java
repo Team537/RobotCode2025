@@ -17,7 +17,6 @@ import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -171,8 +170,6 @@ public class DriveSubsystem extends SubsystemBase {
 
     private PathConstraints constraints;
     private List<Supplier<List<Obstacle>>> pathfindingObstaclesSuppliers = new ArrayList<>();
-    private List<Obstacle> pathfindingObstacles = new ArrayList<>();
-    private List<Pair<Translation2d, Translation2d>> translatedPathfindingObstacles = new ArrayList<>();
 
     private DriveState state = DriveState.MANUAL;
     private boolean inScorePose = false;
@@ -272,7 +269,7 @@ public class DriveSubsystem extends SubsystemBase {
         ModuleConfig moduleConfig = new ModuleConfig(
                 DriveConstants.WHEEL_RADIUS,
                 maxDriveVelocity,
-                DriveConstants.WHEEL_COEFFICIENT_FRICTION, //TODO: set this back
+                DriveConstants.WHEEL_COEFFICIENT_FRICTION,
                 motorType,
                 motorReduction,
                 currentLimit,
@@ -821,18 +818,18 @@ public class DriveSubsystem extends SubsystemBase {
      * @param obstacles a list of circular obstacles
      * @return a list of pairs representing the bottom-left and top-right corners of the inscribed squares
      */
-    private List<Pair<Translation2d, Translation2d>> translatePathfindingObstacles(List<Obstacle> obstacles) {
-        List<Pair<Translation2d, Translation2d>> inscribedSquareCorners = new ArrayList<>();
-        for (Obstacle obstacle : obstacles) {
-            Translation2d center = obstacle.getObstacleTranslation();
-            double radius = obstacle.getObstacleRadius();
-            // Calculate the inscribed square's bottom-left and top-right corners.
-            Translation2d bottomLeft = new Translation2d(center.getX() - radius, center.getY() - radius);
-            Translation2d topRight = new Translation2d(center.getX() + radius, center.getY() + radius);
-            inscribedSquareCorners.add(new Pair<>(bottomLeft, topRight));
-        }
-        return inscribedSquareCorners;
-    }
+    // private List<Pair<Translation2d, Translation2d>> translatePathfindingObstacles(List<Obstacle> obstacles) {
+    //     List<Pair<Translation2d, Translation2d>> inscribedSquareCorners = new ArrayList<>();
+    //     for (Obstacle obstacle : obstacles) {
+    //         Translation2d center = obstacle.getObstacleTranslation();
+    //         double radius = obstacle.getObstacleRadius();
+    //         // Calculate the inscribed square's bottom-left and top-right corners.
+    //         Translation2d bottomLeft = new Translation2d(center.getX() - radius, center.getY() - radius);
+    //         Translation2d topRight = new Translation2d(center.getX() + radius, center.getY() + radius);
+    //         inscribedSquareCorners.add(new Pair<>(bottomLeft, topRight));
+    //     }
+    //     return inscribedSquareCorners;
+    // }
 
     //////////////////////////////////////////////////////////////////////////////
     // Commanded Velocity Getters
