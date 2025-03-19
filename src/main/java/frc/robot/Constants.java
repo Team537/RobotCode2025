@@ -719,10 +719,10 @@ public final class Constants {
 
             // Lists for the coral station intake poses.
             // The human player’s list is from indices 0 to 8 (left-to-right from the driver perspective).
-            public static final List<Pose2d> BLUE_CORAL_INTAKE_LEFT = new ArrayList<>();
-            public static final List<Pose2d> BLUE_CORAL_INTAKE_RIGHT = new ArrayList<>();
-            public static final List<Pose2d> RED_CORAL_INTAKE_LEFT = new ArrayList<>();
-            public static final List<Pose2d> RED_CORAL_INTAKE_RIGHT = new ArrayList<>();
+            public static final List<Pose2d> BLUE_CORAL_INTAKE_LEFT;
+            public static final List<Pose2d> BLUE_CORAL_INTAKE_RIGHT;
+            public static final List<Pose2d> RED_CORAL_INTAKE_LEFT;
+            public static final List<Pose2d> RED_CORAL_INTAKE_RIGHT;
 
             static {
 
@@ -743,10 +743,10 @@ public final class Constants {
                     blueCoralIntakeRight.add(mirrorAcrossHorizontal(FIELD_ORIGIN.getY(), blueCoralIntakeLeft.get(i)));
                 }
                 // Generate corresponding RED positions by rotating the blue positions 180° about FIELD_ORIGIN.
-                for (Pose2d pose : BLUE_CORAL_INTAKE_LEFT) {
+                for (Pose2d pose : blueCoralIntakeLeft) {
                     redCoralIntakeLeft.add(rotate180(pose));
                 }
-                for (Pose2d pose : BLUE_CORAL_INTAKE_RIGHT) {
+                for (Pose2d pose : blueCoralIntakeRight) {
                     redCoralIntakeRight.add(rotate180(pose));
                 }
 
