@@ -13,6 +13,8 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.NarwhalWristState;
@@ -27,13 +29,19 @@ import frc.robot.Constants.NarwhalConstants.NarwhalWristConstants;
  * @since v1.2.0
  */
 public class NarwhalWrist extends SubsystemBase {
+
     public NarwhalWristState currentState;
-    private double currentTargetAngle; // in radians
 
     /** In radians */
+    private double currentTargetAngle;
+    /** In radians */
     public final SparkMax wrist;
+    /** In radians */
     private final SparkMaxConfig wristConfig;
-    private final SparkClosedLoopController wristMotorPIDController;
+    /** In radians */
+    private final ArmFeedforward wristFeedForward;
+    /** In radians */
+    private final PIDController wristMotorPIDController;
     
     /**
      * Create a new instance of the NarwhalWrist class, setting up necessary hardware in the process.
@@ -50,13 +58,19 @@ public class NarwhalWrist extends SubsystemBase {
             .inverted(true);
 
         // Update motor PID values.
-        wristConfig.closedLoop 
-            .pid(
-                NarwhalWristConstants.POSITION_PID_P, 
-                NarwhalWristConstants.POSITION_PID_I, 
-                NarwhalWristConstants.POSITION_PID_D
-            )
-            .outputRange(NarwhalWristConstants.PID_OUTPUT_RANGE_MIN, NarwhalWristConstants.PID_OUTPUT_RANGE_MAX); // uses external encoder
+        wristMotorPIDController = new PIDController(
+            NarwhalWristConstants.POSITION_PID_P,
+            NarwhalWristConstants.POSITION_PID_I,
+            NarwhalWristConstants.POSITION_PID_D
+        );
+        wristMotorPIDController.setTolerance(NarwhalWristConstants.PID_TOLERANCE.getRadians());
+
+        wristFeedForward = new ArmFeedforward(
+            0,
+            NarwhalWristConstants.POSITION_FF_G,
+            0
+        );
+
         // configs for the encoder
         // NOTE FOR THE ENCODER: WHEN VIEWED FROM THE RIGHT, THE ANGLE OF THE WRIST IS BASED ON A UNIT CIRCLE WITH 0 DEGREES POINTING STRAIGHT UP
         wristConfig.encoder
@@ -67,7 +81,6 @@ public class NarwhalWrist extends SubsystemBase {
         wrist = new SparkMax(NarwhalWristConstants.WRIST_MOTOR_CAN_ID, MotorType.kBrushless);
         wrist.configure(wristConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        wristMotorPIDController = wrist.getClosedLoopController();
         currentState = NarwhalWristState.STOPPED;
     }
 
@@ -78,7 +91,22 @@ public class NarwhalWrist extends SubsystemBase {
      */
     public void setCurrentMotorAngle(Rotation2d targetAngle){
         double targetAngleRadians = targetAngle.getRadians();
-        wristMotorPIDController.setReference(targetAngleRadians, ControlType.kPosition);
+        double currentEncoderPosition = wrist.getEncoder().getPosition();
+        double currentEncoderVelocity = wrist.getEncoder().getVelocity();
+
+        wristMotorPIDController.setSetpoint(targetAngleRadians);
+
+        wrist.set(
+            // Math.min + Math.max is used to clamp the output to the motor's range
+            Math.min(
+                Math.max(
+                    wristMotorPIDController.calculate(currentEncoderPosition) + 
+                    wristFeedForward.calculate(currentEncoderPosition, currentEncoderVelocity),
+                    NarwhalWristConstants.PID_OUTPUT_RANGE_MIN
+                ), 
+            NarwhalWristConstants.PID_OUTPUT_RANGE_MAX)
+        );
+
         currentState = NarwhalWristState.CUSTOM;
         currentTargetAngle = targetAngleRadians;
     }

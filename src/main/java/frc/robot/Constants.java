@@ -303,7 +303,13 @@ public final class Constants {
             public static final double POSITION_PID_I = 0;
             public static final double POSITION_PID_D = 0.2;
             public static final double PID_OUTPUT_RANGE_MAX = 0.35;
-            public static final double PID_OUTPUT_RANGE_MIN = -0.35;        
+            public static final double PID_OUTPUT_RANGE_MIN = -0.35;
+
+            public static final double POSITION_FF_G = 0.5; // This is the offset of the center of mass of the wrist from the zero position (x-axis)
+            public static final Rotation2d PID_TOLERANCE = Rotation2d.fromDegrees(8);
+
+            public static final Rotation2d WRIST_FEEDFORWARD_OFFSET_ANGLE = Rotation2d.fromDegrees(30); // This is the offset of the center of mass of the wrist from the zero position (x-axis) 
+
 
             // Set position for wrist angles (Angle is relative to the world, with 0 being the down position and rotating away from 0 being positive)
             public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4.85);
@@ -314,6 +320,8 @@ public final class Constants {
             public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromRadians(3 * Math.PI / 2); // This is the angle the wrist should be at when climbing
             public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(3 * Math.PI / 2);
             
+
+
             /** The angle tolerance for the wrist to be considered at a specific state. */
             public static final Rotation2d WRIST_ANGLE_TOLERANCE = Rotation2d.fromRadians(0.89 * Math.PI);
         }
