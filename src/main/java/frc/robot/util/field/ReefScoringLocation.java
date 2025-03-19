@@ -6,6 +6,8 @@ package frc.robot.util.field;
  * FIRST`s own diagrams and standards.
  * <hr>
  * @see <a href=https://firstfrc.blob.core.windows.net/frc2025/Manual/Sections/2025GameManual-05ARENA.pdf> FRC Reef Layout </a> (PDF Page 6)
+ * @author Cameron Myhre
+ * @version 3.0.0
  */
 public enum ReefScoringLocation {
     A,
