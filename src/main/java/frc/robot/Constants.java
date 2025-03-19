@@ -620,11 +620,11 @@ public final class Constants {
             private static final Translation2d BLUE_BR_BASE = 
                 new Translation2d(REEF_CENTER.getX() + APOTHEM * Math.cos(NORMAL_BR),
                                 REEF_CENTER.getY() + APOTHEM * Math.sin(NORMAL_BR));
-            public static final Pose2d BLUE_CORAL_SCORE_POSITION_F = new Pose2d(
+            public static final Pose2d BLUE_CORAL_SCORE_POSITION_E = new Pose2d(
                 new Translation2d(BLUE_BR_BASE.getX() + TANGENT_OFFSET * Math.sin(NORMAL_BR),
                                 BLUE_BR_BASE.getY() + TANGENT_OFFSET * -Math.cos(NORMAL_BR)),
                 new Rotation2d(NORMAL_BR));
-            public static final Pose2d BLUE_CORAL_SCORE_POSITION_E = new Pose2d(
+            public static final Pose2d BLUE_CORAL_SCORE_POSITION_F = new Pose2d(
                 new Translation2d(BLUE_BR_BASE.getX() - TANGENT_OFFSET * Math.sin(NORMAL_BR),
                                 BLUE_BR_BASE.getY() - TANGENT_OFFSET * -Math.cos(NORMAL_BR)),
                 new Rotation2d(NORMAL_BR));
@@ -651,13 +651,13 @@ public final class Constants {
             private static final Translation2d BLUE_TR_BASE = 
                 new Translation2d(REEF_CENTER.getX() + APOTHEM * Math.cos(NORMAL_TR),
                                 REEF_CENTER.getY() + APOTHEM * Math.sin(NORMAL_TR));
-            public static final Pose2d BLUE_CORAL_SCORE_POSITION_J = new Pose2d(
-                new Translation2d(BLUE_TR_BASE.getX() - TANGENT_OFFSET * Math.sin(NORMAL_TR),
-                                BLUE_TR_BASE.getY() - TANGENT_OFFSET * -Math.cos(NORMAL_TR)),
-                new Rotation2d(NORMAL_TR));
             public static final Pose2d BLUE_CORAL_SCORE_POSITION_I = new Pose2d(
                 new Translation2d(BLUE_TR_BASE.getX() + TANGENT_OFFSET * Math.sin(NORMAL_TR),
                                 BLUE_TR_BASE.getY() + TANGENT_OFFSET * -Math.cos(NORMAL_TR)),
+                new Rotation2d(NORMAL_TR));
+            public static final Pose2d BLUE_CORAL_SCORE_POSITION_J = new Pose2d(
+                new Translation2d(BLUE_TR_BASE.getX() - TANGENT_OFFSET * Math.sin(NORMAL_TR),
+                                BLUE_TR_BASE.getY() - TANGENT_OFFSET * -Math.cos(NORMAL_TR)),
                 new Rotation2d(NORMAL_TR));
                 // ALGAE REMOVAL position (midpoint on bottom-left side)
             public static final Pose2d BLUE_ALGAE_REMOVAL_POSITION_IJ = new Pose2d(
@@ -715,7 +715,7 @@ public final class Constants {
             // Base pose for BLUE LEFT intake positions.
             // Index 0 is given as (1.70244, 7.57545) with the computed intake angle.
             private static final Pose2d BLUE_INTAKE_LEFT_BASE = new Pose2d(
-                    new Translation2d(1.732, 7.540), FIELD_INTAKE_ANGLE);
+                    new Translation2d(1.761, 7.500), FIELD_INTAKE_ANGLE);
 
             // Lists for the coral station intake poses.
             // The human player’s list is from indices 0 to 8 (left-to-right from the driver perspective).
@@ -752,7 +752,7 @@ public final class Constants {
 
                 // Save the arrays in an immutable way.
                 BLUE_CORAL_INTAKE_LEFT = Collections.unmodifiableList(blueCoralIntakeLeft);
-                BLUE_CORAL_INTAKE_RIGHT = Collections.unmodifiableList(blueCoralIntakeLeft);
+                BLUE_CORAL_INTAKE_RIGHT = Collections.unmodifiableList(blueCoralIntakeRight);
                 RED_CORAL_INTAKE_LEFT = Collections.unmodifiableList(redCoralIntakeLeft);
                 RED_CORAL_INTAKE_RIGHT = Collections.unmodifiableList(redCoralIntakeRight);
             }
