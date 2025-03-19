@@ -34,6 +34,9 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
     private final NarwhalElevator elevator;
     private final NarwhalClimber climber;
 
+    /**
+     * Create a new NarwhalUpperAssembly instance . This creates instances of the necessary sub-subsystems.
+     */
     public NarwhalUpperAssembly(){
         super();
         intakeOuttake = new NarwhalIntakeOuttake();
@@ -42,10 +45,18 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
         climber = new NarwhalClimber();
     }
 
+    /**
+     * Sets the supplier tat this UpperAssembly will use to determine if it can raise its lift.
+     * 
+     * @param supplier A supplier that will be used to dictate if the assembly can raise its lift.
+     */
     public void setCanRaiseLiftSupplier(Supplier<Boolean> supplier) {
         canRaiseLiftSupplier = supplier;
     }
 
+    /**
+     * Returns this mechanism`s intake coral command.
+     */
     public Command getCoralIntakeCommand() {
         Command coralIntakeCommand = (
             (
@@ -63,6 +74,11 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
         return coralIntakeCommand;
     }
 
+    /**
+     * Returns this upper assembly`s command to score a coral at the specified height.
+     * 
+     * @param scoringHeight The height coral must be scored at. 
+     */
     public Command getCoralScoreCommand(ScoringHeight scoringHeight) {
 
         Command command = 
@@ -84,10 +100,13 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
             ).handleInterrupt(intakeOuttake::hold);   
         command.addRequirements(this);    
         return command;
-
     }
 
+    /**
+     * Returns the command used to descore algae.
+     */
     public Command getRemoveAlgaeCommand(AlgaeRemovalPosition algaeRemovalPosition) {
+
         /*
         Will keep the upper assembly in transit position until the robot is ready to descore the algae.
         Then it will move the manipulator into position to descore the algae and wait until it can descore the algae
@@ -120,10 +139,16 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
         return command;
     }
 
+    /**
+     * Returns a command used to set the narwal`s mechanisms into their idle state. (Allows the robot to be driven)
+     */
     public Command getLowerCommand() {
         return new NarwhalTransitPositionCommand(elevator, wrist);
     }
 
+    /**
+     * Returns the command that allows for the robot to climb.
+     */
     public Command getClimbCommand() {
         NarwhalClimbCommand narwhalClimbCommand = new NarwhalClimbCommand(
             elevator, 
@@ -135,6 +160,9 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
         return narwhalClimbCommand;
     }
 
+    /**
+     * Returns the command that can be used to manually control this assembly`s sub-subsystems. 
+     */
     public Command getManualCommand(XboxController controller) {
         NarwhalManualIntakeOuttakeCommand narwhalManualIntakeOuttakeCommand = new NarwhalManualIntakeOuttakeCommand(intakeOuttake, controller);
         NarwhalManualWristCommand narwhalManualWristCommand = new NarwhalManualWristCommand(wrist, controller);
@@ -150,5 +178,4 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
         manualParallelCommandGroup.addRequirements(this);
         return manualParallelCommandGroup;
     }
-
 }

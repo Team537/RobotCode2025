@@ -11,6 +11,7 @@ public class NarwhalManualWristCommand extends Command {
 
     /**
      * Creates a manual narwhal climber command that controls the climber subsystem.
+     * 
      * @param squidClimber The climber subsystem to control.
      * @param controller The Xbox controller used to control the subsystem.
      */

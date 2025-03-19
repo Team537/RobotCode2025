@@ -22,19 +22,31 @@ public enum StartingPosition {
     CENTER(StartingPoseConstants.BLUE_CENTER_STARTING_POSE,StartingPoseConstants.RED_CENTER_STARTING_POSE),
     RIGHT(StartingPoseConstants.BLUE_RIGHT_STARTING_POSE,StartingPoseConstants.RED_RIGHT_STARTING_POSE);
 
-    Pose2d bluePose;
-    Pose2d redPose;
+    private final Pose2d BLUE_POSE;
+    private final Pose2d RED_POSE;
 
+    /**
+     * Creates a new StartingPosition enum using the given blue and red starting positions, as Pose2ds.
+     * 
+     * @param bluePose The starting position for the blue alliance, as a Pose2d.
+     * @param redPose The starting position for the red alliance, as a Pose2d.
+     */
     StartingPosition(Pose2d bluePose, Pose2d redPose) {
-        this.bluePose = bluePose;
-        this.redPose = redPose;
+        this.BLUE_POSE = bluePose;
+        this.RED_POSE = redPose;
     }
 
+    /**
+     * Returns teh starting position alongside the associated alliance.
+     * 
+     * @param alliance The alliance color the position will be taken form.
+     * @return The starting position for the specified alliance.
+     */
     public Pose2d getPose(Alliance alliance) { 
         if (alliance == Alliance.BLUE) {
-            return bluePose;
+            return this.BLUE_POSE;
         } else {
-            return redPose;
+            return this.RED_POSE;
         }
     }
 

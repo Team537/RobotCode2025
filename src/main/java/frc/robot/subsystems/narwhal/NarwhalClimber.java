@@ -28,7 +28,7 @@ import frc.robot.util.upper_assembly.narwhal.NarwhalClimberState;
  * @since v1.2.0
  */
 public class NarwhalClimber extends SubsystemBase {
-    public NarwhalClimberState currentState;
+    public NarwhalClimberState currentState; // TODO: Abstract into method for standards sake.
     
     private final SparkMax climber;
     private final SparkMaxConfig climberConfig;

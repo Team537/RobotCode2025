@@ -103,8 +103,8 @@ public abstract class ManualDriveCommand extends Command {
      * @param useTargetRotation Whether or not the robot should aim for a target rotation.
      * @param useAbsoluteRotation Whether the robot should target an absolute orientation or a relative offset.
      * @param throttle A multiplier for controlling the max speed of the robot. Ranges from 0 (minimum speed) to 1 (maximum speed).
-     * @param slow
-     * @param fieldCentric
+     * @param slow Whether or not this drive subsystem will drive in a slow manner.
+     * @param fieldCentric Whether or not this drive subsystem will drive in a field centric manner.
      */
     protected void manualDrive(
         Vector2d linearVelocity, 
@@ -152,12 +152,14 @@ public abstract class ManualDriveCommand extends Command {
                     // xyLockTranslation = driveSubsystem.getRobotPose().getTranslation();
                 }
 
-                // if (xyLockActive) {
-                //     finalLinearVelocity = driveSubsystem.getLinearFeedback(xyLockTranslation).scale(DriveConstants.LINEAR_MAX_SPEED);
-                // } else {
+                /*
+                if (false && xyLockActive) {
+                    finalLinearVelocity = driveSubsystem.getLinearFeedback(xyLockTranslation).scale(DriveConstants.LINEAR_MAX_SPEED);
+                } else {
+                    finalLinearVelocity = new Vector2d(0.0,0.0);
+                }
+                */
                 finalLinearVelocity = new Vector2d(0.0,0.0);
-                // }
-                
             } else {
 
                 xyLockActive = false;
@@ -224,11 +226,16 @@ public abstract class ManualDriveCommand extends Command {
                     // thetaLockRotation = driveSubsystem.getRobotPose().getRotation();
                 }
                 
-                // if (false && thetaLockActive) {
-                //     finalRotationalVelocity = driveSubsystem.getRotationalFeedback(thetaLockRotation) * DriveConstants.ROTATIONAL_MAX_SPEED;
-                // } else {
+                /* Not currently active. Commented out to decrease warnings.
+
+                 if (false && thetaLockActive) {
+                    finalRotationalVelocity = driveSubsystem.getRotationalFeedback(thetaLockRotation) * DriveConstants.ROTATIONAL_MAX_SPEED;
+                } else {
+                    finalRotationalVelocity = 0.0;
+                }
+                */
                 finalRotationalVelocity = 0.0;
-                // }
+                
             } else {
 
                 thetaLockActive = false;

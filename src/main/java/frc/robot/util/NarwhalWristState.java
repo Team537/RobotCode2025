@@ -14,16 +14,16 @@ public enum NarwhalWristState {
     /** In position to descore algae from coral*/
     ALGAE, 
     
-    /** In position to scrore L1 coral */
+    /** In position to score L1 coral */
     L1, 
     
-    /** In position to scrore L2 coral */
+    /** In position to score L2 coral */
     L2, 
     
-    /** In position to scrore L3 coral */
+    /** In position to score L3 coral */
     L3, 
     
-    /** In position to scrore L4 coral :) */
+    /** In position to score L4 coral :) */
     L4, 
 
     /** In position to climb */

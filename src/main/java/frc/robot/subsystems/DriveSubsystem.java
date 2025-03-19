@@ -177,6 +177,8 @@ public class DriveSubsystem extends SubsystemBase {
     private boolean inAlgaeRemovePose = false;
     private boolean narwhalCanRaiseLift = false;
 
+    private DeltaTime testTime = new DeltaTime();
+
     //////////////////////////////////////////////////////////////////////////////
     // Constructor
     //////////////////////////////////////////////////////////////////////////////
@@ -901,8 +903,6 @@ public class DriveSubsystem extends SubsystemBase {
         translatedPathfindingObstacles = translatePathfindingObstacles(pathfindingObstacles);
         Pathfinding.setDynamicObstacles(translatedPathfindingObstacles, getRobotPose().getTranslation());*/
     }
-
-    DeltaTime testTime = new DeltaTime();
 
     @Override
     public void simulationPeriodic() {

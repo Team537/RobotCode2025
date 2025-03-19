@@ -101,9 +101,9 @@ public class RobotContainer {
         try {
             this.udpReceiver = new UDPReceiver(OceanViewConstants.UDP_PORT_NUMBER);    
             this.tcpSender = new TCPSender(OceanViewConstants.PI_IP, OceanViewConstants.TCP_PORT_NUMBER);
-            System.out.println("Successfully created TCPSender and UDPReceiver object!");
+            System.out.println("[@@@ OceanView @@@]: --- Successfully created TCPSender and UDPReceiver object!");
         } catch (Exception e) {
-            System.err.println("Failed to construct TCPSender object: " + e.getMessage());
+            System.err.println("[@@@ OceanView @@@]: --- Failed to construct TCPSender object: " + e.getMessage());
         }
 
         // An OceanView manager instance cannot be created if either the TCPSender or UDPReceiver is null.
@@ -153,12 +153,13 @@ public class RobotContainer {
         SmartDashboard.putData(this.upperAssemblySelector);
         SmartDashboard.putData(this.drivingMotorSelector);
 
+        // Add autonomous configuration options.
         SmartDashboard.putNumber("Auto Delay", this.delayTimeSeconds);
         SmartDashboard.putBoolean("Tush Push Mode", this.startWithTushPush);
     }
 
     /**
-     * sets the upper assembly to the given type
+     * Sets the upper assembly to the given type
      * 
      * @param upperAssemblyType the type of upper assembly to set to
      */
@@ -166,13 +167,19 @@ public class RobotContainer {
         upperAssembly = UpperAssemblyFactory.createUpperAssembly(upperAssemblyType);
     }
 
+    /**
+     * Creates and schedules the selected autonomous routine. 
+     */
     public void scheduleAutonomous() {
         this.delayTimeSeconds = SmartDashboard.getNumber("Auto Delay", this.delayTimeSeconds);
         this.startWithTushPush = SmartDashboard.getBoolean("Tush Push Mode", this.startWithTushPush);
 
+
+        // Get and display the selected autonomous mode.
         AutonomousRoutine autonomousRoutine = autonomousSelector.getSelected();
         Alliance alliance = allianceSelector.getSelected();
 
+        // Update the robot`s subsystems to be configured for the selected autonomous routine.
         driveSubsystem.setConfigs();
         upperAssembly.setRobotInScoringPositionSupplier(driveSubsystem::getInScorePose);
         upperAssembly.setRobotInIntakingPositionSupplier(driveSubsystem::getInIntakePose);
@@ -180,6 +187,7 @@ public class RobotContainer {
             ((NarwhalUpperAssembly)upperAssembly).setCanRaiseLiftSupplier(driveSubsystem::getNarwhalCanRaiseLift);
         }
 
+        // Get the starting position for the specified autonomous routine and alliance.
         switch (autonomousRoutine) {
             case LEFT:
                 driveSubsystem.setRobotPose(StartingPosition.LEFT.getPose(alliance));
@@ -191,12 +199,16 @@ public class RobotContainer {
                 driveSubsystem.setRobotPose(StartingPosition.RIGHT.getPose(alliance));
                 break;
             default:
-            break;
+            System.err.println("[System]: No alliance starting position selected!");
+                break;
         }
+        
+        // Get and create the time delay the driver wants the autonomous to run on.
+        this.delayTimeSeconds = SmartDashboard.getNumber("Auto Delay", this.delayTimeSeconds);
+        Command autoDelayCommand = new WaitCommand(this.delayTimeSeconds);
 
-        Command autoDelayCommand = new WaitCommand(delayTimeSeconds);
+        // Construct the autonomous program for the selected starting position.
         Command autonomousCommand;
-
         switch (autonomousRoutine) {
             case LEFT:
                 autonomousCommand = 
@@ -213,7 +225,11 @@ public class RobotContainer {
                         upperAssembly.getLowerCommand()
                     );  
                 break;  
-            case CENTER:
+            case CENTER: 
+
+                /**
+                 * Drive forwards and score the preloaded coral onto the nearest branch at L4 height.
+                 */
                 autonomousCommand = 
                     (
                         driveSubsystem.getScoringCommand(alliance, ReefScoringLocation.H)
@@ -241,8 +257,8 @@ public class RobotContainer {
                 autonomousCommand =  new InstantCommand(); // Do nothing if no valid auto routine is selected
         }
 
+        // Combine the autonomous delay and the main routine. Then schedule the command.
         autoDelayCommand.andThen(autonomousCommand).schedule();
-
     }
 
     /**
@@ -257,7 +273,6 @@ public class RobotContainer {
         driveSubsystem.setConfigs();
         upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
         driveSubsystem.setDefaultCommand(driveSubsystem.getManualCommand(xBoxController, alliance));
-
     }
 
 

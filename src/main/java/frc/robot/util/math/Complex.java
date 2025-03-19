@@ -35,6 +35,9 @@ package frc.robot.util.math;
  *     Complex cosZ1 = z1.cos();
  *     Complex tanZ1 = z1.tan();
  * </pre>
+ * <hr>
+ * @author Cameron Myhre
+ * @version 3.0.0
  */
 public class Complex {
 

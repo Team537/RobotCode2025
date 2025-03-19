@@ -21,14 +21,24 @@ public enum Alliance {
     BLUE(OperatorConstants.BLUE_ALLIANCE_OFFSET),
     DEMO(OperatorConstants.DEMO_ALLIANCE_OFFSET); // Not used during competition! This is only for showcasing our robot code at events!
 
-    private Rotation2d driverRotationalOffset;
+    private final Rotation2d DRIVER_ROTATIONAL_OFFSET;
 
+    /**
+     * Creates a new Alliance enum with the specified driver rotational offset, as a Rotation2d.
+     * 
+     * @param driverRotationalOffset This enum`s driver rotational offset, as a Rotation2d.
+     */
     Alliance(Rotation2d driverRotationalOffset) {
-        this.driverRotationalOffset = driverRotationalOffset;
+        this.DRIVER_ROTATIONAL_OFFSET = driverRotationalOffset;
     }
 
+    /**
+     * Returns the driver rotation offset for each alliance, as a Rotation2d.
+     * 
+     * @return The driver rotation offset for each alliance, as a Rotation2d.
+     */
     public Rotation2d getDriverRotationalOffset() {
-        return driverRotationalOffset;
+        return this.DRIVER_ROTATIONAL_OFFSET;
     }
 
 }

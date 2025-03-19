@@ -23,7 +23,7 @@ package frc.robot.util.math;
  *     System.out.println("Eigenvalues: " + Arrays.toString(ed.eigenvalues));
  *     System.out.println("Eigenvectors: " + ed.eigenvectors);
  * </pre>
- *
+ * <hr>
  * @author Cameron Myhre
  * @version 2.1.0
  */

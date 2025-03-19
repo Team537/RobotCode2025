@@ -14,6 +14,12 @@ public class NarwhalTransitPositionCommand extends Command {
     private final NarwhalElevator elevator;
     private final NarwhalWrist wrist;
 
+    /**
+     * Create a new NarwhalTransitPositionCommand with the given elevator and wrist mechanisms.
+     * 
+     * @param elevator The robot`s elevator mechanism.
+     * @param wrist The robot`s wrist mechanism.
+     */
     public NarwhalTransitPositionCommand(NarwhalElevator elevator, NarwhalWrist wrist) {
         this.elevator = elevator;
         this.wrist = wrist;
@@ -30,6 +36,6 @@ public class NarwhalTransitPositionCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return elevator.isAtTargetPosition() && wrist.isAtTargetPosition();
+        return elevator.isAtTargetPosition() && wrist.isAtTargetPosition(); //
     }
 }

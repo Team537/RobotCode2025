@@ -511,13 +511,14 @@ public final class Constants {
         public static final String RIGHT_CAMERA_NAME = "Right_Arducam_OV9782";
         public static final String LEFT_CAMERA_NAME  = "Left_Arducam_OV9782";
 
-        public static final Transform3d FRONT_CAMERA_OFFSET = new Transform3d(-0.2159, 0, 0, new Rotation3d(0, 0, -Math.PI));
-        public static final Transform3d RIGHT_CAMERA_OFFSET = new Transform3d(0.219837, 0.1762252, 0.65913, new Rotation3d(0, 0, Math.PI / 2.0));
-        public static final Transform3d LEFT_CAMERA_OFFSET = new Transform3d(-0.219837, 0.1760728, 0.65913, new Rotation3d(0, 0, Math.PI / 2.0));
+        public static final Transform3d FRONT_CAMERA_OFFSET = new Transform3d(-0.2159, 0, 0, new Rotation3d(0, 0, -Math.PI)); // TODO: Verify that the angle s correct.
+        public static final Transform3d RIGHT_CAMERA_OFFSET = new Transform3d(0.219837, 0.1762252, 0.65913, new Rotation3d(0, 0, Math.PI / 2.0 )); 
+        public static final Transform3d LEFT_CAMERA_OFFSET = new Transform3d(-0.219837, 0.1760728, 0.65913, new Rotation3d(0, 0, -Math.PI / 2.0)); 
 
         public static final double[] VISION_STANDARD_DEVIATION_COEFFICIENTS = { // PLACEHOLDER
             0.0025, 0.0025, 0
         };
+        
         public static final Matrix<N3, N1> VISION_STANDARD_DEVIATION = new Matrix<>(N3.instance, N1.instance, VISION_STANDARD_DEVIATION_COEFFICIENTS);
 
         // Pipeline settings
@@ -546,6 +547,7 @@ public final class Constants {
         public static final int DEFAULT_NUM_SAMPLES = 10;
     }
 
+    // TODO: Write better, mroe descriptivejavadoc comments for this portion of the code.
     public static class FieldConstants {
 
         private static final Translation2d FIELD_ORIGIN = new Translation2d(8.775, 4.02);
@@ -724,6 +726,10 @@ public final class Constants {
             public static final List<Pose2d> RED_CORAL_INTAKE_LEFT;
             public static final List<Pose2d> RED_CORAL_INTAKE_RIGHT;
 
+            /**
+             * Create the list of intaking positions on the fly given preceding conditions. These arrays are immutable, 
+             * and cannot be changed.
+             */
             static {
 
                 List<Pose2d> blueCoralIntakeLeft = new ArrayList<>();

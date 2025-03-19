@@ -22,6 +22,7 @@ public class NarwhalClimbCommand extends Command{
 
     /**
      * Creates a new NarwhalClimbCommand.
+     * 
      * @param narwhalElevator The NarwhalElevator subsystem to use.
      * @param narwhalWrist The NarwhalWrist subsystem to use.
      * @param narwhalClimber The NarwhalClimber subsystem to use.
