@@ -513,7 +513,7 @@ public final class Constants {
 
         public static final Transform3d FRONT_CAMERA_OFFSET = new Transform3d(-0.2159, 0, 0, new Rotation3d(0, 0, -Math.PI)); // TODO: Verify that the angle s correct.
         public static final Transform3d RIGHT_CAMERA_OFFSET = new Transform3d(0.219837, 0.1762252, 0.65913, new Rotation3d(0, 0, Math.PI / 2.0 )); 
-        public static final Transform3d LEFT_CAMERA_OFFSET = new Transform3d(-0.219837, 0.1760728, 0.65913, new Rotation3d(0, 0, Math.PI / 2.0)); 
+        public static final Transform3d LEFT_CAMERA_OFFSET = new Transform3d(-0.219837, 0.1760728, 0.65913, new Rotation3d(0, 0, -Math.PI / 2.0)); 
 
         public static final double[] VISION_STANDARD_DEVIATION_COEFFICIENTS = { // PLACEHOLDER
             0.0025, 0.0025, 0
