@@ -40,7 +40,7 @@ public abstract class ManualDriveCommand extends Command {
     /**
      * The translation where the robot is locked.
      */
-    private Translation2d xyLockTranslation = new Translation2d(0.0, 0.0);
+    // private Translation2d xyLockTranslation = new Translation2d(0.0, 0.0);
 
     /**
      * Tracks whether linear velocity has been reset.
@@ -55,7 +55,7 @@ public abstract class ManualDriveCommand extends Command {
     /**
      * The rotation (angle) where the robot is locked.
      */
-    private Rotation2d thetaLockRotation = new Rotation2d(0.0);
+    // private Rotation2d thetaLockRotation = new Rotation2d(0.0);
     
     /**
      * Tracks whether rotational velocity has been reset.
@@ -147,17 +147,16 @@ public abstract class ManualDriveCommand extends Command {
 
             // TODO: test and fix this, delete the "false && " to activate
             if (linearVelocity.magnitude() < 1e-3) {
-                
                 if (!xyLockActive && driveSubsystem.getCommandedLinearVelocity().magnitude() < 1e-3) {
                     xyLockActive = true;
-                    xyLockTranslation = driveSubsystem.getRobotPose().getTranslation();
+                    // xyLockTranslation = driveSubsystem.getRobotPose().getTranslation();
                 }
 
-                if (false && xyLockActive) {
-                    finalLinearVelocity = driveSubsystem.getLinearFeedback(xyLockTranslation).scale(DriveConstants.LINEAR_MAX_SPEED);
-                } else {
-                    finalLinearVelocity = new Vector2d(0.0,0.0);
-                }
+                // if (xyLockActive) {
+                //     finalLinearVelocity = driveSubsystem.getLinearFeedback(xyLockTranslation).scale(DriveConstants.LINEAR_MAX_SPEED);
+                // } else {
+                finalLinearVelocity = new Vector2d(0.0,0.0);
+                // }
                 
             } else {
 
@@ -222,14 +221,14 @@ public abstract class ManualDriveCommand extends Command {
             if (Math.abs(rotationalVelocity) < 1e-3) {
                 if (!thetaLockActive && Math.abs(driveSubsystem.getCommandedRotationalVelocity()) < 1e-3) {
                     thetaLockActive = true;
-                    thetaLockRotation = driveSubsystem.getRobotPose().getRotation();
+                    // thetaLockRotation = driveSubsystem.getRobotPose().getRotation();
                 }
                 
-                if (false && thetaLockActive) {
-                    finalRotationalVelocity = driveSubsystem.getRotationalFeedback(thetaLockRotation) * DriveConstants.ROTATIONAL_MAX_SPEED;
-                } else {
-                    finalRotationalVelocity = 0.0;
-                }
+                // if (false && thetaLockActive) {
+                //     finalRotationalVelocity = driveSubsystem.getRotationalFeedback(thetaLockRotation) * DriveConstants.ROTATIONAL_MAX_SPEED;
+                // } else {
+                finalRotationalVelocity = 0.0;
+                // }
             } else {
 
                 thetaLockActive = false;

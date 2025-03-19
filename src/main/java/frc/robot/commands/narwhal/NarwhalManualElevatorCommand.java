@@ -1,7 +1,5 @@
 package frc.robot.commands.narwhal;
 
-import java.util.function.Supplier;
-
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.narwhal.NarwhalElevator;
@@ -10,21 +8,15 @@ import frc.robot.util.upper_assembly.ScoringHeight;
 public class NarwhalManualElevatorCommand extends Command {
     private final NarwhalElevator narwhalElevator;
     private final XboxController xboxController;
-    private final Supplier<Boolean> narwhalWristReadyToIntakeSupplier;
 
     /**
      * Creates a manual narwhal elevator command that moves the elevator to different positions based on button presses.
      * @param narwhalElevator The elevator subsystem to control.
      * @param controller The Xbox controller used to drive the elevator.
-     * @param narwhalWristReadyToIntakeSupplier A supplier that indicates if the narwhal wrist is ready to intake.
      */
-    public NarwhalManualElevatorCommand(
-            NarwhalElevator narwhalElevator, 
-            XboxController controller, 
-            Supplier<Boolean> narwhalWristReadyToIntakeSupplier) {
+    public NarwhalManualElevatorCommand(NarwhalElevator narwhalElevator, XboxController controller) {
         this.narwhalElevator = narwhalElevator;
         this.xboxController = controller;
-        this.narwhalWristReadyToIntakeSupplier = narwhalWristReadyToIntakeSupplier;
         //addRequirements(narwhalElevator);
     }
 

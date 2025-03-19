@@ -4,18 +4,12 @@
 
 package frc.robot;
 
-import frc.robot.Constants.Defaults;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.FieldConstants;
-import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.OceanViewConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.network.TCPSender;
 import frc.robot.network.UDPReceiver;
-import frc.robot.commands.XboxManualDriveCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.narwhal.NarwhalUpperAssembly;
@@ -27,29 +21,17 @@ import frc.robot.util.EnumPrettifier;
 import frc.robot.util.autonomous.Alliance;
 import frc.robot.util.autonomous.AutonomousRoutine;
 import frc.robot.util.autonomous.StartingPosition;
-import frc.robot.util.field.AlgaeRemovalPosition;
 import frc.robot.util.field.CoralStationSide;
 import frc.robot.util.field.ReefScoringLocation;
 import frc.robot.util.swerve.DrivingMotorType;
 import frc.robot.util.upper_assembly.ScoringHeight;
 import frc.robot.util.upper_assembly.UpperAssemblyFactory;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -74,7 +56,7 @@ public class RobotContainer {
 
     private UpperAssemblyBase upperAssembly = UpperAssemblyFactory.createUpperAssembly(Constants.Defaults.DEFAULT_UPPER_ASSEMBLY);
 
-    private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
+    private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator());
 
     @SuppressWarnings("unused") // The class is used due to how WPILib treats and stores subsystems.
     private OceanViewManager oceanViewManager;
@@ -87,7 +69,8 @@ public class RobotContainer {
     private final SendableChooser<UpperAssemblyType> upperAssemblySelector = new SendableChooser<>();
     private final SendableChooser<DrivingMotorType> drivingMotorSelector = new SendableChooser<>();
 
-    private double delayTimeSeconds;
+    private double delayTimeSeconds = 0;
+    private boolean startWithTushPush = false;
 
     /**
      * Creates a new RobotContainer object and sets up SmartDashboard an the button inputs.
@@ -98,7 +81,7 @@ public class RobotContainer {
         setupOceanViewManager();
 
         // Add cameras to the VisionOdometry object.
-        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, new Transform3d(-0.2159, 0, 0, new Rotation3d(0, 0, -Math.PI))));
+        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, VisionConstants.FRONT_CAMERA_OFFSET));
         visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.RIGHT_CAMERA_NAME, VisionConstants.RIGHT_CAMERA_OFFSET));
         visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.LEFT_CAMERA_NAME, VisionConstants.LEFT_CAMERA_OFFSET)); 
 
@@ -174,6 +157,7 @@ public class RobotContainer {
         SmartDashboard.putData(this.drivingMotorSelector);
 
         SmartDashboard.putNumber("Auto Delay", this.delayTimeSeconds);
+        SmartDashboard.putBoolean("Tush Push Mode", this.startWithTushPush);
     }
 
     /**
@@ -187,10 +171,10 @@ public class RobotContainer {
 
     public void scheduleAutonomous() {
         this.delayTimeSeconds = SmartDashboard.getNumber("Auto Delay", this.delayTimeSeconds);
+        this.startWithTushPush = SmartDashboard.getBoolean("Tush Push Mode", this.startWithTushPush);
+
         AutonomousRoutine autonomousRoutine = autonomousSelector.getSelected();
         Alliance alliance = allianceSelector.getSelected();
-        SmartDashboard.putString("Selected Autonomous", autonomousRoutine.toString());
-        SmartDashboard.putString("Selected Alliance", alliance.toString());
 
         driveSubsystem.setConfigs();
         upperAssembly.setRobotInScoringPositionSupplier(driveSubsystem::getInScorePose);
