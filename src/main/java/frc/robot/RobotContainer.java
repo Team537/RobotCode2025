@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import frc.robot.Constants.Defaults;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.OceanViewConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
@@ -11,9 +15,10 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.network.TCPSender;
 import frc.robot.network.UDPReceiver;
-import frc.robot.commands.XboxParkerManualDriveCommand;
+import frc.robot.commands.XboxManualDriveCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.narwhal.NarwhalUpperAssembly;
 import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
 import frc.robot.subsystems.vision.OceanViewManager;
 import frc.robot.subsystems.vision.odometry.PhotonVisionCamera;
@@ -22,15 +27,30 @@ import frc.robot.util.EnumPrettifier;
 import frc.robot.util.autonomous.Alliance;
 import frc.robot.util.autonomous.AutonomousRoutine;
 import frc.robot.util.autonomous.StartingPosition;
+import frc.robot.util.field.AlgaeRemovalPosition;
+import frc.robot.util.field.CoralStationSide;
+import frc.robot.util.field.ReefScoringLocation;
 import frc.robot.util.swerve.DrivingMotorType;
+import frc.robot.util.upper_assembly.ScoringHeight;
 import frc.robot.util.upper_assembly.UpperAssemblyFactory;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
-
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -59,9 +79,6 @@ public class RobotContainer {
     @SuppressWarnings("unused") // The class is used due to how WPILib treats and stores subsystems.
     private OceanViewManager oceanViewManager;
 
-    // Commands
-    Command manualDriveCommand = new XboxParkerManualDriveCommand(driveSubsystem, xBoxController);
-
     // Smart Dashboard Inputs
     private final SendableChooser<AutonomousRoutine> autonomousSelector = new SendableChooser<>();
     private final SendableChooser<StartingPosition> positionSelector = new SendableChooser<>();
@@ -69,6 +86,8 @@ public class RobotContainer {
 
     private final SendableChooser<UpperAssemblyType> upperAssemblySelector = new SendableChooser<>();
     private final SendableChooser<DrivingMotorType> drivingMotorSelector = new SendableChooser<>();
+
+    private double delayTimeSeconds;
 
     /**
      * Creates a new RobotContainer object and sets up SmartDashboard an the button inputs.
@@ -79,7 +98,7 @@ public class RobotContainer {
         setupOceanViewManager();
 
         // Add cameras to the VisionOdometry object.
-        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, new Transform3d()));
+        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, new Transform3d(-0.2159, 0, 0, new Rotation3d(0, 0, -Math.PI))));
         visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.RIGHT_CAMERA_NAME, VisionConstants.RIGHT_CAMERA_OFFSET));
         visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.LEFT_CAMERA_NAME, VisionConstants.LEFT_CAMERA_OFFSET)); 
 
@@ -153,22 +172,8 @@ public class RobotContainer {
         SmartDashboard.putData(this.allianceSelector);
         SmartDashboard.putData(this.upperAssemblySelector);
         SmartDashboard.putData(this.drivingMotorSelector);
-    }
 
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     */
-    public Command getAutonomousCommand() {
-        // Get and display the currently selected autonomous routine.
-        AutonomousRoutine selectedAutonomousRoutine = autonomousSelector.getSelected();
-        Alliance selectedAlliance = allianceSelector.getSelected();
-        SmartDashboard.putString("Selected Autonomous", selectedAutonomousRoutine.toString());
-        SmartDashboard.putString("Selected Alliance", selectedAlliance.toString());
-
-        this.upperAssembly = UpperAssemblyFactory.createUpperAssembly(this.upperAssemblySelector.getSelected());
-
-        // An example command will be run in autonomous
-        return Autos.exampleAuto(exampleSubsystem);
+        SmartDashboard.putNumber("Auto Delay", this.delayTimeSeconds);
     }
 
     /**
@@ -180,13 +185,98 @@ public class RobotContainer {
         upperAssembly = UpperAssemblyFactory.createUpperAssembly(upperAssemblyType);
     }
 
+    public void scheduleAutonomous() {
+        this.delayTimeSeconds = SmartDashboard.getNumber("Auto Delay", this.delayTimeSeconds);
+        AutonomousRoutine autonomousRoutine = autonomousSelector.getSelected();
+        Alliance alliance = allianceSelector.getSelected();
+        SmartDashboard.putString("Selected Autonomous", autonomousRoutine.toString());
+        SmartDashboard.putString("Selected Alliance", alliance.toString());
+
+        driveSubsystem.setConfigs();
+        upperAssembly.setRobotInScoringPositionSupplier(driveSubsystem::getInScorePose);
+        upperAssembly.setRobotInIntakingPositionSupplier(driveSubsystem::getInIntakePose);
+        if (upperAssembly instanceof NarwhalUpperAssembly) {
+            ((NarwhalUpperAssembly)upperAssembly).setCanRaiseLiftSupplier(driveSubsystem::getNarwhalCanRaiseLift);
+        }
+
+        switch (autonomousRoutine) {
+            case LEFT:
+                driveSubsystem.setRobotPose(StartingPosition.LEFT.getPose(alliance));
+                break;
+            case CENTER:
+                driveSubsystem.setRobotPose(StartingPosition.CENTER.getPose(alliance));
+                break;
+            case RIGHT:
+                driveSubsystem.setRobotPose(StartingPosition.RIGHT.getPose(alliance));
+                break;
+            default:
+            break;
+        }
+
+        Command autoDelayCommand = new WaitCommand(delayTimeSeconds);
+        Command autonomousCommand;
+
+        switch (autonomousRoutine) {
+            case LEFT:
+                autonomousCommand = 
+                    (
+                        driveSubsystem.getScoringCommand(alliance, ReefScoringLocation.J)
+                        .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
+                    ).andThen(
+                        driveSubsystem.getIntakeCommand(alliance, CoralStationSide.LEFT, 2)
+                        .andThen(upperAssembly.getCoralIntakeCommand())
+                    ).andThen(
+                        driveSubsystem.getScoringCommand(alliance, ReefScoringLocation.K)
+                        .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
+                    ).andThen(
+                        upperAssembly.getLowerCommand()
+                    );  
+                break;  
+            case CENTER:
+                autonomousCommand = 
+                    (
+                        driveSubsystem.getScoringCommand(alliance, ReefScoringLocation.H)
+                        .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
+                    ).andThen(
+                        upperAssembly.getCoralIntakeCommand()
+                    );
+                break;
+            case RIGHT:
+                autonomousCommand = 
+                    (
+                        driveSubsystem.getScoringCommand(alliance, ReefScoringLocation.E)
+                        .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
+                    ).andThen(
+                        driveSubsystem.getIntakeCommand(alliance, CoralStationSide.RIGHT, 7)
+                        .andThen(upperAssembly.getCoralIntakeCommand())
+                    ).andThen(
+                        driveSubsystem.getScoringCommand(alliance, ReefScoringLocation.D)
+                        .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
+                    ).andThen(
+                        upperAssembly.getLowerCommand()
+                    );    
+                break;
+            default:
+                autonomousCommand =  new InstantCommand(); // Do nothing if no valid auto routine is selected
+        }
+
+        autoDelayCommand.andThen(autonomousCommand).schedule();
+
+    }
+
     /**
      * Schedules commands used exclusively during TeleOp.
      */
     public void scheduleTeleOp() {
+
+        Alliance alliance = allianceSelector.getSelected();
+        SmartDashboard.putString("Selected Alliance", alliance.toString());
+
         // The Drive Command
-        driveSubsystem.setDefaultCommand(manualDriveCommand);
+        driveSubsystem.setConfigs();
         upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
+        driveSubsystem.setDefaultCommand(driveSubsystem.getManualCommand(xBoxController, alliance));
+
     }
 
 

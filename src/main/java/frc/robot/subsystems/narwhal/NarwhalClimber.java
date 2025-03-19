@@ -88,7 +88,7 @@ public class NarwhalClimber extends SubsystemBase {
      * Set the climber to the deploy angle stored in constants
      */
     public void goToDeploy() {
-        setCurrentMotorAngle(NarwhalClimberConstants.DEPLOYED_ANGLE);
+        setCurrentMotorAngle(NarwhalClimberConstants.DEPLOYED_WINCH_ROTATIONS);
         currentState = NarwhalClimberState.DEPLOYING; // must be after the set function because the set function will default to CUSTOM state
     }
 
@@ -96,7 +96,7 @@ public class NarwhalClimber extends SubsystemBase {
      * Set the climber to the target angle for climbing stored in constants
      */
     public void climb() {
-        setCurrentMotorAngle(NarwhalClimberConstants.CLIMB_ANGLE);
+        setCurrentMotorAngle(NarwhalClimberConstants.CLIMB_WINCH_ROTATIONS);
         currentState = NarwhalClimberState.CLIMBING; // must be after the set function because the set function will default to CUSTOM state
     }
 
@@ -105,7 +105,7 @@ public class NarwhalClimber extends SubsystemBase {
      */
     public boolean isAtClimbAngle(){
         double current_position = climber.getEncoder().getPosition();
-        return Math.abs(current_position - NarwhalClimberConstants.CLIMB_ANGLE.getRotations()) < NarwhalClimberConstants.CLIMBER_ANGLE_TOLERANCE.getRotations();
+        return Math.abs(current_position - NarwhalClimberConstants.CLIMB_WINCH_ROTATIONS.getRotations()) < NarwhalClimberConstants.CLIMBER_ANGLE_TOLERANCE.getRotations();
     }
 
     /**
@@ -113,7 +113,7 @@ public class NarwhalClimber extends SubsystemBase {
      */
     public boolean isAtDeployAngle(){
         double current_position = climber.getEncoder().getPosition();
-        return Math.abs(current_position - NarwhalClimberConstants.DEPLOYED_ANGLE.getRotations()) < NarwhalClimberConstants.CLIMBER_ANGLE_TOLERANCE.getRotations();
+        return Math.abs(current_position - NarwhalClimberConstants.DEPLOYED_WINCH_ROTATIONS.getRotations()) < NarwhalClimberConstants.CLIMBER_ANGLE_TOLERANCE.getRotations();
     }
 
     @Override

@@ -15,7 +15,10 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.NarwhalElevatorState;
 import frc.robot.util.NarwhalWristState;
+import frc.robot.util.upper_assembly.ScoringHeight;
+import frc.robot.Constants.NarwhalConstants.NarwhalElevatorConstants;
 import frc.robot.Constants.NarwhalConstants.NarwhalWristConstants;
 
 /**
@@ -92,35 +95,41 @@ public class NarwhalWrist extends SubsystemBase {
     }
     
     /**
-     * Set the wrist motor to the angle for scoring L1 (defined in constants) & update status.
+     * Set the wrist motor to the angle for the specified scoring height.
+     *
+     * @param height The target scoring height.
      */
-    public void goToL1WristAngle(){
-        setCurrentMotorAngle(NarwhalWristConstants.L1_OUTTAKE_ANGLE);
-        currentState = NarwhalWristState.L1; // must be after the set function because the set function will default to CUSTOM state
-    }
-    
-    /**
-     * Set the wrist motor to the angle for scoring L2 (defined in constants) & update status.
-     */
-    public void goToL2WristAngle(){
-        setCurrentMotorAngle(NarwhalWristConstants.L2_OUTTAKE_ANGLE);
-        currentState = NarwhalWristState.L2; // must be after the set function because the set function will default to CUSTOM state
+    public void goToScoreAngle(ScoringHeight height) {
+        switch (height) {
+            case L1:
+                setCurrentMotorAngle(NarwhalWristConstants.L1_OUTTAKE_ANGLE);
+                currentState = NarwhalWristState.L1;
+                break;
+            case L2:
+                setCurrentMotorAngle(NarwhalWristConstants.L2_OUTTAKE_ANGLE);
+                currentState = NarwhalWristState.L2;
+                break;
+            case L3:
+                setCurrentMotorAngle(NarwhalWristConstants.L3_OUTTAKE_ANGLE);
+                currentState = NarwhalWristState.L3;
+                break;
+            case L4:
+                setCurrentMotorAngle(NarwhalWristConstants.L4_OUTTAKE_ANGLE);
+                currentState = NarwhalWristState.L4;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown scoring height: " + height);
+        }
     }
 
     /**
-     * Set the wrist motor to the angle for scoring L3 (defined in constants) & update status.
+     * Goes to the algae descore position
+     * @param isTopRow True if the algae is in the top row, false if it is in the bottom row
+     * @param isDown True if the manipulator should be pressing down on the algae, false if it should just be above the algae
      */
-    public void goToL3WristAngle(){
-        setCurrentMotorAngle(NarwhalWristConstants.L3_OUTTAKE_ANGLE);
-        currentState = NarwhalWristState.L3; // must be after the set function because the set function will default to CUSTOM state
-    }
-
-    /**
-     * Set the wrist motor to the angle for scoring L4 (defined in constants) & update status.
-     */
-    public void goToL4WristAngle(){
-        setCurrentMotorAngle(NarwhalWristConstants.L4_OUTTAKE_ANGLE);
-        currentState = NarwhalWristState.L4; // must be after the set function because the set function will default to CUSTOM state
+    public void goToAlgaeDescoreAngle(){
+        setCurrentMotorAngle(NarwhalWristConstants.ALGAE_ANGLE);
+        currentState = NarwhalWristState.ALGAE;
     }
 
     /**
@@ -145,6 +154,11 @@ public class NarwhalWrist extends SubsystemBase {
     public void goToClimbAngle(){
         setCurrentMotorAngle(NarwhalWristConstants.CLIMB_ANGLE);
         currentState = NarwhalWristState.CLIMB;
+    }
+
+    public void goToTransitAngle() {
+        setCurrentMotorAngle(NarwhalWristConstants.TRANSIT_ANGLE);
+        currentState = NarwhalWristState.TRANSIT;
     }
 
     /**

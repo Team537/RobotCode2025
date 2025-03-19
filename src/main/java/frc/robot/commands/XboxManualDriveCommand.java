@@ -5,9 +5,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.util.autonomous.Alliance;
 import frc.robot.util.math.Vector2d;
 
-public class XboxParkerManualDriveCommand extends ManualDriveCommand {
+public class XboxManualDriveCommand extends ManualDriveCommand {
+
 
     boolean orientationOffsetTargetActive = false;
 
@@ -17,8 +19,8 @@ public class XboxParkerManualDriveCommand extends ManualDriveCommand {
      * @param driveSubsystem The robot's drive subsystem.
      * @param controller The controller used by the driver.
      */
-    public XboxParkerManualDriveCommand(DriveSubsystem driveSubsystem, XboxController controller) {
-        super(driveSubsystem,controller);
+    public XboxManualDriveCommand(DriveSubsystem driveSubsystem, XboxController controller, Alliance alliance) {
+        super(driveSubsystem,controller, alliance);
     }
 
     @Override
@@ -28,7 +30,7 @@ public class XboxParkerManualDriveCommand extends ManualDriveCommand {
         // Calculate linear velocity based on the left stick input (x for strafe, y for forward/backward).
         // Apply a deadband to ignore small joystick movements and normalize the vector if it's too large.
         Vector2d linearVelocity = new Vector2d(controller.getLeftX(), -controller.getLeftY());
-        if (linearVelocity.magnitude() < OperatorConstants.XBOX_CONTROLLER_JOYSTICK_DEADMAND_RADIUS) {
+        if (linearVelocity.magnitude() < OperatorConstants.XBOX_CONTROLLER_JOYSTICK_DEADBAND_RADIUS) {
             linearVelocity = new Vector2d(0, 0); // Ignore small joystick movements
         } else if (linearVelocity.magnitude() > 1.0) {
             linearVelocity = linearVelocity.normalize(); // Normalize to keep within [-1, 1]
@@ -38,7 +40,7 @@ public class XboxParkerManualDriveCommand extends ManualDriveCommand {
         // Calculate rotational velocity from the right stick's X-axis input.
         // Apply a deadband to ignore small movements and clamp the value to [-1, 1].
         double rotationalVelocity = -controller.getRightX();
-        if (Math.abs(rotationalVelocity) < OperatorConstants.XBOX_CONTROLLER_JOYSTICK_DEADMAND_RADIUS) {
+        if (Math.abs(rotationalVelocity) < OperatorConstants.XBOX_CONTROLLER_JOYSTICK_DEADBAND_RADIUS) {
             rotationalVelocity = 0.0; // Ignore small joystick movements
         } else if (Math.abs(rotationalVelocity) > 1.0) {
             rotationalVelocity = Math.signum(rotationalVelocity); // Clamp to [-1, 1]
@@ -48,9 +50,9 @@ public class XboxParkerManualDriveCommand extends ManualDriveCommand {
         // Calculate a target offset for translation based on the left stick and right trigger.
         // The trigger adjusts the radius of the target offset, ranging from minimum to maximum radius.
         // Activates when the left stick button is pressed.
-        double linearTargetRadius = OperatorConstants.XBOX_CONTROLLER_TARGET_MIN_RADIUS 
-            + controller.getRightTriggerAxis() * (OperatorConstants.XBOX_CONTROLLER_TARGET_MAX_RADIUS 
-            - OperatorConstants.XBOX_CONTROLLER_TARGET_MIN_RADIUS);
+        double linearTargetRadius = OperatorConstants.XBOX_CONTROLLER_TARGET_RADIUS 
+            + controller.getRightTriggerAxis() * (OperatorConstants.XBOX_CONTROLLER_TARGET_THROTTLE_RADIUS 
+            - OperatorConstants.XBOX_CONTROLLER_TARGET_RADIUS);
         Translation2d targetTranslationOffset = new Translation2d(
             controller.getLeftX() * linearTargetRadius, 
             -controller.getLeftY() * linearTargetRadius
@@ -82,6 +84,9 @@ public class XboxParkerManualDriveCommand extends ManualDriveCommand {
         // --- Throttle Control ---
         // Throttle determines the overall speed of the robot, based on the right trigger's position (0 to 1).
         double throttle = controller.getRightTriggerAxis();
+        double slow = controller.getLeftTriggerAxis();
+
+        boolean fieldCentric = !controller.getLeftBumperButton();
 
         // --- Call the Manual Drive Method ---
         // Pass all calculated values to the manualDrive method for execution.
@@ -93,7 +98,9 @@ public class XboxParkerManualDriveCommand extends ManualDriveCommand {
             targetRotationOffset,
             useTargetRotation,
             useAbsoluteRotation,
-            throttle
+            throttle,
+            slow,
+            fieldCentric
         );
 
     }
