@@ -56,7 +56,7 @@ public class RobotContainer {
 
     private UpperAssemblyBase upperAssembly = UpperAssemblyFactory.createUpperAssembly(Constants.Defaults.DEFAULT_UPPER_ASSEMBLY);
 
-    private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
+    private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator());
 
     @SuppressWarnings("unused") // The class is used due to how WPILib treats and stores subsystems.
     private OceanViewManager oceanViewManager;
@@ -80,7 +80,7 @@ public class RobotContainer {
         setupOceanViewManager();
 
         // Add cameras to the VisionOdometry object.
-        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, new Transform3d(-0.2159, 0, 0, new Rotation3d(0, 0, -Math.PI))));
+        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, VisionConstants.FRONT_CAMERA_OFFSET));
         visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.RIGHT_CAMERA_NAME, VisionConstants.RIGHT_CAMERA_OFFSET));
         visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.LEFT_CAMERA_NAME, VisionConstants.LEFT_CAMERA_OFFSET)); 
 

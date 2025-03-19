@@ -267,7 +267,7 @@ public class DriveSubsystem extends SubsystemBase {
         ModuleConfig moduleConfig = new ModuleConfig(
                 DriveConstants.WHEEL_RADIUS,
                 maxDriveVelocity,
-                DriveConstants.WHEEL_COEFFICIENT_FRICTION, //TODO: set this back
+                DriveConstants.WHEEL_COEFFICIENT_FRICTION,
                 motorType,
                 motorReduction,
                 currentLimit,
