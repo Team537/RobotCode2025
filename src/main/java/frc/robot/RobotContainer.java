@@ -63,7 +63,6 @@ public class RobotContainer {
 
     // Smart Dashboard Inputs
     private final SendableChooser<AutonomousRoutine> autonomousSelector = new SendableChooser<>();
-    private final SendableChooser<StartingPosition> positionSelector = new SendableChooser<>();
     private final SendableChooser<Alliance> allianceSelector = new SendableChooser<>();
 
     private final SendableChooser<UpperAssemblyType> upperAssemblySelector = new SendableChooser<>();
@@ -143,15 +142,13 @@ public class RobotContainer {
      */
     private void setupSmartDashboard() {
         // Setup dropdowns from enumeration values
-        EnumPrettifier.setupSendableChooserFromEnum(this.autonomousSelector, AutonomousRoutine.class, AutonomousRoutine.DEFAULT);
-        EnumPrettifier.setupSendableChooserFromEnum(this.positionSelector, StartingPosition.class, StartingPosition.LEFT);
+        EnumPrettifier.setupSendableChooserFromEnum(this.autonomousSelector, AutonomousRoutine.class, AutonomousRoutine.CENTER);
         EnumPrettifier.setupSendableChooserFromEnum(this.allianceSelector, Alliance.class, Alliance.RED);
         EnumPrettifier.setupSendableChooserFromEnum(this.upperAssemblySelector, UpperAssemblyType.class, UpperAssemblyType.NARWHAL);
         EnumPrettifier.setupSendableChooserFromEnum(this.drivingMotorSelector, DrivingMotorType.class, DrivingMotorType.KRAKEN_X60);
 
         // Add the selectors to the dashboard.
         SmartDashboard.putData(this.autonomousSelector);
-        SmartDashboard.putData(this.positionSelector);
         SmartDashboard.putData(this.allianceSelector);
         SmartDashboard.putData(this.upperAssemblySelector);
         SmartDashboard.putData(this.drivingMotorSelector);
