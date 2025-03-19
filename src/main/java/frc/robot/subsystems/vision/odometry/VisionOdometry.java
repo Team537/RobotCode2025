@@ -62,6 +62,17 @@ public class VisionOdometry extends SubsystemBase {
         cameras.add(camera);
     }
 
+     /**
+     * Periodically updates the robot's pose estimator with vision measurements 
+     * from all registered cameras.
+     * <p>
+     * This method is called automatically by the scheduler. For each camera:
+     * <ul>
+     *   <li>The current best estimate of the robot's pose is passed to the camera.</li>
+     *   <li>If the camera provides a valid vision-based pose estimate, it is 
+     *       added to the pose estimator with an appropriate timestamp.</li>
+     * </ul>
+     */
     public void updateVisionPositionData() {
 
         // Get the current best estimate of the robot's pose from the pose estimator
@@ -103,9 +114,6 @@ public class VisionOdometry extends SubsystemBase {
      */
     @Override
     public void periodic() {
-
-        // Updates the robot's position data.
-        updateVisionPositionData();
 
         // Display the robot's current position on the field.
         this.field2d.setRobotPose(this.poseEstimator.getEstimatedPosition());
