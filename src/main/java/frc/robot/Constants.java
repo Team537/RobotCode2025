@@ -718,10 +718,10 @@ public final class Constants {
 
             // Lists for the coral station intake poses.
             // The human player’s list is from indices 0 to 8 (left-to-right from the driver perspective).
-            public static final List<Pose2d> BLUE_CORAL_INTAKE_LEFT = new ArrayList<>();
-            public static final List<Pose2d> BLUE_CORAL_INTAKE_RIGHT = new ArrayList<>();
-            public static final List<Pose2d> RED_CORAL_INTAKE_LEFT = new ArrayList<>();
-            public static final List<Pose2d> RED_CORAL_INTAKE_RIGHT = new ArrayList<>();
+            public static List<Pose2d> BLUE_CORAL_INTAKE_LEFT = new ArrayList<>();
+            public static List<Pose2d> BLUE_CORAL_INTAKE_RIGHT = new ArrayList<>();
+            public static List<Pose2d> RED_CORAL_INTAKE_LEFT = new ArrayList<>();
+            public static List<Pose2d> RED_CORAL_INTAKE_RIGHT = new ArrayList<>();
 
             static {
                 // Generate BLUE LEFT intake positions using Transform2d.
