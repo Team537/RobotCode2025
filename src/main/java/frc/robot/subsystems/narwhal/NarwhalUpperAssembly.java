@@ -28,8 +28,6 @@ import frc.robot.util.upper_assembly.ScoringHeight;
 public class NarwhalUpperAssembly extends UpperAssemblyBase {
 
     private Supplier<Boolean> canRaiseLiftSupplier = ()->{return true;};
-    
-    private boolean drivetrainCanRemoveAlgae = false;
 
     private final NarwhalIntakeOuttake intakeOuttake;
     private final NarwhalWrist wrist;
@@ -109,13 +107,9 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
                 )
                 .andThen(
                     new NarwhalAlgaeRemoveCommand(elevator, wrist, algaeRemovalPosition.isTopRow())
-                    .alongWith(
-                        new InstantCommand(()->drivetrainCanRemoveAlgae = true) // Set the flag to true when the algae is descored
-                    )
                 )
             ).handleInterrupt(
                 ()->{
-                    drivetrainCanRemoveAlgae = false;
                     wrist.goToTransitAngle();
                 }
             );
@@ -144,7 +138,7 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
     public Command getManualCommand(XboxController controller) {
         NarwhalManualIntakeOuttakeCommand narwhalManualIntakeOuttakeCommand = new NarwhalManualIntakeOuttakeCommand(intakeOuttake, controller);
         NarwhalManualWristCommand narwhalManualWristCommand = new NarwhalManualWristCommand(wrist, controller);
-        NarwhalManualElevatorCommand narwhalManualElevatorCommand = new NarwhalManualElevatorCommand(elevator, controller, wrist::readyToIntake);
+        NarwhalManualElevatorCommand narwhalManualElevatorCommand = new NarwhalManualElevatorCommand(elevator, controller);
         NarwhalManualClimberCommand narwhalManualClimberCommand = new NarwhalManualClimberCommand(climber, controller);
 
         ParallelCommandGroup manualParallelCommandGroup = new ParallelCommandGroup(
