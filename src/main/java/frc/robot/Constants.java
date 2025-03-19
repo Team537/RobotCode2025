@@ -66,11 +66,12 @@ public final class Constants {
         // Controller Constants
         public static final double LINEAR_INPUT_CURVE_POWER = 2.5;
         public static final double ROTATION_INPUT_CURVE_POWER = 2.5;
-        public static final double THROTTLE_LINEAR_MIN_SPEED = 2.0; // MeterFper second
+        public static final double NORMAL_LINEAR_MAX_SPEED = 2.0; // Meters/per second
         public static final double THROTTLE_LINEAR_MAX_SPEED = DriveConstants.LINEAR_MAX_SPEED; // Meters per second
-        public static final double THROTTLE_ROTATIONAL_MIN_SPEED = 7.0; // Radians per second
-        public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; // Radians per
-                                                                                                        // second
+        public static final double SLOW_LINEAR_MAX_SPEED = 0.5; // Meters/per second
+        public static final double NORMAL_ROTATIONAL_MAX_SPEED = 7.0; // Radians per second
+        public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; // Radians per second
+        public static final double SLOW_ROTATIONAL_MAX_SPEED = 2.0; // Meters/per second
         public static final double XBOX_CONTROLLER_JOYSTICK_DEADBAND_RADIUS = 0.01;
         public static final double XBOX_CONTROLLER_TARGET_RADIUS = 2.0; // Meters
         public static final double XBOX_CONTROLLER_TARGET_THROTTLE_RADIUS = 0.5; // Meters
@@ -95,6 +96,7 @@ public final class Constants {
         public static final double ROTATION_THRESHOLD = 0.20; // Radians
 
         public static final double NARWHAL_CAN_RAISE_LIFT_DISTANCE = 1.0; // Meters
+        public static final Transform2d NARWHAL_RAKE_ALAGE_TRANSFORM = new Transform2d(0.5,0.0,new Rotation2d());
 
         public static final double[] DRIVE_STANDARD_DEVIATION_COEFFICIENTS = {
             0.006611986432, 0.3500199104, 0
@@ -745,8 +747,16 @@ public final class Constants {
 
         }
 
-        public static class StartingPositionConstants {
-            
+        public static class StartingPoseConstants {
+
+            public static final Pose2d BLUE_LEFT_STARTING_POSE = new Pose2d(new Translation2d(7.247,6.16),new Rotation2d());
+            public static final Pose2d BLUE_CENTER_STARTING_POSE = new Pose2d(new Translation2d(7.247,4.19),new Rotation2d());
+            public static final Pose2d BLUE_RIGHT_STARTING_POSE = new Pose2d(new Translation2d(7.247,1.88),new Rotation2d());
+
+            public static final Pose2d RED_LEFT_STARTING_POSE = rotate180(BLUE_LEFT_STARTING_POSE);
+            public static final Pose2d RED_CENTER_STARTING_POSE = rotate180(BLUE_CENTER_STARTING_POSE);
+            public static final Pose2d RED_RIGHT_STARTING_POSE = rotate180(BLUE_RIGHT_STARTING_POSE);
+
         }
 
     }

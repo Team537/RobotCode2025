@@ -164,8 +164,15 @@ public abstract class ManualDriveCommand extends Command {
                 xyLockActive = false;
 
                 // Apply throttle for speed control
-                double linearThrottleMultiplier = OperatorConstants.THROTTLE_LINEAR_MIN_SPEED + throttle * 
-                    (OperatorConstants.THROTTLE_LINEAR_MAX_SPEED - OperatorConstants.THROTTLE_LINEAR_MIN_SPEED);
+                double linearThrottleMultiplier;
+                if (slow < 1e-2) {
+                    linearThrottleMultiplier = OperatorConstants.NORMAL_LINEAR_MAX_SPEED + throttle * 
+                        (OperatorConstants.THROTTLE_LINEAR_MAX_SPEED - OperatorConstants.NORMAL_LINEAR_MAX_SPEED);
+                } else {
+                    linearThrottleMultiplier = OperatorConstants.NORMAL_LINEAR_MAX_SPEED + slow * 
+                        (OperatorConstants.SLOW_LINEAR_MAX_SPEED - OperatorConstants.NORMAL_LINEAR_MAX_SPEED);
+                }
+                
                 finalLinearVelocity = linearVelocity.scale(linearThrottleMultiplier);
             }
 
@@ -227,9 +234,14 @@ public abstract class ManualDriveCommand extends Command {
 
                 thetaLockActive = false;
 
-                // Apply throttle for rotational speed control
-                double rotationalThrottleMultiplier = OperatorConstants.THROTTLE_ROTATIONAL_MIN_SPEED + throttle * 
-                    (OperatorConstants.THROTTLE_ROTATIONAL_MAX_SPEED - OperatorConstants.THROTTLE_ROTATIONAL_MIN_SPEED);
+                double rotationalThrottleMultiplier;
+                if (slow < 1e-2) {
+                    rotationalThrottleMultiplier = OperatorConstants.NORMAL_ROTATIONAL_MAX_SPEED + throttle * 
+                        (OperatorConstants.THROTTLE_ROTATIONAL_MAX_SPEED - OperatorConstants.NORMAL_ROTATIONAL_MAX_SPEED);
+                } else {
+                    rotationalThrottleMultiplier = OperatorConstants.NORMAL_ROTATIONAL_MAX_SPEED + slow * 
+                        (OperatorConstants.SLOW_ROTATIONAL_MAX_SPEED - OperatorConstants.NORMAL_ROTATIONAL_MAX_SPEED);
+                }
                 finalRotationalVelocity = rotationalVelocity * rotationalThrottleMultiplier;
             }
 

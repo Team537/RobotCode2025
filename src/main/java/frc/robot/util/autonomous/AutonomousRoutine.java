@@ -14,5 +14,8 @@ package frc.robot.util.autonomous;
  * @see {@link frc.robot.RobotContainer}
  */
 public enum AutonomousRoutine {
+    LEFT,
+    CENTER,
+    RIGHT,
     DEFAULT;
 }

@@ -1,6 +1,7 @@
 package frc.robot.util.autonomous;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import frc.robot.Constants.FieldConstants.StartingPoseConstants;
 
 /**
  * <h2> StartingPosition </h2>
@@ -17,14 +18,24 @@ import edu.wpi.first.math.geometry.Pose2d;
  * @see {@link frc.robot.RobotContainer}
  */
 public enum StartingPosition {
-    LEFT(),
-    CENTER(),
-    RIGHT();
+    LEFT(StartingPoseConstants.BLUE_LEFT_STARTING_POSE,StartingPoseConstants.RED_LEFT_STARTING_POSE),
+    CENTER(StartingPoseConstants.BLUE_CENTER_STARTING_POSE,StartingPoseConstants.RED_CENTER_STARTING_POSE),
+    RIGHT(StartingPoseConstants.BLUE_RIGHT_STARTING_POSE,StartingPoseConstants.RED_RIGHT_STARTING_POSE);
 
-    Pose2d pose;
+    Pose2d bluePose;
+    Pose2d redPose;
 
-    StartingPosition(Pose2d pose) {
-        this.pose = pose;
+    StartingPosition(Pose2d bluePose, Pose2d redPose) {
+        this.bluePose = bluePose;
+        this.redPose = redPose;
+    }
+
+    public Pose2d getPose(Alliance alliance) { 
+        if (alliance == Alliance.BLUE) {
+            return bluePose;
+        } else {
+            return redPose;
+        }
     }
 
 }

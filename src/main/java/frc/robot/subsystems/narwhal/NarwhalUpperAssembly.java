@@ -18,6 +18,8 @@ import frc.robot.commands.narwhal.NarwhalAlgaeRemoveCommand;
 import frc.robot.commands.narwhal.NarwhalClimbCommand;
 import frc.robot.commands.narwhal.NarwhalCoralIntakeCommand;
 import frc.robot.commands.narwhal.NarwhalCoralScoreCommand;
+import frc.robot.commands.narwhal.NarwhalIntakeCommand;
+import frc.robot.commands.narwhal.NarwhalIntakePositionCommand;
 import frc.robot.commands.narwhal.NarwhalManualClimberCommand;
 import frc.robot.commands.narwhal.NarwhalManualElevatorCommand;
 import frc.robot.commands.narwhal.NarwhalManualIntakeOuttakeCommand;
@@ -33,9 +35,8 @@ import frc.robot.util.upper_assembly.ScoringHeight;
 public class NarwhalUpperAssembly extends UpperAssemblyBase {
 
     private Supplier<Boolean> canRaiseLiftSupplier = ()->{return true;};
-    private Supplier<Boolean> canDescoreAlgaeSupplier = ()->{return true;};
     
-    private boolean isReadyToDescoreAlgae = false;
+    private boolean drivetrainCanRemoveAlgae = false;
 
     private final NarwhalIntakeOuttake intakeOuttake;
     private final NarwhalWrist wrist;
@@ -54,23 +55,21 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
         canRaiseLiftSupplier = supplier;
     }
 
-    public void setCanDescoreAlgaeSupplier(Supplier<Boolean> supplier) {
-        canDescoreAlgaeSupplier = supplier;
-    }
-
-    public boolean isReadyToDescoreAlgaeSupplier() {
-        return isReadyToDescoreAlgae;
-    }
-
     public Command getCoralIntakeCommand() {
-        NarwhalCoralIntakeCommand narwhalCoralIntakeCommand = new NarwhalCoralIntakeCommand(
-            elevator, 
-            wrist, 
-            intakeOuttake, 
-            robotInClimbPositionSupplier
+        Command coralIntakeCommand = (
+            (
+                new WaitUntilCommand(canRaiseLiftSupplier::get)
+                .deadlineFor(new NarwhalTransitPositionCommand(elevator,wrist))
+            ).andThen(
+                new NarwhalIntakePositionCommand(elevator, wrist)
+            ).andThen(
+                new WaitUntilCommand(robotInIntakingPositionSupplier::get)
+            ).andThen(
+                new NarwhalIntakeCommand(intakeOuttake)
+            )
         );
-        narwhalCoralIntakeCommand.addRequirements(this);
-        return narwhalCoralIntakeCommand;
+        coralIntakeCommand.addRequirements(this);
+        return coralIntakeCommand;
     }
 
     public Command getCoralScoreCommand(ScoringHeight scoringHeight) {
@@ -95,16 +94,6 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
         command.addRequirements(this);    
         return command;
 
-        /*NarwhalCoralScoreCommand narwhalCoralScoreCommand = new NarwhalCoralScoreCommand(
-            elevator, 
-            wrist, 
-            intakeOuttake, 
-            robotInClimbPositionSupplier,
-            scoringHeight
-        );
-        narwhalCoralScoreCommand.addRequirements(this);
-        return narwhalCoralScoreCommand.finallyDo(() -> SmartDashboard.putBoolean("test",true))*/
-
     }
 
     public Command getRemoveAlgaeCommand(AlgaeRemovalPosition algaeRemovalPosition) {
@@ -113,7 +102,7 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
         Then it will move the manipulator into position to descore the algae and wait until it can descore the algae
         Then it will move down to descore the algae and set the descored algae flag to true
          */
-        Command removeAlgaeCommand = 
+        Command command = 
             (
                 (
                     new WaitUntilCommand(canRaiseLiftSupplier::get)
@@ -123,25 +112,29 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
                     new NarwhalAlgaePreparePositionCommand(elevator, wrist, algaeRemovalPosition.isTopRow())
                 )
                 .andThen(
-                    new WaitUntilCommand(canDescoreAlgaeSupplier::get)
+                    new WaitUntilCommand(robotInAlgaeRemovingPositionSupplier::get)
                 )
                 .andThen(
                     new NarwhalAlgaeRemoveCommand(elevator, wrist, algaeRemovalPosition.isTopRow())
                     .alongWith(
-                        new InstantCommand(()->isReadyToDescoreAlgae = true) // Set the flag to true when the algae is descored
+                        new InstantCommand(()->drivetrainCanRemoveAlgae = true) // Set the flag to true when the algae is descored
                     )
                 )
             ).handleInterrupt(
                 ()->{
-                    isReadyToDescoreAlgae = false;
+                    drivetrainCanRemoveAlgae = false;
                     wrist.goToTransitAngle();
                 }
             );
             
-        removeAlgaeCommand.addRequirements(this);
+        command.addRequirements(this);
 
         // returns the remove algae command
-        return removeAlgaeCommand;
+        return command;
+    }
+
+    public Command getLowerCommand() {
+        return new NarwhalTransitPositionCommand(elevator, wrist);
     }
 
     public Command getClimbCommand() {

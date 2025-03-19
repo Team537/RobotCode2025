@@ -44,6 +44,13 @@ public class SquidUpperAssembly extends UpperAssemblyBase {
         );
     }
 
+    public Command getLowerCommand() {
+        return new RunCommand(
+            () -> {/*PLACEHOLDER, DO NOT USE RUN COMMANDS!*/},
+            this
+        );
+    }
+
     public Command getManualCommand(XboxController controller) {
         if (squidManipulator == null) {
             squidManipulator = new SquidManipulator();

@@ -19,7 +19,6 @@ public interface UpperAssembly {
      * Creates a command to run the coral intake mechanism.
      * This command is used to collect coral.
      *
-     * @param robotPoseSupplier A supplier to return the pose of the robot
      * @return A command that controls the coral intake mechanism.
      */
     public Command getCoralIntakeCommand();
@@ -29,7 +28,6 @@ public interface UpperAssembly {
      * This command operates the mechanism required to place coral at the specified scoring position.
      *
      * @param scoringHeight The target height for scoring the coral.
-     * @param robotPoseSupplier A supplier to return the pose of the robot
      * @return A command to control the scoring mechanism at the specified height.
      */
     public Command getCoralScoreCommand(ScoringHeight scoringHeight);
@@ -38,7 +36,6 @@ public interface UpperAssembly {
      * Creates a command to remove algae.
      * This command controls the mechanism for clearing algae.
      *
-     * @param robotPoseSupplier A supplier to return the pose of the robot
      * @return A command that handles the removal of algae.
      */
     public Command getRemoveAlgaeCommand(AlgaeRemovalPosition algaeRemovalPosition);
@@ -46,11 +43,17 @@ public interface UpperAssembly {
     /**
      * Creates a command to climb or elevate the robot.
      * This command is used during climbing or traversal operations.
-     *
-     * @param robotPoseSupplier A supplier to return the pose of the robot
+     * 
      * @return A command that controls the climbing mechanism.
      */
     public Command getClimbCommand();
+
+    /**
+     * 
+     *
+     * @return A command that controls the climbing mechanism.
+     */
+    public Command getLowerCommand();
 
     /**
      * Creates a manual control command for the upper assembly.

@@ -36,6 +36,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Constants;
 import frc.robot.Configs.Narwhal;
 import frc.robot.Constants.Defaults;
 import frc.robot.Constants.DriveConstants;
@@ -131,6 +134,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     /** The last chassis speeds actually commanded to the swerve modules. */
     private ChassisSpeeds commandedVelocities = new ChassisSpeeds();
+
+    private Supplier<Boolean> narwahlCanRemoveAlgaeSupplier = (() -> {return true;});
 
     /**
      * Pose estimator for the robot’s position. Note: Although this is initialized via field
@@ -326,6 +331,14 @@ public class DriveSubsystem extends SubsystemBase {
         setpointGenerator = new SwerveSetpointGenerator(swerveConfig, maxTurningSpeed);
     }
 
+    /**
+     * sets the supplier for whether the drivetrain can move to remove algae from the reef
+     * @param supplier the supplier, that when true, will move the drivetrain.
+     */
+    public void setNarwhalCanRemoveAlgaeSupplier(Supplier<Boolean> supplier) {
+        narwahlCanRemoveAlgaeSupplier = supplier;
+    }
+
     //////////////////////////////////////////////////////////////////////////////
     // Driving Command Methods
     //////////////////////////////////////////////////////////////////////////////
@@ -502,8 +515,13 @@ public class DriveSubsystem extends SubsystemBase {
             }
         }
 
+        Command moveAfterUpperAssemblyCommand;
         if (upperAssemblyType == UpperAssemblyType.NARWHAL) {
             targetPose = targetPose.transformBy(NarwhalConstants.ALGAE_REMOVAL_RELATIVE_TRANSFORM);
+            moveAfterUpperAssemblyCommand = new WaitUntilCommand(narwahlCanRemoveAlgaeSupplier::get)
+                .andThen(getPathfindingCommand(targetPose.transformBy(DriveConstants.NARWHAL_RAKE_ALAGE_TRANSFORM)));
+        } else {
+            moveAfterUpperAssemblyCommand = new InstantCommand();
         }
 
         return 
@@ -513,6 +531,8 @@ public class DriveSubsystem extends SubsystemBase {
                 getPathfindingCommand(targetPose) 
             ).andThen(
                 new InstantCommand(() -> {inAlgaeRemovePose = true;})
+            ).andThen(
+                moveAfterUpperAssemblyCommand
             );
     }
 
