@@ -18,6 +18,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.NarwhalWristState;
+import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.NarwhalConstants.NarwhalWristConstants;
 
 /**
@@ -95,13 +96,12 @@ public class NarwhalWrist extends SubsystemBase {
         double currentEncoderVelocity = wrist.getEncoder().getVelocity();
 
         wristMotorPIDController.setSetpoint(targetAngleRadians);
-
         wrist.set(
             // Math.min + Math.max is used to clamp the output to the motor's range
             Math.min(
                 Math.max(
                     wristMotorPIDController.calculate(currentEncoderPosition) + 
-                    wristFeedForward.calculate(currentEncoderPosition, currentEncoderVelocity),
+                    wristFeedForward.calculate(currentEncoderPosition + NarwhalWristConstants.WRIST_FEEDFORWARD_OFFSET_ANGLE.getRadians(), currentEncoderVelocity),
                     NarwhalWristConstants.PID_OUTPUT_RANGE_MIN
                 ), 
             NarwhalWristConstants.PID_OUTPUT_RANGE_MAX)
