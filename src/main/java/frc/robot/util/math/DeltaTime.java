@@ -5,6 +5,9 @@ import edu.wpi.first.math.MathSharedStore;
 /**
  * A simple class to calculate the elapsed time (delta time) between successive calls,
  * using MathSharedStore.getTimestamp() to obtain the current time in seconds.
+ * <hr>
+ * @author Parker Huibregtse
+ * @version 2.0.0
  */
 public class DeltaTime {
 

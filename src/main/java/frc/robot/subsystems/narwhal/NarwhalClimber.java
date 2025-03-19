@@ -28,7 +28,7 @@ import frc.robot.util.upper_assembly.narwhal.NarwhalClimberState;
  * @since v1.2.0
  */
 public class NarwhalClimber extends SubsystemBase {
-    public NarwhalClimberState currentState;
+    public NarwhalClimberState currentState; // TODO: Abstract into method for standards sake.
     
     private final SparkMax climber;
     private final SparkMaxConfig climberConfig;
@@ -60,7 +60,7 @@ public class NarwhalClimber extends SubsystemBase {
                 NarwhalClimberConstants.PID_D,
                 NarwhalClimberConstants.PID_F)
             .outputRange(
-                -NarwhalClimberConstants.CLIMBER_PID_MIN_OUTPUT, 
+                NarwhalClimberConstants.CLIMBER_PID_MIN_OUTPUT, 
                 NarwhalClimberConstants.CLIMBER_PID_MAX_OUTPUT
             );
         
@@ -88,7 +88,7 @@ public class NarwhalClimber extends SubsystemBase {
      * Set the climber to the deploy angle stored in constants
      */
     public void goToDeploy() {
-        setCurrentMotorAngle(NarwhalClimberConstants.DEPLOYED_ANGLE);
+        setCurrentMotorAngle(NarwhalClimberConstants.DEPLOYED_WINCH_ROTATIONS);
         currentState = NarwhalClimberState.DEPLOYING; // must be after the set function because the set function will default to CUSTOM state
     }
 
@@ -96,8 +96,24 @@ public class NarwhalClimber extends SubsystemBase {
      * Set the climber to the target angle for climbing stored in constants
      */
     public void climb() {
-        setCurrentMotorAngle(NarwhalClimberConstants.CLIMB_ANGLE);
+        setCurrentMotorAngle(NarwhalClimberConstants.CLIMB_WINCH_ROTATIONS);
         currentState = NarwhalClimberState.CLIMBING; // must be after the set function because the set function will default to CUSTOM state
+    }
+
+    /**
+     * Check if the climber is at the Climbing angle
+     */
+    public boolean isAtClimbAngle(){
+        double current_position = climber.getEncoder().getPosition();
+        return Math.abs(current_position - NarwhalClimberConstants.CLIMB_WINCH_ROTATIONS.getRotations()) < NarwhalClimberConstants.CLIMBER_ANGLE_TOLERANCE.getRotations();
+    }
+
+    /**
+     * Check if the climber is at the Deploy angle
+     */
+    public boolean isAtDeployAngle(){
+        double current_position = climber.getEncoder().getPosition();
+        return Math.abs(current_position - NarwhalClimberConstants.DEPLOYED_WINCH_ROTATIONS.getRotations()) < NarwhalClimberConstants.CLIMBER_ANGLE_TOLERANCE.getRotations();
     }
 
     @Override

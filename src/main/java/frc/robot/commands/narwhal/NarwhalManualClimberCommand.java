@@ -13,7 +13,7 @@ public class NarwhalManualClimberCommand extends Command {
     /**
      * Creates a manual squid climber command that toggles between down and climbed positions.
      * 
-     * @param squidClimber The climber subsystem to control.
+     * @param narwhalClimber The climber subsystem to control.
      * @param controller The Xbox controller used to drive the climber.
      */
     public NarwhalManualClimberCommand(NarwhalClimber narwhalClimber, XboxController controller) {

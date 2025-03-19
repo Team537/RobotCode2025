@@ -17,10 +17,12 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.NarwhalConstants.NarwhalElevatorConstants;
 import frc.robot.util.NarwhalElevatorState;
+import frc.robot.util.upper_assembly.ScoringHeight;
 
 
 public class NarwhalElevator extends SubsystemBase {
     public NarwhalElevatorState currentState;
+    private double currentTargetPosition;
 
     private final SparkMax leadElevator;
     private final SparkMaxConfig leadElevatorConfig;
@@ -30,6 +32,8 @@ public class NarwhalElevator extends SubsystemBase {
     private final SparkMaxConfig followerElevatorConfig;
 
     public NarwhalElevator(){
+        currentTargetPosition = 0.0;
+
         // Configurations for the Spark Max that controls the lead elevator motor
         leadElevatorConfig = new SparkMaxConfig();
         leadElevatorConfig // general configs
@@ -72,12 +76,14 @@ public class NarwhalElevator extends SubsystemBase {
     
     /**
      * Function to go to a specific height in meters. Measured from the zero position. 
-     * @param meters positive - 0.0 is bottomed out. values are automatically clamped between MIN_HEIGHT_METERS and MAX_HEIGHT_METERS
+     * @param height positive - 0.0 is bottomed out. values are automatically clamped between MIN_HEIGHT_METERS and MAX_HEIGHT_METERS
      */
-    public void setHeight(double meters){
-        double target_height = Math.min(Math.max(meters, NarwhalElevatorConstants.MIN_HEIGHT_METERS), NarwhalElevatorConstants.MAX_HEIGHT_METERS); // Clamps the height to [MAX_HEIGHT_METERS, MIN_HEIGHT_METERS]
+    public void setHeight(double height){
+        double target_height = Math.min(Math.max(height, NarwhalElevatorConstants.MIN_HEIGHT_METERS), NarwhalElevatorConstants.MAX_HEIGHT_METERS); // Clamps the height to [MAX_HEIGHT_METERS, MIN_HEIGHT_METERS]
         leadElevatorPID.setReference(target_height, ControlType.kPosition); // Runs using percent output of duty cycle
         currentState = NarwhalElevatorState.CUSTOM;
+
+        currentTargetPosition = target_height;
     }
 
     /**
@@ -97,35 +103,66 @@ public class NarwhalElevator extends SubsystemBase {
     }
 
     /**
-     * Goes to the height for scoring L1 defined by {@link NarwhalElevatorConstants#L1_ELEVATOR_HEIGHT}
+     * Goes to the specified scoring height.
+     *
+     * @param height The target scoring height.
      */
-    public void goToScoreHeightL1(){
-        setHeight(NarwhalElevatorConstants.L1_ELEVATOR_HEIGHT);
-        currentState = NarwhalElevatorState.L1;
+    public void goToScoreHeight(ScoringHeight height) {
+        switch (height) {
+            case L1:
+                setHeight(NarwhalElevatorConstants.L1_ELEVATOR_HEIGHT);
+                currentState = NarwhalElevatorState.L1;
+                break;
+            case L2:
+                setHeight(NarwhalElevatorConstants.L2_ELEVATOR_HEIGHT);
+                currentState = NarwhalElevatorState.L2;
+                break;
+            case L3:
+                setHeight(NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT);
+                currentState = NarwhalElevatorState.L3;
+                break;
+            case L4:
+                setHeight(NarwhalElevatorConstants.L4_ELEVATOR_HEIGHT);
+                currentState = NarwhalElevatorState.L4;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown scoring height: " + height);
+        }
+        
     }
 
     /**
-     * Goes to the height for scoring L2 defined by {@link NarwhalElevatorConstants#L2_ELEVATOR_HEIGHT}
+     * Goes to the algae descore position
+     * @param isTopRow True if the algae is in the top row, false if it is in the bottom row
+     * @param isDown True if the manipulator should be pressing down on the algae, false if it should just be above the algae
      */
-    public void goToScoreHeightL2(){
-        setHeight(NarwhalElevatorConstants.L2_ELEVATOR_HEIGHT);
-        currentState = NarwhalElevatorState.L2;
+    public void goToAlgaeDescorePosition(boolean isTopRow, boolean isDown){
+        double targetHeight;
+
+        // Set the target height based on the row
+        if (isTopRow){
+            targetHeight = NarwhalElevatorConstants.ALGAE_DESCORE_HEIGHT_METERS_TOP_ROW;
+        } else {
+            targetHeight = NarwhalElevatorConstants.ALGAE_DESCORE_HEIGHT_METERS_BOTTOM_ROW;
+        }
+
+        // Apply an offset if the manipulator should be pressing down on the algae
+        if (isDown){
+            targetHeight += NarwhalElevatorConstants.ALGAE_DESCORE_HEIGHT_METERS_DOWN_OFFSET;
+        }
+
+        setHeight(targetHeight);
+
+        currentState = NarwhalElevatorState.ALGAE_DESCORE;
     }
 
     /**
-     * Goes to the height for scoring L3 defined by {@link NarwhalElevatorConstants#L3_ELEVATOR_HEIGHT}
+     * Checks if the elevator is at the target position. Note: this method does not account for velocity and uses a tolerance.
+     * 
+     * @return Returns true if the elevator is at the target position
      */
-    public void goToScoreHeightL3(){
-        setHeight(NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT);
-        currentState = NarwhalElevatorState.L3;
-    }
-
-    /**
-     * Goes to the height for scoring L4 defined by {@link NarwhalElevatorConstants#L4_ELEVATOR_HEIGHT} :)
-     */
-    public void goToScoreHeightL4(){
-        setHeight(NarwhalElevatorConstants.L4_ELEVATOR_HEIGHT);
-        currentState = NarwhalElevatorState.L4;
+    public boolean isAtTargetPosition(){
+        return Math.abs(leadElevator.getEncoder().getPosition() - currentTargetPosition) < NarwhalElevatorConstants.ELEVATOR_POSITION_TOLERANCE;
     }
 
     @Override

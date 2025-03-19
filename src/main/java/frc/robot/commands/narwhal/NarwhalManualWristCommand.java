@@ -3,20 +3,22 @@ package frc.robot.commands.narwhal;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.narwhal.NarwhalWrist;
+import frc.robot.util.upper_assembly.ScoringHeight;
 
-public class ManualNarwhalWristCommand extends Command {
+public class NarwhalManualWristCommand extends Command {
     private final XboxController xBoxController;
     private final NarwhalWrist narwhalWrist;
 
     /**
      * Creates a manual narwhal climber command that controls the climber subsystem.
+     * 
      * @param squidClimber The climber subsystem to control.
      * @param controller The Xbox controller used to control the subsystem.
      */
-    public ManualNarwhalWristCommand(XboxController xboxController, NarwhalWrist narwhalWrist){
+    public NarwhalManualWristCommand(NarwhalWrist narwhalWrist, XboxController xboxController){
         this.xBoxController = xboxController;
         this.narwhalWrist = narwhalWrist;
-        addRequirements(narwhalWrist);
+        //addRequirements(narwhalWrist);
     }
 
     @Override
@@ -31,19 +33,23 @@ public class ManualNarwhalWristCommand extends Command {
         }
         // Back button = Score L1 Wrist Angle
         else if(xBoxController.getBackButton()){
-            narwhalWrist.goToL1WristAngle();
+            narwhalWrist.goToScoreAngle(ScoringHeight.L1);
         } 
         // A button = Score L2 Wrist Angle
         else if(xBoxController.getAButton()){
-            narwhalWrist.goToL2WristAngle();
+            narwhalWrist.goToScoreAngle(ScoringHeight.L2);
         } 
         // B button = Score L3 Wrist Angle
         else if(xBoxController.getBButton()){
-            narwhalWrist.goToL3WristAngle();
+            narwhalWrist.goToScoreAngle(ScoringHeight.L3);
         } 
         // Y button = Score L4 Wrist Angle
         else if(xBoxController.getYButton()){
-            narwhalWrist.goToL4WristAngle();
+            narwhalWrist.goToScoreAngle(ScoringHeight.L4);
+        }
+        // Climb button = Move to wrist out of the way
+        else if(xBoxController.getStartButton()){
+            narwhalWrist.goToClimbAngle();
         }
     }
 }

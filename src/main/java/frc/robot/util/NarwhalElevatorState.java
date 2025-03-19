@@ -7,5 +7,5 @@ public enum NarwhalElevatorState {
     L3,
     L4,
     INTAKE,
-    CUSTOM, // set to a custom intake-outtake percentage
+    CUSTOM, ALGAE_DESCORE, // set to a custom intake-outtake percentage
 }
