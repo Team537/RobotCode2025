@@ -192,6 +192,19 @@
               "divisions": 5,
               "update_continuously": true
             }
+          },
+          {
+            "title": "Tush Push Mode",
+            "x": 512.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/SmartDashboard/Tush Push Mode",
+              "period": 0.06,
+              "data_type": "boolean"
+            }
           }
         ]
       }

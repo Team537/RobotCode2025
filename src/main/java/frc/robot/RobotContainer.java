@@ -69,7 +69,8 @@ public class RobotContainer {
     private final SendableChooser<UpperAssemblyType> upperAssemblySelector = new SendableChooser<>();
     private final SendableChooser<DrivingMotorType> drivingMotorSelector = new SendableChooser<>();
 
-    private double delayTimeSeconds;
+    private double delayTimeSeconds = 0;
+    private boolean startWithTushPush = false;
 
     /**
      * Creates a new RobotContainer object and sets up SmartDashboard an the button inputs.
@@ -156,6 +157,7 @@ public class RobotContainer {
         SmartDashboard.putData(this.drivingMotorSelector);
 
         SmartDashboard.putNumber("Auto Delay", this.delayTimeSeconds);
+        SmartDashboard.putBoolean("Tush Push Mode", this.startWithTushPush);
     }
 
     /**
@@ -169,10 +171,10 @@ public class RobotContainer {
 
     public void scheduleAutonomous() {
         this.delayTimeSeconds = SmartDashboard.getNumber("Auto Delay", this.delayTimeSeconds);
+        this.startWithTushPush = SmartDashboard.getBoolean("Tush Push Mode", this.startWithTushPush);
+
         AutonomousRoutine autonomousRoutine = autonomousSelector.getSelected();
         Alliance alliance = allianceSelector.getSelected();
-        SmartDashboard.putString("Selected Autonomous", autonomousRoutine.toString());
-        SmartDashboard.putString("Selected Alliance", alliance.toString());
 
         driveSubsystem.setConfigs();
         upperAssembly.setRobotInScoringPositionSupplier(driveSubsystem::getInScorePose);
