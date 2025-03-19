@@ -14,6 +14,7 @@ public class NarwhalManualElevatorCommand extends Command {
 
     /**
      * Creates a manual narwhal elevator command that moves the elevator to different positions based on button presses.
+     * 
      * @param narwhalElevator The elevator subsystem to control.
      * @param controller The Xbox controller used to drive the elevator.
      * @param narwhalWristReadyToIntakeSupplier A supplier that indicates if the narwhal wrist is ready to intake.

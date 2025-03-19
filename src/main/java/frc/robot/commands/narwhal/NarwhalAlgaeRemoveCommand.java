@@ -15,6 +15,7 @@ public class NarwhalAlgaeRemoveCommand extends Command{
 
     /**
      * Creates a new NarwhalAlgaeRemoveCommand.
+     * 
      * @param narwhalElevator The NarwhalElevator subsystem to use.
      * @param narwhalWrist The NarwhalWrist subsystem to use.
      * @param isTopRow Whether the algae is in the top row or not

@@ -28,6 +28,7 @@ public class NarwhalCoralScoreCommand extends Command{
 
     /**
      * Creates a new NarwhalScoreCommand.
+     * 
      * @param narwhalElevator The NarwhalElevator subsystem to use.
      * @param narwhalWrist The NarwhalWrist subsystem to use.
      * @param narwhalIntakeOuttake The NarwhalIntakeOuttake subsystem to use.

@@ -10,7 +10,6 @@ import frc.robot.util.math.Vector2d;
 
 public class XboxManualDriveCommand extends ManualDriveCommand {
 
-
     boolean orientationOffsetTargetActive = false;
 
     /**
@@ -102,7 +101,5 @@ public class XboxManualDriveCommand extends ManualDriveCommand {
             slow,
             fieldCentric
         );
-
     }
-
 }
