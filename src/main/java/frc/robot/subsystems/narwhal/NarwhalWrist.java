@@ -216,6 +216,21 @@ public class NarwhalWrist extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+        if (currentState != NarwhalWristState.STOPPED) {
+            double currentEncoderPosition = wrist.getEncoder().getPosition();
+            double currentEncoderVelocity = wrist.getEncoder().getVelocity();
+            
+            wrist.set(
+                // Math.min + Math.max is used to clamp the output to the motor's range
+                Math.min(
+                    Math.max(
+                        wristMotorPIDController.calculate(currentEncoderPosition) + 
+                        wristFeedForward.calculate(currentEncoderPosition + NarwhalWristConstants.WRIST_FEEDFORWARD_OFFSET_ANGLE.getRadians(), currentEncoderVelocity),
+                        NarwhalWristConstants.PID_OUTPUT_RANGE_MIN
+                    ), 
+                NarwhalWristConstants.PID_OUTPUT_RANGE_MAX)
+            );
+        }
     }
 
     @Override
