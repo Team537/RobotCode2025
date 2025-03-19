@@ -1,23 +1,17 @@
 package frc.robot.subsystems.narwhal;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants;
 import frc.robot.commands.narwhal.NarwhalAlgaePreparePositionCommand;
 import frc.robot.commands.narwhal.NarwhalAlgaeRemoveCommand;
 import frc.robot.commands.narwhal.NarwhalClimbCommand;
-import frc.robot.commands.narwhal.NarwhalCoralIntakeCommand;
-import frc.robot.commands.narwhal.NarwhalCoralScoreCommand;
 import frc.robot.commands.narwhal.NarwhalIntakeCommand;
 import frc.robot.commands.narwhal.NarwhalIntakePositionCommand;
 import frc.robot.commands.narwhal.NarwhalManualClimberCommand;
@@ -93,9 +87,11 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
             ).handleInterrupt(intakeOuttake::hold);   
         command.addRequirements(this);    
         return command;
-
     }
 
+    /**
+     * Returns the command used to descore algae.
+     */
     public Command getRemoveAlgaeCommand(AlgaeRemovalPosition algaeRemovalPosition) {
         /*
         Will keep the upper assembly in transit position until the robot is ready to descore the algae.
@@ -133,10 +129,16 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
         return command;
     }
 
+    /**
+     * Returns a command used to set the narwal`s mechanisms into their idle state. (Allows the robot to be driven)
+     */
     public Command getLowerCommand() {
         return new NarwhalTransitPositionCommand(elevator, wrist);
     }
 
+    /**
+     * Returns the command that allows for the robot to climb.
+     */
     public Command getClimbCommand() {
         NarwhalClimbCommand narwhalClimbCommand = new NarwhalClimbCommand(
             elevator, 

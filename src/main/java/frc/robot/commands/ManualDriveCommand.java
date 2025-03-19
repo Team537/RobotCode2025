@@ -153,12 +153,14 @@ public abstract class ManualDriveCommand extends Command {
                     xyLockTranslation = driveSubsystem.getRobotPose().getTranslation();
                 }
 
+                /*
                 if (false && xyLockActive) {
                     finalLinearVelocity = driveSubsystem.getLinearFeedback(xyLockTranslation).scale(DriveConstants.LINEAR_MAX_SPEED);
                 } else {
                     finalLinearVelocity = new Vector2d(0.0,0.0);
                 }
-                
+                */
+                finalLinearVelocity = new Vector2d(0.0,0.0);
             } else {
 
                 xyLockActive = false;
@@ -225,11 +227,16 @@ public abstract class ManualDriveCommand extends Command {
                     thetaLockRotation = driveSubsystem.getRobotPose().getRotation();
                 }
                 
-                if (false && thetaLockActive) {
+                /* Not currently active. Commented out to decrease warnings.
+                
+                 if (false && thetaLockActive) {
                     finalRotationalVelocity = driveSubsystem.getRotationalFeedback(thetaLockRotation) * DriveConstants.ROTATIONAL_MAX_SPEED;
                 } else {
                     finalRotationalVelocity = 0.0;
                 }
+                */
+                finalRotationalVelocity = 0.0;
+                
             } else {
 
                 thetaLockActive = false;

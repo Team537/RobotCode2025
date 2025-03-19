@@ -34,12 +34,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.Constants;
-import frc.robot.Configs.Narwhal;
 import frc.robot.Constants.Defaults;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants.CoralStationConstants;
@@ -183,6 +179,8 @@ public class DriveSubsystem extends SubsystemBase {
     private boolean inIntakePose = false;
     private boolean inAlgaeRemovePose = false;
     private boolean narwhalCanRaiseLift = false;
+
+    private DeltaTime testTime = new DeltaTime();
 
     //////////////////////////////////////////////////////////////////////////////
     // Constructor
@@ -908,8 +906,6 @@ public class DriveSubsystem extends SubsystemBase {
         translatedPathfindingObstacles = translatePathfindingObstacles(pathfindingObstacles);
         Pathfinding.setDynamicObstacles(translatedPathfindingObstacles, getRobotPose().getTranslation());*/
     }
-
-    DeltaTime testTime = new DeltaTime();
 
     @Override
     public void simulationPeriodic() {

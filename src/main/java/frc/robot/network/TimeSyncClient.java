@@ -13,6 +13,9 @@ import java.util.List;
  * The offset is computed using:
  *   offset = ((T2 - T1) + (T3 - T4)) / 2
  * where T1 is the send time and T4 is the receive time on the RoboRIO.
+ * <hr>
+ * @author Cameron Myhre
+ * @version 3.0.0
  */
 public class TimeSyncClient {
     private final String piIp;

@@ -30,6 +30,12 @@ public enum StartingPosition {
         this.redPose = redPose;
     }
 
+    /**
+     * Returns teh starting position alongside the associated alliance.
+     * 
+     * @param alliance The alliance color the position will be taken form.
+     * @return The starting position for the specified alliance.
+     */
     public Pose2d getPose(Alliance alliance) { 
         if (alliance == Alliance.BLUE) {
             return bluePose;

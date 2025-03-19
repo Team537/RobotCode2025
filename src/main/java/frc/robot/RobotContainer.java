@@ -4,18 +4,12 @@
 
 package frc.robot;
 
-import frc.robot.Constants.Defaults;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.FieldConstants;
-import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.OceanViewConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.network.TCPSender;
 import frc.robot.network.UDPReceiver;
-import frc.robot.commands.XboxManualDriveCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.narwhal.NarwhalUpperAssembly;
@@ -27,29 +21,17 @@ import frc.robot.util.EnumPrettifier;
 import frc.robot.util.autonomous.Alliance;
 import frc.robot.util.autonomous.AutonomousRoutine;
 import frc.robot.util.autonomous.StartingPosition;
-import frc.robot.util.field.AlgaeRemovalPosition;
 import frc.robot.util.field.CoralStationSide;
 import frc.robot.util.field.ReefScoringLocation;
 import frc.robot.util.swerve.DrivingMotorType;
 import frc.robot.util.upper_assembly.ScoringHeight;
 import frc.robot.util.upper_assembly.UpperAssemblyFactory;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -98,7 +80,7 @@ public class RobotContainer {
         setupOceanViewManager();
 
         // Add cameras to the VisionOdometry object.
-        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, new Transform3d(-0.2159, 0, 0, new Rotation3d(0, 0, -Math.PI))));
+        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, VisionConstants.FRONT_CAMERA_OFFSET));
         visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.RIGHT_CAMERA_NAME, VisionConstants.RIGHT_CAMERA_OFFSET));
         visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.LEFT_CAMERA_NAME, VisionConstants.LEFT_CAMERA_OFFSET)); 
 
@@ -119,9 +101,9 @@ public class RobotContainer {
         try {
             this.udpReceiver = new UDPReceiver(OceanViewConstants.UDP_PORT_NUMBER);    
             this.tcpSender = new TCPSender(OceanViewConstants.PI_IP, OceanViewConstants.TCP_PORT_NUMBER);
-            System.out.println("Successfully created TCPSender and UDPReceiver object!");
+            System.out.println("[@@@ OceanView @@@]: --- Successfully created TCPSender and UDPReceiver object!");
         } catch (Exception e) {
-            System.err.println("Failed to construct TCPSender object: " + e.getMessage());
+            System.err.println("[@@@ OceanView @@@]: --- Failed to construct TCPSender object: " + e.getMessage());
         }
 
         // An OceanView manager instance cannot be created if either the TCPSender or UDPReceiver is null.
@@ -173,11 +155,12 @@ public class RobotContainer {
         SmartDashboard.putData(this.upperAssemblySelector);
         SmartDashboard.putData(this.drivingMotorSelector);
 
+        // Add autonomous configuration options.
         SmartDashboard.putNumber("Auto Delay", this.delayTimeSeconds);
     }
 
     /**
-     * sets the upper assembly to the given type
+     * Sets the upper assembly to the given type
      * 
      * @param upperAssemblyType the type of upper assembly to set to
      */
@@ -185,13 +168,18 @@ public class RobotContainer {
         upperAssembly = UpperAssemblyFactory.createUpperAssembly(upperAssemblyType);
     }
 
+    /**
+     * Creates and schedules the selected autonomous routine. 
+     */
     public void scheduleAutonomous() {
-        this.delayTimeSeconds = SmartDashboard.getNumber("Auto Delay", this.delayTimeSeconds);
+
+        // Get and display the selected autonomous mode.
         AutonomousRoutine autonomousRoutine = autonomousSelector.getSelected();
         Alliance alliance = allianceSelector.getSelected();
         SmartDashboard.putString("Selected Autonomous", autonomousRoutine.toString());
         SmartDashboard.putString("Selected Alliance", alliance.toString());
 
+        // Update the robot`s subsystems to be configured for the selected autonomous routine.
         driveSubsystem.setConfigs();
         upperAssembly.setRobotInScoringPositionSupplier(driveSubsystem::getInScorePose);
         upperAssembly.setRobotInIntakingPositionSupplier(driveSubsystem::getInIntakePose);
@@ -199,6 +187,7 @@ public class RobotContainer {
             ((NarwhalUpperAssembly)upperAssembly).setCanRaiseLiftSupplier(driveSubsystem::getNarwhalCanRaiseLift);
         }
 
+        // Get the starting position for the specified autonomous routine and alliance.
         switch (autonomousRoutine) {
             case LEFT:
                 driveSubsystem.setRobotPose(StartingPosition.LEFT.getPose(alliance));
@@ -210,12 +199,16 @@ public class RobotContainer {
                 driveSubsystem.setRobotPose(StartingPosition.RIGHT.getPose(alliance));
                 break;
             default:
-            break;
+            System.err.println("[System]: No alliance starting position selected!");
+                break;
         }
+        
+        // Get and create the time delay the driver wants the autonomous to run on.
+        this.delayTimeSeconds = SmartDashboard.getNumber("Auto Delay", this.delayTimeSeconds);
+        Command autoDelayCommand = new WaitCommand(this.delayTimeSeconds);
 
-        Command autoDelayCommand = new WaitCommand(delayTimeSeconds);
+        // Construct the autonomous program for the selected starting position.
         Command autonomousCommand;
-
         switch (autonomousRoutine) {
             case LEFT:
                 autonomousCommand = 
@@ -232,7 +225,11 @@ public class RobotContainer {
                         upperAssembly.getLowerCommand()
                     );  
                 break;  
-            case CENTER:
+            case CENTER: 
+
+                /**
+                 * Drive forwards and score the preloaded coral onto the nearest branch at L4 height.
+                 */
                 autonomousCommand = 
                     (
                         driveSubsystem.getScoringCommand(alliance, ReefScoringLocation.H)
@@ -260,8 +257,8 @@ public class RobotContainer {
                 autonomousCommand =  new InstantCommand(); // Do nothing if no valid auto routine is selected
         }
 
+        // Combine the autonomous delay and the main routine. Then schedule the command.
         autoDelayCommand.andThen(autonomousCommand).schedule();
-
     }
 
     /**
@@ -276,7 +273,6 @@ public class RobotContainer {
         driveSubsystem.setConfigs();
         upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
         driveSubsystem.setDefaultCommand(driveSubsystem.getManualCommand(xBoxController, alliance));
-
     }
 
 

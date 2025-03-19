@@ -2,7 +2,6 @@ package frc.robot.subsystems.upper_assembly;
 
 import java.util.function.Supplier;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.util.field.AlgaeRemovalPosition;
