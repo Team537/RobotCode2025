@@ -602,6 +602,21 @@ public class DriveSubsystem extends SubsystemBase {
     //////////////////////////////////////////////////////////////////////////////
 
     /**
+     * Updates the robot's odometry. This is done via a separate method to allow for faster update times
+     * than the base WPILib periodic method.
+     */
+    public void updateOdometry() {
+
+        // Update the robot's estimated pose using current sensor readings.
+        poseEstimator.update(getGyroscopeHeading(), getSwerveModulePositions());
+
+        // Display the data 
+        SmartDashboard.putNumber("X Position",getRobotPose().getX());
+        SmartDashboard.putNumber("Y Position",getRobotPose().getY());
+        SmartDashboard.putNumber("Theta Rotation", getRobotPose().getRotation().getRadians());
+    }
+
+    /**
      * Periodically updates the drive subsystem.
      * <p>
      * This method is called every cycle (even when disabled) and handles:
@@ -616,13 +631,6 @@ public class DriveSubsystem extends SubsystemBase {
     public void periodic() {
         // Update module states using the target velocities.
         setModules(targetVelocities);
-
-        // Update the robot's estimated pose using current sensor readings.
-        poseEstimator.update(getGyroscopeHeading(), getSwerveModulePositions());
-
-        SmartDashboard.putNumber("X Position",getRobotPose().getX());
-        SmartDashboard.putNumber("Y Position",getRobotPose().getY());
-        SmartDashboard.putNumber("Theta Rotation", getRobotPose().getRotation().getRadians());
 
         // Refresh dynamic pathfinding obstacles.
         pathfindingObstacles.clear();

@@ -31,6 +31,12 @@ public class Robot extends TimedRobot {
         // autonomous chooser on the dashboard.
         robotContainer = new RobotContainer();
 
+        // Update the robot's odometry faster than the main loop times. (called every 4ms, offset by 10ms to prevent
+        // it from being called at the same time as the main loop).
+        addPeriodic(() -> {
+            robotContainer.updateOdometry();
+        }, 0.004, 0.01);
+
         // Automatically capture data with the driver camera.
         CameraServer.startAutomaticCapture();
 
