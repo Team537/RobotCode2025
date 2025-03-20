@@ -193,13 +193,12 @@ public class DriveSubsystem extends SubsystemBase {
     public DriveSubsystem() {
         // Enable continuous input for the rotational controller (wraps around at ±π).
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
+        
         // Update all configuration settings (motor types, module configurations, etc.).
         setConfigs();
 
         Pathfinding.ensureInitialized();
         PathfindingCommand.warmupCommand();
-
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -210,6 +209,11 @@ public class DriveSubsystem extends SubsystemBase {
      * Updates the swerve drive configurations including upper assembly, motor, module, and auto-builder settings.
      */
     public void setConfigs() {
+
+        // IMU Configuration
+        // Increase the gyroscope update speed. This puts it in sync with the rest of the code.
+        gyroscope.getYaw().setUpdateFrequency(DriveConstants.SENSOR_UPDATE_TIME_HZ);
+
         // --- Upper Assembly Configuration ---
         double upperAssemblyMass;
         double upperAssemblyMOI;
