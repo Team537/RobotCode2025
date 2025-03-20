@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkLowLevel.PeriodicFrame;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkMax;
 
@@ -216,6 +217,7 @@ public class SwerveModule extends SubsystemBase {
                 drivingNeo = new SparkMax(drivingCANID,MotorType.kBrushless);
                 drivingNeo.configure(Configs.Swerve.Driving.NEO_DRIVING_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
                 drivingNeo.getEncoder().setPosition(0.0);
+                drivingNeo.setControlFramePeriodMs( 5);
                 drivingNeoSim = new SparkMaxSim(drivingNeo, DCMotor.getNEO(1));
                 break;
             
@@ -223,6 +225,7 @@ public class SwerveModule extends SubsystemBase {
                 drivingKrakenX60 = new TalonFX(drivingCANID);
                 drivingKrakenX60.getConfigurator().apply(Configs.Swerve.Driving.KRAKEN_X60_CONFIGURATION);
                 drivingKrakenX60.setPosition(0.0);
+                drivingKrakenX60.getPosition().setUpdateFrequency(250);
                 drivingKrakenX60Sim = new TalonFXSimState(drivingKrakenX60);
                 break;
 
@@ -230,6 +233,7 @@ public class SwerveModule extends SubsystemBase {
                 drivingKrakenX60FOC = new TalonFX(drivingCANID);
                 drivingKrakenX60FOC.getConfigurator().apply(Configs.Swerve.Driving.KRAKEN_X60_FOC_CONFIGURATION);
                 drivingKrakenX60FOC.setPosition(0.0);
+                drivingKrakenX60FOC.getPosition().setUpdateFrequency(250);
                 drivingKrakenX60FOCSim = new TalonFXSimState(drivingKrakenX60FOC);
                 break;
         }
@@ -275,6 +279,7 @@ public class SwerveModule extends SubsystemBase {
             case NEO_550:
                 turningNeo550 = new SparkMax(turningCANID,MotorType.kBrushless);
                 turningNeo550.configure(Configs.Swerve.Turning.NEO_550_TURNING_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+                turningNeo550.setControlFramePeriodMs(4);
                 turningNeo550Sim = new SparkMaxSim(turningNeo550, DCMotor.getNeo550(1));
                 break;
         }
