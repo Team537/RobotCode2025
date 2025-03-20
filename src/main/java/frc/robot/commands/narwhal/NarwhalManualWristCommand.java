@@ -48,7 +48,7 @@ public class NarwhalManualWristCommand extends Command {
             narwhalWrist.goToScoreAngle(ScoringHeight.L4);
         }
         // Climb button = Move to wrist out of the way
-        else if(xBoxController.getStartButton()){
+        else if(xBoxController.getPOV() == 90){
             narwhalWrist.goToClimbAngle();
         }
     }

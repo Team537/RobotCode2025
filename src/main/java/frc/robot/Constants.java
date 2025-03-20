@@ -337,7 +337,7 @@ public final class Constants {
             public static final double PID_OUTPUT_RANGE_MIN = -0.4;        
 
             // Set position for wrist angles (Angle is relative to the world, with 0 being the down position and rotating away from 0 being positive)
-            public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4.85);
+            public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4.75);
             public static final Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d L2_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.03 * Math.PI);
@@ -363,8 +363,8 @@ public final class Constants {
             public static final double PID_D = 0.1;
             public static final double PID_F = 1.9;
 
-            public static final double CLIMBER_PID_MIN_OUTPUT = -0.3;
-            public static final double CLIMBER_PID_MAX_OUTPUT = 0.3;
+            public static final double CLIMBER_PID_MIN_OUTPUT = -0.8;
+            public static final double CLIMBER_PID_MAX_OUTPUT = 0.8;
             
             public static final Rotation2d DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(900);
             public static final Rotation2d CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(300);
