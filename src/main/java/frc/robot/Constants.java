@@ -179,6 +179,9 @@ public final class Constants {
         public static final double ROTATIONAL_KI = 0.0;
         public static final double ROTATIONAL_KD = 0.1;
 
+        // Update times
+        public static final int SENSOR_UPDATE_TIME_HZ = 250;
+
         /*
          * ---------------------------------- DRIVING CONSTANTS ----------------------------------
          */
