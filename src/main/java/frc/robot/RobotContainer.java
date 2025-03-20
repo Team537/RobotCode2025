@@ -244,7 +244,7 @@ public class RobotContainer {
                         driveSubsystem.getScoringCommand(alliance, ReefScoringLocation.E)
                         .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
                     ).andThen(
-                        driveSubsystem.getIntakeCommand(alliance, CoralStationSide.RIGHT, 7)
+                        driveSubsystem.getIntakeCommand(alliance, CoralStationSide.RIGHT, 6)
                         .andThen(upperAssembly.getCoralIntakeCommand())
                     ).andThen(
                         driveSubsystem.getScoringCommand(alliance, ReefScoringLocation.D)
