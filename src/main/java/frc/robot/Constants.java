@@ -340,8 +340,8 @@ public final class Constants {
             public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4.75);
             public static final Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d L2_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
-            public static final Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.03 * Math.PI);
-            public static final Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.08 * Math.PI);
+            public static final Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
+            public static final Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI); // This is the angle the wrist should be at when climbing
             public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d TRANSIT_ANGLE = Rotation2d.fromRadians(0.5 * Math.PI);
@@ -367,7 +367,7 @@ public final class Constants {
             public static final double CLIMBER_PID_MAX_OUTPUT = 0.8;
             
             public static final Rotation2d DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(900);
-            public static final Rotation2d CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(300);
+            public static final Rotation2d CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(270);
 
             /** The angle tolerance for the climber to be considered at a specific state. */
             public static final Rotation2d CLIMBER_ANGLE_TOLERANCE = Rotation2d.fromDegrees(3);
