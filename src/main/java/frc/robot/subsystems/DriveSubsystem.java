@@ -209,9 +209,9 @@ public class DriveSubsystem extends SubsystemBase {
      * Updates the swerve drive configurations including upper assembly, motor, module, and auto-builder settings.
      */
     public void setConfigs() {
-        
+
         // IMU Configuration
-        // Increase the gyroscope update speed. This puts it in sync with the rst of the code.
+        // Increase the gyroscope update speed. This puts it in sync with the rest of the code.
         gyroscope.getYaw().setUpdateFrequency(DriveConstants.SENSOR_UPDATE_TIME_HZ);
 
         // --- Upper Assembly Configuration ---
