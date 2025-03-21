@@ -94,7 +94,7 @@ public final class Constants {
         public static final double GRAVITY_ACCELERATION = 9.81; // Meters / sec^2
 
         public static final double TRANSLATION_THRESHOLD = 0.05; // Meters
-        public static final double ROTATION_THRESHOLD = 0.20; // Radians
+        public static final double ROTATION_THRESHOLD = 0.157; // Radians
 
         public static final double NARWHAL_CAN_RAISE_LIFT_DISTANCE = 1.0; // Meters
         public static final Transform2d NARWHAL_RAKE_ALAGE_TRANSFORM = new Transform2d(0.5,0.0,new Rotation2d());
@@ -721,7 +721,7 @@ public final class Constants {
             // Base pose for BLUE LEFT intake positions.
             // Index 0 is given as (1.70244, 7.57545) with the computed intake angle.
             private static final Pose2d BLUE_INTAKE_LEFT_BASE = new Pose2d(
-                    new Translation2d(1.761, 7.500), FIELD_INTAKE_ANGLE);
+                    new Translation2d(1.70298, 7.57847), FIELD_INTAKE_ANGLE);
 
             // Lists for the coral station intake poses.
             // The human player’s list is from indices 0 to 8 (left-to-right from the driver perspective).
