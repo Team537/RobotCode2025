@@ -57,7 +57,7 @@ public class PhotonVisionCamera extends SubsystemBase {
     public void update(Pose2d currentBestGuess) {
 
         // Update the reference pose for better solvePNP
-        // photonPoseEstimator.setReferencePose(currentBestGuess);
+        photonPoseEstimator.setReferencePose(currentBestGuess);
 
         // Grab *all* the new pipeline results since our last call
         List<PhotonPipelineResult> allResults = camera.getAllUnreadResults();
