@@ -28,7 +28,7 @@ public class NarwhalManualWristCommand extends Command {
             narwhalWrist.goToIntakeAngle();
         }
         // Left bumper = Algae
-        else if(xBoxController.getLeftBumperButtonPressed()){
+        else if(xBoxController.getPOV() == 90){
             narwhalWrist.goToAlgaeAngle();
         }
         // Back button = Score L1 Wrist Angle
@@ -48,7 +48,7 @@ public class NarwhalManualWristCommand extends Command {
             narwhalWrist.goToScoreAngle(ScoringHeight.L4);
         }
         // Climb button = Move to wrist out of the way
-        else if(xBoxController.getPOV() == 90){
+        else if(xBoxController.getPOV() == 180){
             narwhalWrist.goToClimbAngle();
         }
     }
