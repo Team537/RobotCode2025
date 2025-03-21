@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.OceanViewConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
@@ -27,6 +28,7 @@ import frc.robot.util.swerve.DrivingMotorType;
 import frc.robot.util.upper_assembly.ScoringHeight;
 import frc.robot.util.upper_assembly.UpperAssemblyFactory;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -154,6 +156,8 @@ public class RobotContainer {
         SmartDashboard.putData(this.drivingMotorSelector);
 
         // Add autonomous configuration options.
+        SmartDashboard.putNumber("Intake Angle", NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE.getDegrees());
+        SmartDashboard.putNumber("Intake Height", NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS);
         SmartDashboard.putNumber("Auto Delay", this.delayTimeSeconds);
         SmartDashboard.putBoolean("Tush Push Mode", this.startWithTushPush);
     }
@@ -171,6 +175,8 @@ public class RobotContainer {
      * Creates and schedules the selected autonomous routine. 
      */
     public void scheduleAutonomous() {
+        NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("Intake Angle", NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE.getDegrees()));
+        NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS = SmartDashboard.getNumber("Intake Height", NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS);
         this.delayTimeSeconds = SmartDashboard.getNumber("Auto Delay", this.delayTimeSeconds);
         this.startWithTushPush = SmartDashboard.getBoolean("Tush Push Mode", this.startWithTushPush);
 
@@ -265,7 +271,9 @@ public class RobotContainer {
      * Schedules commands used exclusively during TeleOp.
      */
     public void scheduleTeleOp() {
-
+        NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("Intake Angle", NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE.getDegrees()));
+        NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS = SmartDashboard.getNumber("Intake Height", NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS);
+        
         Alliance alliance = allianceSelector.getSelected();
         SmartDashboard.putString("Selected Alliance", alliance.toString());
 

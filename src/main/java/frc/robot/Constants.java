@@ -337,8 +337,8 @@ public final class Constants {
             public static final double PID_OUTPUT_RANGE_MIN = -0.4;        
 
             // Set position for wrist angles (Angle is relative to the world, with 0 being the down position and rotating away from 0 being positive)
-            public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4.75);
-            public static final Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
+            public static Rotation2d INTAKE_ANGLE = Rotation2d.fromDegrees(50); // there's a lot of slop so this is going to be ~10 degreses over the actual position
+            public static final Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);   
             public static final Rotation2d L2_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
@@ -346,7 +346,7 @@ public final class Constants {
             public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d TRANSIT_ANGLE = Rotation2d.fromRadians(0.5 * Math.PI);
             
-            /** The angle tolerance for the wrist to be considered at a specific state. */
+            /** The angle tolerance for the wrxist to be considered at a specific state. */
             public static final Rotation2d WRIST_ANGLE_TOLERANCE = Rotation2d.fromRadians(0.89 * Math.PI);
         }
 
@@ -366,7 +366,7 @@ public final class Constants {
             public static final double CLIMBER_PID_MIN_OUTPUT = -0.8;
             public static final double CLIMBER_PID_MAX_OUTPUT = 0.8;
             
-            public static final Rotation2d DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(900);
+            public static final Rotation2d DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(1080);
             public static final Rotation2d CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(270);
 
             /** The angle tolerance for the climber to be considered at a specific state. */
@@ -401,7 +401,7 @@ public final class Constants {
             public static final double L2_ELEVATOR_HEIGHT = 0.07; // Meters
             public static final double L3_ELEVATOR_HEIGHT = 0.45; // Meters
             public static final double L4_ELEVATOR_HEIGHT = 1.7; // Meters
-            public static final double INTAKE_ELEVATOR_HEIGHT_METERS = 0.05; // Meters
+            public static double INTAKE_ELEVATOR_HEIGHT_METERS = 0.12; // Meters
             public static final boolean MOTOR_INVERTED = true;
             public static final double ELEVATOR_POSITION_TOLERANCE = 0.05; // Meters
             public static final double ALGAE_DESCORE_HEIGHT_METERS_TOP_ROW = -0.4; // Meters (negative to go down)
