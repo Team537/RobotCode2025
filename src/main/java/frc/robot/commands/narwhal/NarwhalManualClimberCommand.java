@@ -25,7 +25,7 @@ public class NarwhalManualClimberCommand extends Command {
     @Override
     public void execute() {
         // deploy
-        if (controller.getPOV() == 90){
+        if (controller.getPOV() == 180){
             narwhalClimber.goToDeploy();
         }
             
