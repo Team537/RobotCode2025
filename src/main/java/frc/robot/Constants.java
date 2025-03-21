@@ -330,10 +330,10 @@ public final class Constants {
             public static final double ENCODER_FACTOR = Math.PI * 2 / GEAR_REDUCTION; // Wrist target angles (radians) are multiplied by this to get the motor target position           
             
             // PID configurations
-            public static double POSITION_PID_P = 0.2;
-            public static double POSITION_PID_I = 0.0;
-            public static double POSITION_PID_D = 0.7;
-            public static double POSITION_PID_F = 0.0;
+            public static final double POSITION_PID_P = 0.2;
+            public static final double POSITION_PID_I = 0.0;
+            public static final double POSITION_PID_D = 0.7;
+            public static final double POSITION_PID_F = 0.0;
             public static final double PID_OUTPUT_RANGE_MAX = 0.45;
             public static final double PID_OUTPUT_RANGE_MIN = -0.4;        
 
