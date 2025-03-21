@@ -158,6 +158,9 @@ public class RobotContainer {
         // Add autonomous configuration options.
         SmartDashboard.putNumber("Intake Angle", NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE.getDegrees());
         SmartDashboard.putNumber("Intake Height", NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS);
+        SmartDashboard.putNumber("L3 Angle", NarwhalConstants.NarwhalWristConstants.L3_OUTTAKE_ANGLE.getDegrees());
+        SmartDashboard.putNumber("L3 Height", NarwhalConstants.NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT);
+        
         SmartDashboard.putNumber("Auto Delay", this.delayTimeSeconds);
         SmartDashboard.putBoolean("Tush Push Mode", this.startWithTushPush);
     }
@@ -177,6 +180,8 @@ public class RobotContainer {
     public void scheduleAutonomous() {
         NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("Intake Angle", NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE.getDegrees()));
         NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS = SmartDashboard.getNumber("Intake Height", NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS);
+        NarwhalConstants.NarwhalWristConstants.L3_OUTTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("L3 Angle", NarwhalConstants.NarwhalWristConstants.L3_OUTTAKE_ANGLE.getDegrees()));
+        NarwhalConstants.NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT = SmartDashboard.getNumber("L3 Height", NarwhalConstants.NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT);
         this.delayTimeSeconds = SmartDashboard.getNumber("Auto Delay", this.delayTimeSeconds);
         this.startWithTushPush = SmartDashboard.getBoolean("Tush Push Mode", this.startWithTushPush);
 
@@ -223,7 +228,7 @@ public class RobotContainer {
                         .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
                     ).andThen(
                         driveSubsystem.getIntakeCommand(alliance, CoralStationSide.LEFT, 2)
-                        .andThen(upperAssembly.getCoralIntakeCommand())
+                        .alongWith(upperAssembly.getCoralIntakeCommand())
                     ).andThen(
                         driveSubsystem.getScoringCommand(alliance, ReefScoringLocation.K)
                         .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
@@ -251,7 +256,7 @@ public class RobotContainer {
                         .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
                     ).andThen(
                         driveSubsystem.getIntakeCommand(alliance, CoralStationSide.RIGHT, 6)
-                        .andThen(upperAssembly.getCoralIntakeCommand())
+                        .alongWith(upperAssembly.getCoralIntakeCommand())
                     ).andThen(
                         driveSubsystem.getScoringCommand(alliance, ReefScoringLocation.D)
                         .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
@@ -273,6 +278,8 @@ public class RobotContainer {
     public void scheduleTeleOp() {
         NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("Intake Angle", NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE.getDegrees()));
         NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS = SmartDashboard.getNumber("Intake Height", NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS);
+        NarwhalConstants.NarwhalWristConstants.L3_OUTTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("L3 Angle", NarwhalConstants.NarwhalWristConstants.L3_OUTTAKE_ANGLE.getDegrees()));
+        NarwhalConstants.NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT = SmartDashboard.getNumber("L3 Height", NarwhalConstants.NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT);
         
         Alliance alliance = allianceSelector.getSelected();
         SmartDashboard.putString("Selected Alliance", alliance.toString());

@@ -330,9 +330,10 @@ public final class Constants {
             public static final double ENCODER_FACTOR = Math.PI * 2 / GEAR_REDUCTION; // Wrist target angles (radians) are multiplied by this to get the motor target position           
             
             // PID configurations
-            public static final double POSITION_PID_P = 0.2;
-            public static final double POSITION_PID_I = 0;
-            public static final double POSITION_PID_D = 0.7;
+            public static double POSITION_PID_P = 0.2;
+            public static double POSITION_PID_I = 0.0;
+            public static double POSITION_PID_D = 0.7;
+            public static double POSITION_PID_F = 0.0;
             public static final double PID_OUTPUT_RANGE_MAX = 0.45;
             public static final double PID_OUTPUT_RANGE_MIN = -0.4;        
 
@@ -340,7 +341,7 @@ public final class Constants {
             public static Rotation2d INTAKE_ANGLE = Rotation2d.fromDegrees(50); // there's a lot of slop so this is going to be ~10 degreses over the actual position
             public static final Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);   
             public static final Rotation2d L2_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
-            public static final Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
+            public static Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI); // This is the angle the wrist should be at when climbing
             public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(1.12 * Math.PI);
@@ -363,8 +364,8 @@ public final class Constants {
             public static final double PID_D = 0.1;
             public static final double PID_F = 1.9;
 
-            public static final double CLIMBER_PID_MIN_OUTPUT = -0.8;
-            public static final double CLIMBER_PID_MAX_OUTPUT = 0.8;
+            public static final double CLIMBER_PID_MIN_OUTPUT = -1.0;
+            public static final double CLIMBER_PID_MAX_OUTPUT = 1.0;
             
             public static final Rotation2d DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(1080);
             public static final Rotation2d CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(270);
@@ -399,7 +400,7 @@ public final class Constants {
             public static final double MAX_HEIGHT_METERS = 2.1336; // stops the robot from ending itself
             public static final double L1_ELEVATOR_HEIGHT = 0.05; // Meters
             public static final double L2_ELEVATOR_HEIGHT = 0.07; // Meters
-            public static final double L3_ELEVATOR_HEIGHT = 0.45; // Meters
+            public static double L3_ELEVATOR_HEIGHT = 0.45; // Meters
             public static final double L4_ELEVATOR_HEIGHT = 1.7; // Meters
             public static double INTAKE_ELEVATOR_HEIGHT_METERS = 0.12; // Meters
             public static final boolean MOTOR_INVERTED = true;
