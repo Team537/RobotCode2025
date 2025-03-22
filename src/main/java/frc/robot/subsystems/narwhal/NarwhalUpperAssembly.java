@@ -143,6 +143,7 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
      * Returns a command used to set the narwal`s mechanisms into their idle state. (Allows the robot to be driven)
      */
     public Command getLowerCommand() {
+        System.out.println("Get lower command");
         return new NarwhalTransitPositionCommand(elevator, wrist);
     }
 
