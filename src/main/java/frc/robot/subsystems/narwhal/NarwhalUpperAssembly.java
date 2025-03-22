@@ -45,6 +45,10 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
         climber = new NarwhalClimber();
     }
 
+    public void disableCoralSensor(){
+        intakeOuttake.disableCoralSensor();
+    }
+
     /**
      * Sets the supplier tat this UpperAssembly will use to determine if it can raise its lift.
      * 

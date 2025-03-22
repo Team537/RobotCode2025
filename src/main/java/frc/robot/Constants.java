@@ -291,7 +291,7 @@ public final class Constants {
         public static final double UPPER_ASSEMBLY_MOI = 0.995; //Kg m^2
 
         public static final Transform2d INTAKING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0),new Rotation2d(Math.PI));
-        public static final Transform2d SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.1524,0.0),new Rotation2d(0));
+        public static final Transform2d SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0),new Rotation2d(0));
         public static final Transform2d ALGAE_REMOVAL_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0),new Rotation2d(0.0));
         public static final Transform2d CLIMB_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0),new Rotation2d(Math.PI));
  
@@ -341,7 +341,7 @@ public final class Constants {
             public static Rotation2d INTAKE_ANGLE = Rotation2d.fromDegrees(50); // there's a lot of slop so this is going to be ~10 degreses over the actual position
             public static Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);   
             public static Rotation2d L2_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
-            public static Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
+            public static Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.135 * Math.PI);
             public static Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI); // This is the angle the wrist should be at when climbing
             public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(1.12 * Math.PI);

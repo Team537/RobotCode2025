@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import frc.robot.Configs.Narwhal;
 import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.OceanViewConstants;
 import frc.robot.Constants.OperatorConstants;
@@ -281,6 +282,10 @@ public class RobotContainer {
      * Schedules commands used exclusively during TeleOp.
      */
     public void scheduleTeleOp() {
+        // disables the coral sensor to prevent double outtaking
+        if (upperAssembly instanceof NarwhalUpperAssembly)
+            ((NarwhalUpperAssembly)upperAssembly).disableCoralSensor();
+        
         CommandScheduler.getInstance().cancelAll();
         this.setWristValuesFromSmartDashbaord();
 

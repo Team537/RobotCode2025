@@ -37,6 +37,8 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
     private final SparkMaxConfig intakeOuttakeMotorConfig;
     private final SparkClosedLoopController intakeOuttakeMotorPIDController;
     
+    private boolean coralSensorEnabled = true;
+        
     /**
      * Creates a new instance of the NarwhalIntakeOuttake class, setting up all necessary hardware in the process.
      */
@@ -65,7 +67,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
         // Creating intakeOuttakeMotor and applying configs
         intakeOuttakeMotor = new SparkMax(NarwhalIntakeOuttakeConstants.INTAKE_OUTTAKE_MOTOR_CAN_ID, MotorType.kBrushless);
         intakeOuttakeMotor.configure(intakeOuttakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-      
+        
         intakeOuttakeMotorPIDController = intakeOuttakeMotor.getClosedLoopController();
         currentState = NarwhalIntakeOuttakeState.STOPPED;
     }
@@ -119,9 +121,19 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
      * @return boolean
      */
     public boolean isCoralSensorTriggered(){
-        return !intakeSensor.get(); // negated so that true means it is pressed, and false means it is not
+        if (coralSensorEnabled)
+            return !intakeSensor.get(); // negated so that true means it is pressed, and false means it is not
+        else
+            return false;
     }
     
+    /**
+     * Will cause coral sensor to only output false
+     */
+    public void disableCoralSensor(){
+        coralSensorEnabled = false;
+    }
+
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
