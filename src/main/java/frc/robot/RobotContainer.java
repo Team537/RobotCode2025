@@ -29,6 +29,8 @@ import frc.robot.util.upper_assembly.ScoringHeight;
 import frc.robot.util.upper_assembly.UpperAssemblyFactory;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -168,6 +170,10 @@ public class RobotContainer {
         SmartDashboard.putNumber("L4 Angle", NarwhalConstants.NarwhalWristConstants.L4_OUTTAKE_ANGLE.getDegrees());
         SmartDashboard.putNumber("L4 Height", NarwhalConstants.NarwhalElevatorConstants.L4_ELEVATOR_HEIGHT);
         
+        SmartDashboard.putNumber("Auto Score Offset X", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getX());
+        SmartDashboard.putNumber("Auto Score Offset Y", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getY());
+        SmartDashboard.putNumber("Auto Score Offset Rot", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getRotation().getDegrees());
+
         SmartDashboard.putNumber("Auto Delay", this.delayTimeSeconds);
         SmartDashboard.putBoolean("Tush Push Mode", this.startWithTushPush);
     }
@@ -189,6 +195,11 @@ public class RobotContainer {
         this.delayTimeSeconds = SmartDashboard.getNumber("Auto Delay", this.delayTimeSeconds);
         this.startWithTushPush = SmartDashboard.getBoolean("Tush Push Mode", this.startWithTushPush);
 
+        double autoScoreOffsetX = SmartDashboard.getNumber("Auto Score Offset X", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getX());
+        double autoScoreOffsetY = SmartDashboard.getNumber("Auto Score Offset Y", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getY());
+        double autoScoreOffsetRot = SmartDashboard.getNumber("Auto Score Offset Rot", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getRotation().getDegrees());
+
+        NarwhalConstants.SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(autoScoreOffsetX, autoScoreOffsetY), Rotation2d.fromDegrees(autoScoreOffsetRot));
 
         // Get and display the selected autonomous mode.
         AutonomousRoutine autonomousRoutine = autonomousSelector.getSelected();
