@@ -1,6 +1,9 @@
 package frc.robot.routines;
 
+import java.util.Set;
+
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.upper_assembly.UpperAssembly;
 import frc.robot.util.autonomous.Alliance;
@@ -36,15 +39,20 @@ public class MultiScoreRoutine {
             .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
             .andThen(
                 // Then loop intake -> score, shifting around the reef
-                (driveSubsystem.getIntakeCommand(alliance, coralStationSide, 2).alongWith(upperAssembly.getCoralIntakeCommand()))
-                .andThen(
-                    (driveSubsystem.getScoringCommand(alliance, getNextScoringLocation()).alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))))
-                .repeatedly()
+                // Deferred so that the position is recalculated each loop
+                new DeferredCommand(() ->
+                    driveSubsystem.getIntakeCommand(alliance, coralStationSide, 2)
+                        .alongWith(upperAssembly.getCoralIntakeCommand())
+                        .andThen((driveSubsystem.getScoringCommand(alliance, getNextScoringLocation())
+                        .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))))
+                , Set.of(driveSubsystem)).repeatedly()
             );
     }
 
     private static ReefScoringLocation getNextScoringLocation() {
         scoringLocation = ReefScoringLocation.getNextScoringLocation(scoringLocation, useClockwiseFillingScheme);
+
+        System.out.println("Next scoring position: " + scoringLocation.toString());
 
         return scoringLocation;
     }
