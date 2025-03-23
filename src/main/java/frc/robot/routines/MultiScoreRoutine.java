@@ -36,12 +36,10 @@ public class MultiScoreRoutine {
             .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
             .andThen(
                 // Then loop intake -> score, shifting around the reef
-                driveSubsystem
-                    .getIntakeCommand(alliance, coralStationSide, 2)
-                    .alongWith(upperAssembly.getCoralIntakeCommand())
-                    .andThen(driveSubsystem.getScoringCommand(alliance, getNextScoringLocation()))
-                    .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
-                    .repeatedly()
+                (driveSubsystem.getIntakeCommand(alliance, coralStationSide, 2).alongWith(upperAssembly.getCoralIntakeCommand()))
+                .andThen(
+                    (driveSubsystem.getScoringCommand(alliance, getNextScoringLocation()).alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))))
+                .repeatedly()
             );
     }
 
