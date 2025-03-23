@@ -158,7 +158,7 @@ public class RobotContainer {
         SmartDashboard.putData(this.upperAssemblySelector);
         SmartDashboard.putData(this.drivingMotorSelector);
 
-        // Add autonomous configuration options.
+        // Add narwhal upper assembly configuration options.
         SmartDashboard.putNumber("Intake Angle", NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE.getDegrees());
         SmartDashboard.putNumber("Intake Height", NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS);
         SmartDashboard.putNumber("L1 Angle", NarwhalConstants.NarwhalWristConstants.L1_OUTTAKE_ANGLE.getDegrees());
@@ -169,7 +169,11 @@ public class RobotContainer {
         SmartDashboard.putNumber("L3 Height", NarwhalConstants.NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT);
         SmartDashboard.putNumber("L4 Angle", NarwhalConstants.NarwhalWristConstants.L4_OUTTAKE_ANGLE.getDegrees());
         SmartDashboard.putNumber("L4 Height", NarwhalConstants.NarwhalElevatorConstants.L4_ELEVATOR_HEIGHT);
-        
+
+        SmartDashboard.putNumber("Climb Rotations (degrees)", NarwhalConstants.NarwhalClimberConstants.CLIMB_WINCH_ROTATIONS.getDegrees());
+        SmartDashboard.putNumber("Deploy Rotations (degrees)", NarwhalConstants.NarwhalClimberConstants.DEPLOYED_WINCH_ROTATIONS.getDegrees());
+
+        // Add autonomous configuration options.
         SmartDashboard.putNumber("Auto Score Offset X", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getX());
         SmartDashboard.putNumber("Auto Score Offset Y", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getY());
         SmartDashboard.putNumber("Auto Score Offset Rot", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getRotation().getDegrees());
@@ -294,6 +298,8 @@ public class RobotContainer {
     public void scheduleTeleOp() {
         CommandScheduler.getInstance().cancelAll();
         this.setWristValuesFromSmartDashbaord();
+        NarwhalConstants.NarwhalClimberConstants.CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(SmartDashboard.getNumber("Climb Rotations (degrees)", NarwhalConstants.NarwhalClimberConstants.CLIMB_WINCH_ROTATIONS.getDegrees()));
+        NarwhalConstants.NarwhalClimberConstants.DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(SmartDashboard.getNumber("Deploy Rotations (degrees)", NarwhalConstants.NarwhalClimberConstants.DEPLOYED_WINCH_ROTATIONS.getDegrees()));
 
         Alliance alliance = allianceSelector.getSelected();
         SmartDashboard.putString("Selected Alliance", alliance.toString());
