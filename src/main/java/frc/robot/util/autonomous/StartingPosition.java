@@ -18,9 +18,9 @@ import frc.robot.Constants.FieldConstants.StartingPoseConstants;
  * @see {@link frc.robot.RobotContainer}
  */
 public enum StartingPosition {
-    LEFT(StartingPoseConstants.BLUE_LEFT_STARTING_POSE,StartingPoseConstants.RED_LEFT_STARTING_POSE),
-    CENTER(StartingPoseConstants.BLUE_CENTER_STARTING_POSE,StartingPoseConstants.RED_CENTER_STARTING_POSE),
-    RIGHT(StartingPoseConstants.BLUE_RIGHT_STARTING_POSE,StartingPoseConstants.RED_RIGHT_STARTING_POSE);
+    LEFT(StartingPoseConstants.BLUE_LEFT_STARTING_POSE, StartingPoseConstants.RED_LEFT_STARTING_POSE),
+    CENTER(StartingPoseConstants.BLUE_CENTER_STARTING_POSE, StartingPoseConstants.RED_CENTER_STARTING_POSE),
+    RIGHT(StartingPoseConstants.BLUE_RIGHT_STARTING_POSE, StartingPoseConstants.RED_RIGHT_STARTING_POSE);
 
     private final Pose2d BLUE_POSE;
     private final Pose2d RED_POSE;
@@ -42,12 +42,11 @@ public enum StartingPosition {
      * @param alliance The alliance color the position will be taken form.
      * @return The starting position for the specified alliance.
      */
-    public Pose2d getPose(Alliance alliance) { 
+    public Pose2d getPose(Alliance alliance) {
         if (alliance == Alliance.BLUE) {
             return this.BLUE_POSE;
-        } else {
-            return this.RED_POSE;
         }
-    }
 
+        return this.RED_POSE;
+    }
 }

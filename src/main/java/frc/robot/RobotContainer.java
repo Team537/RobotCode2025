@@ -10,6 +10,8 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.network.TCPSender;
 import frc.robot.network.UDPReceiver;
+import frc.robot.routines.CenterScoreRoutine;
+import frc.robot.routines.MultiScoreRoutine;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.narwhal.NarwhalUpperAssembly;
 import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
@@ -20,10 +22,7 @@ import frc.robot.util.EnumPrettifier;
 import frc.robot.util.autonomous.Alliance;
 import frc.robot.util.autonomous.AutonomousRoutine;
 import frc.robot.util.autonomous.StartingPosition;
-import frc.robot.util.field.CoralStationSide;
-import frc.robot.util.field.ReefScoringLocation;
 import frc.robot.util.swerve.DrivingMotorType;
-import frc.robot.util.upper_assembly.ScoringHeight;
 import frc.robot.util.upper_assembly.UpperAssemblyFactory;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -176,79 +175,29 @@ public class RobotContainer {
             ((NarwhalUpperAssembly)upperAssembly).setCanRaiseLiftSupplier(driveSubsystem::getNarwhalCanRaiseLift);
         }
 
-        // Get the starting position for the specified autonomous routine and alliance.
-        switch (autonomousRoutine) {
-            case LEFT:
-                driveSubsystem.setRobotPose(StartingPosition.LEFT.getPose(alliance));
-                break;
-            case CENTER:
-                driveSubsystem.setRobotPose(StartingPosition.CENTER.getPose(alliance));
-                break;
-            case RIGHT:
-                driveSubsystem.setRobotPose(StartingPosition.RIGHT.getPose(alliance));
-                break;
-            default:
-            System.err.println("[System]: No alliance starting position selected!");
-                break;
-        }
-        
-        // Get and create the time delay the driver wants the autonomous to run on.
-        this.delayTimeSeconds = SmartDashboard.getNumber("Auto Delay", this.delayTimeSeconds);
-        Command autoDelayCommand = new WaitCommand(this.delayTimeSeconds);
-
-        // Construct the autonomous program for the selected starting position.
         Command autonomousCommand;
         switch (autonomousRoutine) {
             case LEFT:
-                autonomousCommand = 
-                    (
-                        driveSubsystem.getScoringCommand(alliance, ReefScoringLocation.J)
-                        .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
-                    ).andThen(
-                        driveSubsystem.getIntakeCommand(alliance, CoralStationSide.LEFT, 2)
-                        .alongWith(upperAssembly.getCoralIntakeCommand())
-                    ).andThen(
-                        driveSubsystem.getScoringCommand(alliance, ReefScoringLocation.K)
-                        .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
-                    ).andThen(
-                        upperAssembly.getLowerCommand()
-                    );  
-                break;  
-            case CENTER: 
-
-                /**
-                 * Drive forwards and score the preloaded coral onto the nearest branch at L4 height.
-                 */
-                autonomousCommand = 
-                    (
-                        driveSubsystem.getScoringCommand(alliance, ReefScoringLocation.H)
-                        .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
-                    ).andThen(
-                        upperAssembly.getLowerCommand()
-                        
-                    );
-                break;
             case RIGHT:
-                autonomousCommand = 
-                    (
-                        driveSubsystem.getScoringCommand(alliance, ReefScoringLocation.E)
-                        .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
-                    ).andThen(
-                        driveSubsystem.getIntakeCommand(alliance, CoralStationSide.RIGHT, 6)
-                        .alongWith(upperAssembly.getCoralIntakeCommand())
-                    ).andThen(
-                        driveSubsystem.getScoringCommand(alliance, ReefScoringLocation.D)
-                        .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
-                    ).andThen(
-                        upperAssembly.getLowerCommand()
-                    );    
+                autonomousCommand = MultiScoreRoutine.getCommand(autonomousRoutine == AutonomousRoutine.LEFT ? StartingPosition.LEFT : StartingPosition.RIGHT, alliance, driveSubsystem, upperAssembly);
+                break;
+            case CENTER:
+                autonomousCommand = CenterScoreRoutine.getCommand(alliance, driveSubsystem, upperAssembly);
                 break;
             default:
-                autonomousCommand =  new InstantCommand(); // Do nothing if no valid auto routine is selected
+                System.err.println("[System]: No alliance starting position selected!");
+                autonomousCommand = new InstantCommand(); // Do nothing if no valid auto routine is selected
+                break;
         }
 
-        // Combine the autonomous delay and the main routine. Then schedule the command.
-        autoDelayCommand.andThen(autonomousCommand).schedule();
+        // Wait if specified, otherwise just execute auto command
+        if (this.delayTimeSeconds > 0) {
+            Command autoDelayCommand = new WaitCommand(this.delayTimeSeconds);
+            autoDelayCommand.andThen(autonomousCommand).schedule();
+        }
+        else {
+            autonomousCommand.schedule();
+        }
     }
 
     /**

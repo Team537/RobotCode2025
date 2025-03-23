@@ -22,4 +22,17 @@ public enum ReefScoringLocation {
     J,
     K,
     L;
+
+    public static ReefScoringLocation getNextScoringLocation(ReefScoringLocation previouScoringLocation, boolean clockwise) {
+        ReefScoringLocation[] allLocations = ReefScoringLocation.values();
+        int change = clockwise ? -1 : 1; // positions are alphabetically counter-clockwise
+
+        // total length (12) + current position (0-11) +/- 1, modded by 12 eg
+        // A->B - (12 + 0 + 1) % 12 = 1
+        // A->L - (12 + 0 - 1) % 12 = 11
+        // L->A - (12 + 11 + 1) % 12 = 0
+        // L->K - (12 + 11 - 1) % 12 = 10
+        int nextPosition = (allLocations.length + previouScoringLocation.ordinal() + change) % allLocations.length;
+        return allLocations[nextPosition];
+    }
 }
