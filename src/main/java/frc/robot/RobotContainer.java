@@ -8,11 +8,9 @@ import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.OceanViewConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.commands.ExampleCommand;
 import frc.robot.network.TCPSender;
 import frc.robot.network.UDPReceiver;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.narwhal.NarwhalUpperAssembly;
 import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
 import frc.robot.subsystems.vision.OceanViewManager;
@@ -36,7 +34,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -54,7 +51,6 @@ public class RobotContainer {
     private TCPSender tcpSender;
 
     // Subsystems
-    private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
 
     private UpperAssemblyBase upperAssembly = UpperAssemblyFactory.createUpperAssembly(Constants.Defaults.DEFAULT_UPPER_ASSEMBLY);
@@ -78,7 +74,6 @@ public class RobotContainer {
      * Creates a new RobotContainer object and sets up SmartDashboard an the button inputs.
      */
     public RobotContainer() {
-        
         // Setup OceanView & all of its networking dependencies.
         setupOceanViewManager();
 
@@ -89,9 +84,6 @@ public class RobotContainer {
 
         // Setup Dashboard
         setupSmartDashboard();
-
-        // Configure the trigger bindings
-        configureBindings();
     }
 
     /**
@@ -120,24 +112,6 @@ public class RobotContainer {
 
         // Create a new OceanViewManager object.
         this.oceanViewManager = new OceanViewManager(this.udpReceiver, this.tcpSender, driveSubsystem::getRobotPose);
-    }
-
-    /**
-     * Use this method to define your trigger->command mappings. Triggers can be
-     * created via the {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
-     * an arbitrary predicate, or via the named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s 
-     * subclasses for {@link CommandXboxControllerXbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4ControllerPS4} 
-     * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
-     */
-    private void configureBindings() {
-        
-        // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-        new Trigger(exampleSubsystem::exampleCondition)
-                .onTrue(new ExampleCommand(exampleSubsystem));
-
-        // Schedule `exampleMethodCommand` when the Xbox controller's B button is
-        // pressed, cancelling on release.
-        // driverController.b().whileTrue(exampleSubsystem.exampleMethodCommand());
     }
 
     /**
@@ -292,11 +266,6 @@ public class RobotContainer {
         upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
         driveSubsystem.setDefaultCommand(driveSubsystem.getManualCommand(xBoxController, alliance));
     }
-
-
-    //////////////////////////////////////////////////////////////////////////////
-    // Periodic Update Methods
-    //////////////////////////////////////////////////////////////////////////////
     
     /**
      * Updates the robot's odometry. This calls the {@code DriveSubsystem}'s {@code updateOdometry()} method and 
