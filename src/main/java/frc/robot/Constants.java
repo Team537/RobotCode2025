@@ -196,7 +196,7 @@ public final class Constants {
         public static final double LINEAR_KI = 0.0;
         public static final double LINEAR_KD = 0.0;
 
-        public static final double ROTATIONAL_KP = 1.2;
+        public static final double ROTATIONAL_KP = 2.0;
         public static final double ROTATIONAL_KI = 0.0;
         public static final double ROTATIONAL_KD = 0.1;
 

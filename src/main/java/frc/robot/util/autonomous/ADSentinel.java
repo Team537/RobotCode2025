@@ -177,14 +177,6 @@ public class ADSentinel implements Pathfinder {
       return null;
     }
 
-    
-    // Create a list to hold the point towards locations for each waypoint (except the starting pose).
-    List<Translation2d> pointTowardsTranslations = new ArrayList<>();
-    List<Integer> pointTowardsTranslationWaypoints = new ArrayList<>();
-    
-    // The rotation offset, so a camera will face the tag
-    Rotation2d lastDirectionToBestTag = null;
-
     // Create a list to hold the zones for each waypoint (except the starting pose).
     List<PointTowardsZone> zones = new ArrayList<>();
 
@@ -193,7 +185,7 @@ public class ADSentinel implements Pathfinder {
 
     // For each waypoint (starting at index 1), calculate the best AprilTag and create a corresponding zone.
     // Don't start at index 0 because then the robot would start rotating immediately
-    for (int i = 1; i < (waypoints.size() - 1); i++) {
+    for (int i = 0; i < (waypoints.size() - 1); i++) {
       // Use the waypoint's anchor as the "robot" position.
       Translation2d waypointAnchor = waypoints.get(i).anchor();
 
@@ -201,51 +193,37 @@ public class ADSentinel implements Pathfinder {
       Translation2d bestTag = getBestAprilTagForPoint(waypointAnchor);
       if (bestTag == null) {
         // If no suitable tag is found, skip this waypoint.
-        pointTowardsTranslations.add(null);
         continue;
       }
 
-      pointTowardsTranslations.add(bestTag);
-      pointTowardsTranslationWaypoints.add(i);
+      Rotation2d directionToBestTag = bestTag.minus(waypointAnchor).getAngle();
 
-      lastDirectionToBestTag = bestTag.minus(waypointAnchor).getAngle();
+      // Initialize the best camera offset as null and set the smallest angle difference to the maximum value.
+      Rotation2d bestOffset = null;
+      double smallestAngleDifference = Double.MAX_VALUE;
 
-    }
+      // Iterate through each available camera offset.
+      for (Rotation2d offset : availableCameraOffsets) {
 
-    // Initialize the best camera offset as null and set the smallest angle difference to the maximum value.
-    Rotation2d bestOffset = null;
-    double smallestAngleDifference = Double.MAX_VALUE;
+          // Calculate the combined rotation by adding the current offset to the last known direction toward the best tag.
+          Rotation2d combinedRotation = directionToBestTag.plus(offset);
 
-    // Ensure that there is a valid lastDirectionToBestTag before processing.
-    if (lastDirectionToBestTag != null) {
+          // Compute the absolute angular difference between the combined rotation and the desired goal end rotation.
+          // This difference indicates how close the camera's orientation (after applying the offset) is to the desired target orientation.
+          double angleDifference = Math.abs(combinedRotation.minus(goalEndState.rotation()).getRadians());
 
-        // Iterate through each available camera offset.
-        for (Rotation2d offset : availableCameraOffsets) {
-
-            // Calculate the combined rotation by adding the current offset to the last known direction toward the best tag.
-            Rotation2d combinedRotation = lastDirectionToBestTag.plus(offset);
-
-            // Compute the absolute angular difference between the combined rotation and the desired goal end rotation.
-            // This difference indicates how close the camera's orientation (after applying the offset) is to the desired target orientation.
-            double angleDifference = Math.abs(combinedRotation.minus(goalEndState.rotation()).getRadians());
-
-            // If the current offset produces a smaller angular difference, update the bestOffset and smallestAngleDifference.
-            if (angleDifference < smallestAngleDifference) {
-                smallestAngleDifference = angleDifference;
-                bestOffset = offset;
-            }
-        }
-    }
-
-    // setup the zones for each point
-    for (int i = 0; i < (pointTowardsTranslationWaypoints.size()); i++) {
+          // If the current offset produces a smaller angular difference, update the bestOffset and smallestAngleDifference.
+          if (angleDifference < smallestAngleDifference) {
+              smallestAngleDifference = angleDifference;
+              bestOffset = offset;
+          }
+      }
 
       // Determine the activation range for this zone.
       // Here, we take the waypoint index (which is its parameter along the path) and add fixed offsets.
       // Clamp the end value to the total path length if necessary.
-      double waypointIndex = pointTowardsTranslationWaypoints.get(i);
-      double zoneStart = waypointIndex - 0.5;
-      double zoneEnd = waypointIndex + 0.5;
+      double zoneStart = i - 0.5;
+      double zoneEnd = i + 0.5;
       if (zoneEnd > totalPathLength) {
         zoneEnd = totalPathLength;
       }
@@ -253,7 +231,7 @@ public class ADSentinel implements Pathfinder {
       // Create a new zone using the best tag's translation and rotation.
       PointTowardsZone zone = new PointTowardsZone(
           "zone_" + i,                           // name (unique for each zone)
-          pointTowardsTranslations.get(i),              // target translation (2D)
+          bestTag,              // target translation (2D)
           bestOffset,                 // rotation offset
           zoneStart,
           zoneEnd
