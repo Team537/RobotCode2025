@@ -110,6 +110,27 @@ public final class Constants {
         
         public static final Matrix<N3, N1> DRIVE_STANDARD_DEVIATION = new Matrix<>(N3.instance, N1.instance, DRIVE_STANDARD_DEVIATION_COEFFICIENTS);
     
+        public static final List<Integer> AVAILABLE_SENTINEL_TAGS = List.of(
+            1,
+            2,
+            12,
+            13,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22
+        );
+        public static final double SENTINEL_DISTANCE_WEIGHT = 1.0;
+        public static final double SENTINEL_ORIENTATION_WEIGHT = 0.1;
+
         // Angular Offsets for Swerve Modules
         public static final Rotation2d FRONT_LEFT_MODULE_ANGULAR_OFFSET = new Rotation2d(-0.5 * Math.PI);
         public static final Rotation2d REAR_LEFT_MODULE_ANGULAR_OFFSET = new Rotation2d(Math.PI);
@@ -518,6 +539,12 @@ public final class Constants {
         public static final Transform3d FRONT_CAMERA_OFFSET = new Transform3d(-0.2159, 0, 0, new Rotation3d(0, 0, -Math.PI)); // TODO: Verify that the angle s correct.
         public static final Transform3d RIGHT_CAMERA_OFFSET = new Transform3d(0.219837, 0.1762252, 0.65913, new Rotation3d(0, 0, Math.PI / 2.0 )); 
         public static final Transform3d LEFT_CAMERA_OFFSET = new Transform3d(-0.219837, 0.1760728, 0.65913, new Rotation3d(0, 0, -Math.PI / 2.0)); 
+
+        public static final List<Rotation2d> AVAILABLE_CAMERA_OFFSETS = List.of(
+            new Rotation2d(FRONT_CAMERA_OFFSET.getRotation().getMeasureZ()),
+            new Rotation2d(RIGHT_CAMERA_OFFSET.getRotation().getMeasureZ()),
+            new Rotation2d(LEFT_CAMERA_OFFSET.getRotation().getMeasureZ())
+        );
 
         public static final double[] VISION_STANDARD_DEVIATION_COEFFICIENTS = { // PLACEHOLDER
             0.0025, 0.0025, 0
