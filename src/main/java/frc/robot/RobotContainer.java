@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -158,8 +159,14 @@ public class RobotContainer {
         // Add autonomous configuration options.
         SmartDashboard.putNumber("Intake Angle", NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE.getDegrees());
         SmartDashboard.putNumber("Intake Height", NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS);
+        SmartDashboard.putNumber("L1 Angle", NarwhalConstants.NarwhalWristConstants.L1_OUTTAKE_ANGLE.getDegrees());
+        SmartDashboard.putNumber("L1 Height", NarwhalConstants.NarwhalElevatorConstants.L1_ELEVATOR_HEIGHT);
+        SmartDashboard.putNumber("L2 Angle", NarwhalConstants.NarwhalWristConstants.L2_OUTTAKE_ANGLE.getDegrees());
+        SmartDashboard.putNumber("L2 Height", NarwhalConstants.NarwhalElevatorConstants.L2_ELEVATOR_HEIGHT);
         SmartDashboard.putNumber("L3 Angle", NarwhalConstants.NarwhalWristConstants.L3_OUTTAKE_ANGLE.getDegrees());
         SmartDashboard.putNumber("L3 Height", NarwhalConstants.NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT);
+        SmartDashboard.putNumber("L4 Angle", NarwhalConstants.NarwhalWristConstants.L4_OUTTAKE_ANGLE.getDegrees());
+        SmartDashboard.putNumber("L4 Height", NarwhalConstants.NarwhalElevatorConstants.L4_ELEVATOR_HEIGHT);
         
         SmartDashboard.putNumber("Auto Delay", this.delayTimeSeconds);
         SmartDashboard.putBoolean("Tush Push Mode", this.startWithTushPush);
@@ -178,10 +185,7 @@ public class RobotContainer {
      * Creates and schedules the selected autonomous routine. 
      */
     public void scheduleAutonomous() {
-        NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("Intake Angle", NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE.getDegrees()));
-        NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS = SmartDashboard.getNumber("Intake Height", NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS);
-        NarwhalConstants.NarwhalWristConstants.L3_OUTTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("L3 Angle", NarwhalConstants.NarwhalWristConstants.L3_OUTTAKE_ANGLE.getDegrees()));
-        NarwhalConstants.NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT = SmartDashboard.getNumber("L3 Height", NarwhalConstants.NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT);
+        this.setWristValuesFromSmartDashbaord();
         this.delayTimeSeconds = SmartDashboard.getNumber("Auto Delay", this.delayTimeSeconds);
         this.startWithTushPush = SmartDashboard.getBoolean("Tush Push Mode", this.startWithTushPush);
 
@@ -247,6 +251,7 @@ public class RobotContainer {
                         .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
                     ).andThen(
                         upperAssembly.getLowerCommand()
+                        
                     );
                 break;
             case RIGHT:
@@ -276,11 +281,9 @@ public class RobotContainer {
      * Schedules commands used exclusively during TeleOp.
      */
     public void scheduleTeleOp() {
-        NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("Intake Angle", NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE.getDegrees()));
-        NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS = SmartDashboard.getNumber("Intake Height", NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS);
-        NarwhalConstants.NarwhalWristConstants.L3_OUTTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("L3 Angle", NarwhalConstants.NarwhalWristConstants.L3_OUTTAKE_ANGLE.getDegrees()));
-        NarwhalConstants.NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT = SmartDashboard.getNumber("L3 Height", NarwhalConstants.NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT);
-        
+        CommandScheduler.getInstance().cancelAll();
+        this.setWristValuesFromSmartDashbaord();
+
         Alliance alliance = allianceSelector.getSelected();
         SmartDashboard.putString("Selected Alliance", alliance.toString());
 
@@ -302,5 +305,19 @@ public class RobotContainer {
     public void updateOdometry() {
         this.driveSubsystem.updateOdometry();
         this.visionOdometry.updateVisionPositionData();
+    }
+
+    private void setWristValuesFromSmartDashbaord() {
+        NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("Intake Angle", NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE.getDegrees()));
+        NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS = SmartDashboard.getNumber("Intake Height", NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS);
+
+        NarwhalConstants.NarwhalWristConstants.L1_OUTTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("L1 Angle", NarwhalConstants.NarwhalWristConstants.L1_OUTTAKE_ANGLE.getDegrees()));
+        NarwhalConstants.NarwhalElevatorConstants.L1_ELEVATOR_HEIGHT = SmartDashboard.getNumber("L1 Height", NarwhalConstants.NarwhalElevatorConstants.L1_ELEVATOR_HEIGHT);
+        NarwhalConstants.NarwhalWristConstants.L2_OUTTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("L2 Angle", NarwhalConstants.NarwhalWristConstants.L2_OUTTAKE_ANGLE.getDegrees()));
+        NarwhalConstants.NarwhalElevatorConstants.L2_ELEVATOR_HEIGHT = SmartDashboard.getNumber("L2 Height", NarwhalConstants.NarwhalElevatorConstants.L2_ELEVATOR_HEIGHT);
+        NarwhalConstants.NarwhalWristConstants.L3_OUTTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("L3 Angle", NarwhalConstants.NarwhalWristConstants.L3_OUTTAKE_ANGLE.getDegrees()));
+        NarwhalConstants.NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT = SmartDashboard.getNumber("L3 Height", NarwhalConstants.NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT);
+        NarwhalConstants.NarwhalWristConstants.L4_OUTTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("L4 Angle", NarwhalConstants.NarwhalWristConstants.L4_OUTTAKE_ANGLE.getDegrees()));
+        NarwhalConstants.NarwhalElevatorConstants.L4_ELEVATOR_HEIGHT = SmartDashboard.getNumber("L4 Height", NarwhalConstants.NarwhalElevatorConstants.L4_ELEVATOR_HEIGHT);
     }
 }
