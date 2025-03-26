@@ -779,6 +779,12 @@ public final class Constants {
             public static final Pose2d RED_CENTER_STARTING_POSE = rotate180(BLUE_CENTER_STARTING_POSE);
             public static final Pose2d RED_RIGHT_STARTING_POSE = rotate180(BLUE_RIGHT_STARTING_POSE);
 
+            // The offset if starting with a tush push (middle of the tape, rather than edge)
+            public static final Transform2d TUSH_PUSH_STARTING_TRANSFORM = new Transform2d(-0.0254,0.0,new Rotation2d());
+
+            // The offset tush push will move the robot. This is relative to the transformed starting pose.
+            public static final Transform2d TUSH_PUSH_TRANSFORM = new Transform2d(0.10,0.0,new Rotation2d());
+
         }
 
     }

@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.OceanViewConstants;
 import frc.robot.Constants.OperatorConstants;
@@ -28,6 +29,7 @@ import frc.robot.util.swerve.DrivingMotorType;
 import frc.robot.util.upper_assembly.ScoringHeight;
 import frc.robot.util.upper_assembly.UpperAssemblyFactory;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -202,20 +204,32 @@ public class RobotContainer {
             ((NarwhalUpperAssembly)upperAssembly).setCanRaiseLiftSupplier(driveSubsystem::getNarwhalCanRaiseLift);
         }
 
-        // Get the starting position for the specified autonomous routine and alliance.
+        Pose2d startingPose;
+
+        // Determine the starting position for the specified autonomous routine and alliance.
         switch (autonomousRoutine) {
             case LEFT:
-                driveSubsystem.setRobotPose(StartingPosition.LEFT.getPose(alliance));
+                startingPose = StartingPosition.LEFT.getPose(alliance);
                 break;
             case CENTER:
-                driveSubsystem.setRobotPose(StartingPosition.CENTER.getPose(alliance));
+                startingPose = StartingPosition.CENTER.getPose(alliance);
                 break;
             case RIGHT:
-                driveSubsystem.setRobotPose(StartingPosition.RIGHT.getPose(alliance));
+                startingPose = StartingPosition.RIGHT.getPose(alliance);
                 break;
             default:
-            System.err.println("[System]: No alliance starting position selected!");
+                System.err.println("[System]: No alliance starting position selected!");
+                startingPose = null;
                 break;
+        }
+
+        if (startWithTushPush) {
+            startingPose.transformBy(FieldConstants.StartingPoseConstants.TUSH_PUSH_STARTING_TRANSFORM);
+        }
+
+        // If a valid starting pose was determined, set the robot pose.
+        if (startingPose != null) {
+            driveSubsystem.setRobotPose(startingPose);
         }
         
         // Get and create the time delay the driver wants the autonomous to run on.
@@ -223,10 +237,17 @@ public class RobotContainer {
         Command autoDelayCommand = new WaitCommand(this.delayTimeSeconds);
 
         // Construct the autonomous program for the selected starting position.
-        Command autonomousCommand;
+        Command autonomousCommand = new InstantCommand();
+
+        if (startWithTushPush) {
+            
+            autonomousCommand = autonomousCommand.andThen(driveSubsystem.getDriveToPoseCommand(startingPose.transformBy(FieldConstants.StartingPoseConstants.TUSH_PUSH_TRANSFORM)));
+
+        }
+
         switch (autonomousRoutine) {
             case LEFT:
-                autonomousCommand = 
+                autonomousCommand = autonomousCommand.andThen(
                     (
                         driveSubsystem.getScoringCommand(alliance, ReefScoringLocation.J)
                         .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
@@ -238,24 +259,26 @@ public class RobotContainer {
                         .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
                     ).andThen(
                         upperAssembly.getLowerCommand()
-                    );  
+                    )
+                );      
                 break;  
             case CENTER: 
 
                 /**
                  * Drive forwards and score the preloaded coral onto the nearest branch at L4 height.
                  */
-                autonomousCommand = 
+                autonomousCommand = autonomousCommand.andThen(
                     (
                         driveSubsystem.getScoringCommand(alliance, ReefScoringLocation.H)
                         .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
                     ).andThen(
                         upperAssembly.getLowerCommand()
                         
-                    );
+                    )
+                );
                 break;
             case RIGHT:
-                autonomousCommand = 
+                autonomousCommand = autonomousCommand.andThen(
                     (
                         driveSubsystem.getScoringCommand(alliance, ReefScoringLocation.E)
                         .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
@@ -267,7 +290,8 @@ public class RobotContainer {
                         .alongWith(upperAssembly.getCoralScoreCommand(ScoringHeight.L4))
                     ).andThen(
                         upperAssembly.getLowerCommand()
-                    );    
+                    )
+                );     
                 break;
             default:
                 autonomousCommand =  new InstantCommand(); // Do nothing if no valid auto routine is selected
