@@ -23,16 +23,29 @@ public enum ReefScoringLocation {
     K,
     L;
 
-    public static ReefScoringLocation getNextScoringLocation(ReefScoringLocation previouScoringLocation, boolean clockwise) {
+    /**
+     * Returns the next scoring location based on the previous location and a direction.
+     *
+     * @param previousScoringLocation the current scoring location.
+     * @param clockwise               if true, the next location is determined in the clockwise direction;
+     *                                if false, counter-clockwise.
+     * @return the next ReefScoringLocation.
+     */
+    public static ReefScoringLocation getNextScoringLocation(ReefScoringLocation previousScoringLocation, boolean clockwise) {
         ReefScoringLocation[] allLocations = ReefScoringLocation.values();
         int change = clockwise ? -1 : 1; // positions are alphabetically counter-clockwise
-
-        // total length (12) + current position (0-11) +/- 1, modded by 12 eg
-        // A->B - (12 + 0 + 1) % 12 = 1
-        // A->L - (12 + 0 - 1) % 12 = 11
-        // L->A - (12 + 11 + 1) % 12 = 0
-        // L->K - (12 + 11 - 1) % 12 = 10
-        int nextPosition = (allLocations.length + previouScoringLocation.ordinal() + change) % allLocations.length;
+        int nextPosition = (allLocations.length + previousScoringLocation.ordinal() + change) % allLocations.length;
         return allLocations[nextPosition];
+    }
+
+    /**
+     * Returns the next scoring location from the current one.
+     *
+     * @param clockwise if true, the next location is determined in the clockwise direction;
+     *                  if false, counter-clockwise.
+     * @return the next ReefScoringLocation.
+     */
+    public ReefScoringLocation getNextScoringLocation(boolean clockwise) {
+        return getNextScoringLocation(this, clockwise);
     }
 }

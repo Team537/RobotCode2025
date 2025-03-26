@@ -279,6 +279,15 @@ public final class Constants {
         }
     }
 
+    public static class UpperAssemblyConstants {
+
+        /**
+         * The amount of time, in seconds, that the stub upper assembly will take to complete a simulated "task"
+         */
+        public static final double STUB_SIMULATED_WAIT_TIME = 2.0;
+
+    }
+
     /**
      * <h2>NarwhalConstants</h2>
      * The {@code NarwhalConstants} class is a subclass contained within the {@code Constants} class.
