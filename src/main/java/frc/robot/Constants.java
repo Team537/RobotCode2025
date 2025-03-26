@@ -284,7 +284,7 @@ public final class Constants {
         /**
          * The amount of time, in seconds, that the stub upper assembly will take to complete a simulated "task"
          */
-        public static final double STUB_SIMULATED_WAIT_TIME = 2.0;
+        public static final double STUB_SIMULATED_TASK_TIME = 2.0;
 
     }
 
