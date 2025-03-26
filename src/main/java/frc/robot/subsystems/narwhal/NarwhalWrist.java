@@ -13,9 +13,11 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.NarwhalWristState;
 import frc.robot.Constants.NarwhalConstants;
@@ -42,7 +44,9 @@ public class NarwhalWrist extends SubsystemBase {
     /** In radians */
     private final ArmFeedforward wristFeedForward;
     /** In radians */
-    private final PIDController wristMotorPIDController;
+    private PIDController wristMotorPIDController;
+    
+    private double current_target_voltage;
     
     /**
      * Create a new instance of the NarwhalWrist class, setting up necessary hardware in the process.
@@ -92,23 +96,36 @@ public class NarwhalWrist extends SubsystemBase {
      */
     public void setCurrentMotorAngle(Rotation2d targetAngle){
         double targetAngleRadians = targetAngle.getRadians();
-        double currentEncoderPosition = wrist.getEncoder().getPosition();
-        double currentEncoderVelocity = wrist.getEncoder().getVelocity();
-
         wristMotorPIDController.setSetpoint(targetAngleRadians);
-        wrist.set(
-            // Math.min + Math.max is used to clamp the output to the motor's range
-            Math.min(
-                Math.max(
-                    wristMotorPIDController.calculate(currentEncoderPosition) + 
-                    wristFeedForward.calculate(currentEncoderPosition + NarwhalWristConstants.WRIST_FEEDFORWARD_OFFSET_ANGLE.getRadians(), currentEncoderVelocity),
-                    NarwhalWristConstants.PID_OUTPUT_RANGE_MIN
-                ), 
-            NarwhalWristConstants.PID_OUTPUT_RANGE_MAX)
-        );
 
         currentState = NarwhalWristState.CUSTOM;
         currentTargetAngle = targetAngleRadians;
+    }
+
+    /**
+     * Updates the current motor voltage based on the recalculated PID outputs
+     */
+    public void updateMotor(){
+        double currentEncoderPosition = wrist.getEncoder().getPosition();
+        double currentEncoderVelocity = wrist.getEncoder().getVelocity();
+
+        double raw_output = wristMotorPIDController.calculate(currentEncoderPosition);
+        raw_output += wristFeedForward.calculate(currentEncoderPosition + NarwhalWristConstants.WRIST_FEEDFORWARD_OFFSET_ANGLE.getRadians(), currentEncoderVelocity);
+        
+        wrist.setVoltage(
+            // Math.min + Math.max is used to clamp the output to the motor's range
+            MathUtil.clamp(
+                raw_output,
+                NarwhalWristConstants.PID_OUTPUT_RANGE_MIN_VOLTAGE,
+                NarwhalWristConstants.PID_OUTPUT_RANGE_MAX_VOLTAGE
+            )
+        );
+
+        this.current_target_voltage = MathUtil.clamp(
+            raw_output,
+            NarwhalWristConstants.PID_OUTPUT_RANGE_MIN_VOLTAGE,
+            NarwhalWristConstants.PID_OUTPUT_RANGE_MAX_VOLTAGE
+        );
     }
 
     /**
@@ -216,21 +233,12 @@ public class NarwhalWrist extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
-        if (currentState != NarwhalWristState.STOPPED) {
-            double currentEncoderPosition = wrist.getEncoder().getPosition();
-            double currentEncoderVelocity = wrist.getEncoder().getVelocity();
-            
-            wrist.set(
-                // Math.min + Math.max is used to clamp the output to the motor's range
-                Math.min(
-                    Math.max(
-                        wristMotorPIDController.calculate(currentEncoderPosition) + 
-                        wristFeedForward.calculate(currentEncoderPosition + NarwhalWristConstants.WRIST_FEEDFORWARD_OFFSET_ANGLE.getRadians(), currentEncoderVelocity),
-                        NarwhalWristConstants.PID_OUTPUT_RANGE_MIN
-                    ), 
-                NarwhalWristConstants.PID_OUTPUT_RANGE_MAX)
-            );
-        }
+        // if (currentState != NarwhalWristState.STOPPED) {
+            this.updateMotor();
+        // }
+        SmartDashboard.putData("Wrist PID", wristMotorPIDController);
+        SmartDashboard.putNumber("target_voltage", current_target_voltage);
+        this.wristMotorPIDController = (PIDController)SmartDashboard.getData("Wrist PID");
     }
 
     @Override

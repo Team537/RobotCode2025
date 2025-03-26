@@ -302,8 +302,8 @@ public final class Constants {
             public static final double POSITION_PID_P = 0.3;
             public static final double POSITION_PID_I = 0;
             public static final double POSITION_PID_D = 0.2;
-            public static final double PID_OUTPUT_RANGE_MAX = 0.35;
-            public static final double PID_OUTPUT_RANGE_MIN = -0.35;
+            public static final double PID_OUTPUT_RANGE_MAX_VOLTAGE = 4.0;
+            public static final double PID_OUTPUT_RANGE_MIN_VOLTAGE = -4.0;
 
             public static final double POSITION_FF_G = 0.2; // This is the offset of the center of mass of the wrist from the zero position (x-axis)
             public static final Rotation2d PID_TOLERANCE = Rotation2d.fromDegrees(8);
