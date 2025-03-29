@@ -28,6 +28,7 @@ public class NarwhalCoralScoreCommand extends Command{
 
     /**
      * Creates a new NarwhalScoreCommand.
+     * 
      * @param narwhalElevator The NarwhalElevator subsystem to use.
      * @param narwhalWrist The NarwhalWrist subsystem to use.
      * @param narwhalIntakeOuttake The NarwhalIntakeOuttake subsystem to use.
@@ -40,7 +41,7 @@ public class NarwhalCoralScoreCommand extends Command{
         this.narwhalIntakeOuttake = narwhalIntakeOuttake;
         this.readyToScoreSupplier = readyToScoreSupplier;
         this.targetScoringHeight = targetScoringHeight;
-        addRequirements(narwhalElevator, narwhalWrist, narwhalIntakeOuttake);
+        //addRequirements(narwhalElevator, narwhalWrist, narwhalIntakeOuttake);
 
         outtakeDelayTimer = new Timer();
     }
@@ -59,24 +60,8 @@ public class NarwhalCoralScoreCommand extends Command{
     @Override
     public void execute(){
         // Move the elevator and wrist to the appropriate positions
-        switch (targetScoringHeight){
-            case L1:
-                narwhalElevator.goToScoreHeightL1();
-                narwhalWrist.goToL1WristAngle();
-                break;
-            case L2:
-                narwhalElevator.goToScoreHeightL2();
-                narwhalWrist.goToL2WristAngle();
-                break;
-            case L3:
-                narwhalElevator.goToScoreHeightL3();
-                narwhalWrist.goToL3WristAngle();
-                break;
-            case L4:
-                narwhalElevator.goToScoreHeightL4();
-                narwhalWrist.goToL4WristAngle();
-                break;
-        }
+        narwhalElevator.goToScoreHeight(targetScoringHeight);
+        narwhalWrist.goToScoreAngle(targetScoringHeight);
         
         // If the robot is ready to score, score the Coral, otherwise do nothing with the intake/outtake
         if(readyToScoreSupplier.get() && narwhalElevator.isAtTargetPosition() && narwhalWrist.isAtTargetPosition()){

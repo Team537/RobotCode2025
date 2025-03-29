@@ -23,7 +23,7 @@ public class DriveToPoseCommand extends Command {
     private final double rotationThreshold;    // in radians
 
     /**
-     * Constructs a new DriveTotranslationCommand.
+     * Constructs a new DriveToTranslationCommand.
      *
      * @param driveSubsystem    the drive subsystem used to drive the robot
      * @param targetPose        the target pose (translation and orientation) to drive to

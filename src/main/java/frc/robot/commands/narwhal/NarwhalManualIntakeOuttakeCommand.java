@@ -2,12 +2,10 @@ package frc.robot.commands.narwhal;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.narwhal.NarwhalElevator;
 import frc.robot.subsystems.narwhal.NarwhalIntakeOuttake;
 
 public class NarwhalManualIntakeOuttakeCommand extends Command {
     private final NarwhalIntakeOuttake narwhalIntakeOuttake;
-    private final NarwhalElevator narwhalElevator;
     private final XboxController xboxController;
 
     /**
@@ -15,21 +13,18 @@ public class NarwhalManualIntakeOuttakeCommand extends Command {
      * Narwhal's intake/outtake during teleop.
      * 
      * @param narwhalIntakeOuttake The {@link NarwhalIntakeOuttake} subsystem used by the robot.
-     * @param narwhalElevator The {@link NarwhalElevator} subsystem used by the robot.
      * @param xboxController The Xbox controller used to control the intake.
      */
-    public NarwhalManualIntakeOuttakeCommand(NarwhalIntakeOuttake narwhalIntakeOuttake, NarwhalElevator narwhalElevator, XboxController xboxController){
+    public NarwhalManualIntakeOuttakeCommand(NarwhalIntakeOuttake narwhalIntakeOuttake, XboxController xboxController){
         this.narwhalIntakeOuttake = narwhalIntakeOuttake;
-        this.narwhalElevator = narwhalElevator;
         this.xboxController = xboxController;
-        addRequirements(narwhalIntakeOuttake);
+        //addRequirements(narwhalIntakeOuttake);
     }
 
     @Override
     public void execute() {
         // Right bumper (intake) = intake
         if (xboxController.getRightBumperButton()) {
-            narwhalElevator.goToIntakeHeight();
             narwhalIntakeOuttake.intake();
         }
 

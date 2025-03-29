@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public abstract class UpperAssemblyBase extends SubsystemBase implements UpperAssembly {
     
     protected Supplier<Boolean> robotInScoringPositionSupplier;
+    protected Supplier<Boolean> robotInAlgaeRemovingPositionSupplier;
     protected Supplier<Boolean> robotInIntakingPositionSupplier;
     protected Supplier<Boolean> robotInClimbPositionSupplier;
 
@@ -24,10 +25,15 @@ public abstract class UpperAssemblyBase extends SubsystemBase implements UpperAs
         robotInScoringPositionSupplier = () -> {return true;};
         robotInIntakingPositionSupplier = () -> {return true;};
         robotInClimbPositionSupplier = () -> {return true;};
+        robotInAlgaeRemovingPositionSupplier = () -> {return true;};
     }
 
     public void setRobotInScoringPositionSupplier(Supplier<Boolean> supplier) {
         robotInScoringPositionSupplier = supplier;
+    }
+
+    public void setRobotInAlgaeRemovingPositionSupplier(Supplier<Boolean> supplier) {
+        robotInAlgaeRemovingPositionSupplier = supplier;
     }
 
     public void setRobotInIntakingPositionSupplier(Supplier<Boolean> supplier) {

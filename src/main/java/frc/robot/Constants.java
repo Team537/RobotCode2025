@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.photonvision.PhotonPoseEstimator;
@@ -11,11 +13,16 @@ import org.photonvision.PhotonPoseEstimator;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import frc.robot.util.swerve.DrivingMotorType;
 import frc.robot.util.swerve.TurningMotorType;
@@ -55,20 +62,21 @@ public final class Constants {
         // Position offsets, used to determine the orientation of the driver
         public static final Rotation2d BLUE_ALLIANCE_OFFSET = new Rotation2d(-0.5 * Math.PI);
         public static final Rotation2d RED_ALLIANCE_OFFSET = new Rotation2d(0.5 * Math.PI);
-        public static final Rotation2d DEMO_ALLIANCE_OFFSET = new Rotation2d(-0.5 * Math.PI);
+        public static final Rotation2d DEMO_ALLIANCE_OFFSET = new Rotation2d(0.0);
 
         // Controller Constants
         public static final double LINEAR_INPUT_CURVE_POWER = 2.5;
         public static final double ROTATION_INPUT_CURVE_POWER = 2.5;
-        public static final double THROTTLE_LINEAR_MIN_SPEED = 2.0; // Meters per second
+        public static final double NORMAL_LINEAR_MAX_SPEED = 2.0; // Meters/per second
         public static final double THROTTLE_LINEAR_MAX_SPEED = DriveConstants.LINEAR_MAX_SPEED; // Meters per second
-        public static final double THROTTLE_ROTATIONAL_MIN_SPEED = 7.0; // Radians per second
-        public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; // Radians per
-                                                                                                        // second
-        public static final double XBOX_CONTROLLER_JOYSTICK_DEADMAND_RADIUS = 0.01;
-        public static final double XBOX_CONTROLLER_TARGET_MIN_RADIUS = 2.0; // Meters
-        public static final double XBOX_CONTROLLER_TARGET_MAX_RADIUS = 0.5; // Meters
-        public static final double XBOX_CONTROLLER_ROTATIONAL_TARGET_ACTIVATION_ZONE = 0.8;
+        public static final double SLOW_LINEAR_MAX_SPEED = 0.5; // Meters/per second
+        public static final double NORMAL_ROTATIONAL_MAX_SPEED = 7.0; // Radians per second
+        public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; // Radians per second
+        public static final double SLOW_ROTATIONAL_MAX_SPEED = 2.0; // Meters/per second
+        public static final double XBOX_CONTROLLER_JOYSTICK_DEADBAND_RADIUS = 0.01;
+        public static final double XBOX_CONTROLLER_TARGET_RADIUS = 2.0; // Meters
+        public static final double XBOX_CONTROLLER_TARGET_THROTTLE_RADIUS = 0.5; // Meters
+        public static final double XBOX_CONTROLLER_ROTATIONAL_TARGET_ACTIVATION_ZONE = 0.99;
         public static final double XBOX_CONTROLLER_ROTATIONAL_TARGET_DEACTIVATION_ZONE = 0.7;
     }
 
@@ -82,11 +90,25 @@ public final class Constants {
 
         // Robot Features
         public static final double DRIVETRAIN_MASS = 39.5; //Kg
-        public static final double DRIVETRAIN_MOI = 1.227; //Kg meters
+        public static final double DRIVETRAIN_MOI = 2.285; //Kg meters
         public static final double GRAVITY_ACCELERATION = 9.81; // Meters / sec^2
 
         public static final double TRANSLATION_THRESHOLD = 0.05; // Meters
-        public static final double ROTATION_THRESHOLD = 0.08; // Radians
+        public static final double ROTATION_THRESHOLD = 0.20; // Radians
+
+        public static final double NARWHAL_CAN_RAISE_LIFT_DISTANCE = 1.0; // Meters
+        public static final Transform2d NARWHAL_RAKE_ALAGE_TRANSFORM = new Transform2d(0.5,0.0,new Rotation2d());
+
+        public static final double[] DRIVE_STANDARD_DEVIATION_COEFFICIENTS = {
+            0.006611986432, 0.3500199104, 0
+        };
+
+        public static final double AUTO_DRIVING_TRANSLATIONAL_SPEED_SAFETY_FACTOR = 0.25;
+        public static final double AUTO_DRIVING_TRANSLATIONAL_ACCELERATION_SAFETY_FACTOR = 0.5;
+        public static final double AUTO_DRIVING_ROTATIONAL_SPEED_SAFETY_FACTOR = 0.25;
+        public static final double AUTO_DRIVING_ROTATIONAL_ACCELERATION_FACTOR = 0.5;
+        
+        public static final Matrix<N3, N1> DRIVE_STANDARD_DEVIATION = new Matrix<>(N3.instance, N1.instance, DRIVE_STANDARD_DEVIATION_COEFFICIENTS);
     
         // Angular Offsets for Swerve Modules
         public static final Rotation2d FRONT_LEFT_MODULE_ANGULAR_OFFSET = new Rotation2d(-0.5 * Math.PI);
@@ -153,9 +175,12 @@ public final class Constants {
         public static final double LINEAR_KI = 0.0;
         public static final double LINEAR_KD = 0.0;
 
-        public static final double ROTATIONAL_KP = 0.3;
+        public static final double ROTATIONAL_KP = 1.2;
         public static final double ROTATIONAL_KI = 0.0;
-        public static final double ROTATIONAL_KD = 0.0;
+        public static final double ROTATIONAL_KD = 0.1;
+
+        // Update times
+        public static final int SENSOR_UPDATE_TIME_HZ = 250;
 
         /*
          * ---------------------------------- DRIVING CONSTANTS ----------------------------------
@@ -254,6 +279,15 @@ public final class Constants {
         }
     }
 
+    public static class UpperAssemblyConstants {
+
+        /**
+         * The amount of time, in seconds, that the stub upper assembly will take to complete a simulated "task"
+         */
+        public static final double STUB_SIMULATED_TASK_TIME = 2.0;
+
+    }
+
     /**
      * <h2>NarwhalConstants</h2>
      * The {@code NarwhalConstants} class is a subclass contained within the {@code Constants} class.
@@ -262,8 +296,14 @@ public final class Constants {
      */
     public static class NarwhalConstants {
 
-        public static final double UPPER_ASSEMBLY_MASS = 0.0; //Kg
-        public static final double UPPER_ASSEMBLY_MOI = 0.0; //Kg m^2
+        public static final double UPPER_ASSEMBLY_MASS = 17.2; //Kg
+        public static final double UPPER_ASSEMBLY_MOI = 0.995; //Kg m^2
+
+        public static final Transform2d INTAKING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0),new Rotation2d(Math.PI));
+        public static Transform2d SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.1524,0.0),new Rotation2d(0));
+        public static final Transform2d ALGAE_REMOVAL_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0),new Rotation2d(0.0));
+        public static final Transform2d CLIMB_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0),new Rotation2d(Math.PI));
+ 
 
         public static class NarwhalIntakeOuttakeConstants {
             // Sensor IDs
@@ -312,13 +352,14 @@ public final class Constants {
 
 
             // Set position for wrist angles (Angle is relative to the world, with 0 being the down position and rotating away from 0 being positive)
-            public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(Math.PI / 4.85);
-            public static final Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
-            public static final Rotation2d L2_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
-            public static final Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
-            public static final Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.08 * Math.PI);
-            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromRadians(3 * Math.PI / 2); // This is the angle the wrist should be at when climbing
-            public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(3 * Math.PI / 2);
+            public static Rotation2d INTAKE_ANGLE = Rotation2d.fromDegrees(50); // there's a lot of slop so this is going to be ~10 degreses over the actual position
+            public static Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);   
+            public static Rotation2d L2_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
+            public static Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
+            public static Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
+            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI); // This is the angle the wrist should be at when climbing
+            public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(1.12 * Math.PI);
+            public static final Rotation2d TRANSIT_ANGLE = Rotation2d.fromRadians(0.5 * Math.PI);
             
 
 
@@ -332,19 +373,18 @@ public final class Constants {
             public static final boolean IS_CLIMBER_INVERTED = false;
 
             public static final double GEAR_REDUCTION = 125.0;
-            public static final double PULLY_REDUCTION = 10.0;
-            public static final double CLIMBER_ANGLE_TO_MOTOR_ANGLE = GEAR_REDUCTION * PULLY_REDUCTION; // technically not a 1 to 1 conversion because of how the climber arm and winch are linked
+            public static final double CLIMBER_ANGLE_TO_MOTOR_ANGLE = GEAR_REDUCTION; // technically not a 1 to 1 conversion because of how the climber arm and winch are linked
 
             public static final double PID_P = 8.5;
             public static final double PID_I = 0;
             public static final double PID_D = 0.1;
             public static final double PID_F = 1.9;
 
-            public static final double CLIMBER_PID_MIN_OUTPUT = -0.3;
-            public static final double CLIMBER_PID_MAX_OUTPUT = 0.3;
+            public static final double CLIMBER_PID_MIN_OUTPUT = -1.0;
+            public static final double CLIMBER_PID_MAX_OUTPUT = 1.0;
             
-            public static final Rotation2d DEPLOYED_ANGLE = Rotation2d.fromDegrees(40);
-            public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromDegrees(-13.5);
+            public static Rotation2d DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(1035);
+            public static Rotation2d CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(270);
 
             /** The angle tolerance for the climber to be considered at a specific state. */
             public static final Rotation2d CLIMBER_ANGLE_TOLERANCE = Rotation2d.fromDegrees(3);
@@ -367,20 +407,23 @@ public final class Constants {
             // PID
             public static final double ELEVATOR_KP = 2.5;
             public static final double ELEVATOR_KI = 0;
-            public static final double ELEVATOR_KD = 0.2;
-            public static final double ELEVATOR_MIN_OUTPUT = -0.9;
-            public static final double ELEVATOR_MAX_OUTPUT = 0.9;
+            public static final double ELEVATOR_KD = 0.4;
+            public static final double ELEVATOR_MIN_OUTPUT = -1.0;
+            public static final double ELEVATOR_MAX_OUTPUT = 1.0;
 
             // Set positions for the length the elevator needs to extend to to score.
             public static final double MIN_HEIGHT_METERS = 0.0; // probably should leave at 0.0.
             public static final double MAX_HEIGHT_METERS = 2.1336; // stops the robot from ending itself
-            public static final double L1_ELEVATOR_HEIGHT = 0.05; // Meters
-            public static final double L2_ELEVATOR_HEIGHT = 0.07; // Meters
-            public static final double L3_ELEVATOR_HEIGHT = 0.67; // Meters
-            public static final double L4_ELEVATOR_HEIGHT = 1.7; // Meters
-            public static final double INTAKE_ELEVATOR_HEIGHT_METERS = 0.05; // Meters
+            public static double L1_ELEVATOR_HEIGHT = 0.05; // Meters
+            public static double L2_ELEVATOR_HEIGHT = 0.07; // Meters
+            public static double L3_ELEVATOR_HEIGHT = 0.75; // Meters
+            public static double L4_ELEVATOR_HEIGHT = 1.7; // Meters
+            public static double INTAKE_ELEVATOR_HEIGHT_METERS = 0.08; // Meters
             public static final boolean MOTOR_INVERTED = true;
             public static final double ELEVATOR_POSITION_TOLERANCE = 0.05; // Meters
+            public static final double ALGAE_DESCORE_HEIGHT_METERS_TOP_ROW = -0.4; // Meters (negative to go down)
+            public static final double ALGAE_DESCORE_HEIGHT_METERS_BOTTOM_ROW = 0.7; // Meters
+            public static final double ALGAE_DESCORE_HEIGHT_METERS_DOWN_OFFSET = 1.7; // Meters
         }
     }
 
@@ -394,6 +437,9 @@ public final class Constants {
 
         public static final double UPPER_ASSEMBLY_MASS = 0.0;
         public static final double UPPER_ASSEMBLY_MOI = 0.0; //Kg m^2
+        public static final Transform2d INTAKING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.5,0.0),new Rotation2d(Math.PI));
+        public static final Transform2d SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.5,0.0),new Rotation2d(0));
+        public static final Transform2d CLIMB_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.5,0.0),new Rotation2d(Math.PI));
 
         public static class SquidManipulatorConstants {
 
@@ -481,13 +527,19 @@ public final class Constants {
     public static class VisionConstants {
 
         // Camera Settings
-        public static final String FRONT_CAMERA_NAME = "Arducam_OV9782_USB_Camera"; //
+        public static final String FRONT_CAMERA_NAME = "Arducam_OV2311_USB_Camera"; //
         public static final String RIGHT_CAMERA_NAME = "Right_Arducam_OV9782";
         public static final String LEFT_CAMERA_NAME  = "Left_Arducam_OV9782";
 
-        public static final Transform3d FRONT_CAMERA_OFFSET = new Transform3d(); // TODO: Fill in actual values.
-        public static final Transform3d RIGHT_CAMERA_OFFSET = new Transform3d(0.219837, 0.1762252, 0.65913, new Rotation3d(0, 0, Math.PI / 2.0 )); // TODO: Fill in actual values.
-        public static final Transform3d LEFT_CAMERA_OFFSET = new Transform3d(-0.219837, 0.1760728, 0.65913, new Rotation3d(0, 0, Math.PI / 2.0)); // TODO: Fill in actual values.
+        public static final Transform3d FRONT_CAMERA_OFFSET = new Transform3d(-0.2159, 0, 0, new Rotation3d(0, 0, -Math.PI)); // TODO: Verify that the angle s correct.
+        public static final Transform3d RIGHT_CAMERA_OFFSET = new Transform3d(0.219837, 0.1762252, 0.65913, new Rotation3d(0, 0, Math.PI / 2.0 )); 
+        public static final Transform3d LEFT_CAMERA_OFFSET = new Transform3d(-0.219837, 0.1760728, 0.65913, new Rotation3d(0, 0, -Math.PI / 2.0)); 
+
+        public static final double[] VISION_STANDARD_DEVIATION_COEFFICIENTS = { // PLACEHOLDER
+            0.0025, 0.0025, 0
+        };
+        
+        public static final Matrix<N3, N1> VISION_STANDARD_DEVIATION = new Matrix<>(N3.instance, N1.instance, VISION_STANDARD_DEVIATION_COEFFICIENTS);
 
         // Pipeline settings
         public static final int APRIL_TAG_PIPELINE = 0;
@@ -513,5 +565,237 @@ public final class Constants {
         // Time Synchronization
         public static final int TIME_SYNC_PORT_NUMBER = 6000;
         public static final int DEFAULT_NUM_SAMPLES = 10;
+    }
+
+    // TODO: Write better, mroe descriptivejavadoc comments for this portion of the code.
+    public static class FieldConstants {
+
+        private static final Translation2d FIELD_ORIGIN = new Translation2d(8.775, 4.02);
+
+        // Helper: rotate a Pose2d 180 degrees about the field origin.
+        private static Pose2d rotate180(Pose2d bluePose) {
+            Translation2d blueTranslation = bluePose.getTranslation();
+            // 180° rotation about FIELD_ORIGIN: (2*ox - x, 2*oy - y)
+            double redX = 2 * FIELD_ORIGIN.getX() - blueTranslation.getX();
+            double redY = 2 * FIELD_ORIGIN.getY() - blueTranslation.getY();
+            // Orientation: add π and normalize (Rotation2d takes care of that if needed)
+            Rotation2d redRotation = bluePose.getRotation().plus(new Rotation2d(Math.PI));
+            return new Pose2d(new Translation2d(redX, redY), redRotation);
+        }
+
+        // Helper: Mirror a pose across a horizontal line at a given y-value.
+        private static Pose2d mirrorAcrossHorizontal(double yLine, Pose2d bluePose) {
+            Translation2d translation = bluePose.getTranslation();
+            double mirroredY = 2 * yLine - translation.getY();
+            Translation2d newTranslation = new Translation2d(translation.getX(), mirroredY);
+            // For a horizontal mirror, the x component stays the same while the y component of any vector is inverted.
+            // Here we reflect the rotation by negating its radians.
+            double mirroredRadians = -bluePose.getRotation().getRadians();
+            Rotation2d newRotation = new Rotation2d(mirroredRadians);
+            return new Pose2d(newTranslation, newRotation);
+        }
+
+        public static class ReefConstants {
+
+            /* --- BLUE CORAL SCORING POSITIONS --- */
+            // Side normals (in radians): 
+            // Left: PI, Bottom-Left: 4PI/3, Bottom-Right: 5PI/3, Right: 0, Top-Right: PI/3, Top-Left: 2PI/3
+
+            private static final Translation2d REEF_CENTER = new Translation2d(4.49, 4.02);
+            private static final double APOTHEM = 1.212;      // distance from reef center to a side
+            private static final double TANGENT_OFFSET = 0.17; // offset along the side
+
+            // LEFT SIDE (normal = PI)
+            // Base position for algae removal is at REEF_CENTER + APOTHEM*(cos(PI), sin(PI))
+            private static final Translation2d BLUE_LEFT_BASE = 
+            new Translation2d(REEF_CENTER.getX() + APOTHEM * Math.cos(Math.PI),
+                            REEF_CENTER.getY() + APOTHEM * Math.sin(Math.PI));
+            public static final Pose2d BLUE_CORAL_SCORE_POSITION_A = new Pose2d(
+            new Translation2d(BLUE_LEFT_BASE.getX(), BLUE_LEFT_BASE.getY() + TANGENT_OFFSET),
+            new Rotation2d(Math.PI));
+            public static final Pose2d BLUE_CORAL_SCORE_POSITION_B = new Pose2d(
+            new Translation2d(BLUE_LEFT_BASE.getX(), BLUE_LEFT_BASE.getY() - TANGENT_OFFSET),
+            new Rotation2d(Math.PI));
+            // ALGAE REMOVAL position (midpoint on left side)
+            public static final Pose2d BLUE_ALGAE_REMOVAL_POSITION_AB = new Pose2d(
+            BLUE_LEFT_BASE, new Rotation2d(Math.PI));
+
+            // BOTTOM-LEFT SIDE (normal = 4PI/3)
+            private static final double NORMAL_BL = 4 * Math.PI / 3;
+            private static final Translation2d BLUE_BL_BASE = 
+            new Translation2d(REEF_CENTER.getX() + APOTHEM * Math.cos(NORMAL_BL),
+                            REEF_CENTER.getY() + APOTHEM * Math.sin(NORMAL_BL));
+            public static final Pose2d BLUE_CORAL_SCORE_POSITION_C = new Pose2d(
+            new Translation2d(BLUE_BL_BASE.getX() + TANGENT_OFFSET * Math.sin(NORMAL_BL),
+                            BLUE_BL_BASE.getY() + TANGENT_OFFSET * -Math.cos(NORMAL_BL)),
+            new Rotation2d(NORMAL_BL));
+            public static final Pose2d BLUE_CORAL_SCORE_POSITION_D = new Pose2d(
+            new Translation2d(BLUE_BL_BASE.getX() - TANGENT_OFFSET * Math.sin(NORMAL_BL),
+                            BLUE_BL_BASE.getY() - TANGENT_OFFSET * -Math.cos(NORMAL_BL)),
+            new Rotation2d(NORMAL_BL));
+            // ALGAE REMOVAL position (midpoint on bottom-left side)
+            public static final Pose2d BLUE_ALGAE_REMOVAL_POSITION_CD = new Pose2d(
+            BLUE_BL_BASE, new Rotation2d(NORMAL_BL));
+
+            // BOTTOM-RIGHT SIDE (normal = 5PI/3)
+            private static final double NORMAL_BR = 5 * Math.PI / 3;
+            private static final Translation2d BLUE_BR_BASE = 
+                new Translation2d(REEF_CENTER.getX() + APOTHEM * Math.cos(NORMAL_BR),
+                                REEF_CENTER.getY() + APOTHEM * Math.sin(NORMAL_BR));
+            public static final Pose2d BLUE_CORAL_SCORE_POSITION_E = new Pose2d(
+                new Translation2d(BLUE_BR_BASE.getX() + TANGENT_OFFSET * Math.sin(NORMAL_BR),
+                                BLUE_BR_BASE.getY() + TANGENT_OFFSET * -Math.cos(NORMAL_BR)),
+                new Rotation2d(NORMAL_BR));
+            public static final Pose2d BLUE_CORAL_SCORE_POSITION_F = new Pose2d(
+                new Translation2d(BLUE_BR_BASE.getX() - TANGENT_OFFSET * Math.sin(NORMAL_BR),
+                                BLUE_BR_BASE.getY() - TANGENT_OFFSET * -Math.cos(NORMAL_BR)),
+                new Rotation2d(NORMAL_BR));
+                // ALGAE REMOVAL position (midpoint on bottom-left side)
+            public static final Pose2d BLUE_ALGAE_REMOVAL_POSITION_EF = new Pose2d(
+                BLUE_BR_BASE, new Rotation2d(NORMAL_BR));
+
+            // RIGHT SIDE (normal = 0)
+            private static final Translation2d BLUE_RIGHT_BASE = 
+                new Translation2d(REEF_CENTER.getX() + APOTHEM * Math.cos(0),
+                                REEF_CENTER.getY() + APOTHEM * Math.sin(0));
+            public static final Pose2d BLUE_CORAL_SCORE_POSITION_G = new Pose2d(
+                new Translation2d(BLUE_RIGHT_BASE.getX(), BLUE_RIGHT_BASE.getY() - TANGENT_OFFSET),
+                new Rotation2d(0));
+            public static final Pose2d BLUE_CORAL_SCORE_POSITION_H = new Pose2d(
+                new Translation2d(BLUE_RIGHT_BASE.getX(), BLUE_RIGHT_BASE.getY() + TANGENT_OFFSET),
+                new Rotation2d(0));
+                // ALGAE REMOVAL position (midpoint on bottom-left side)
+            public static final Pose2d BLUE_ALGAE_REMOVAL_POSITION_GH = new Pose2d(
+                BLUE_RIGHT_BASE, new Rotation2d(0));
+
+            // TOP-RIGHT SIDE (normal = PI/3)
+            private static final double NORMAL_TR = Math.PI / 3;
+            private static final Translation2d BLUE_TR_BASE = 
+                new Translation2d(REEF_CENTER.getX() + APOTHEM * Math.cos(NORMAL_TR),
+                                REEF_CENTER.getY() + APOTHEM * Math.sin(NORMAL_TR));
+            public static final Pose2d BLUE_CORAL_SCORE_POSITION_I = new Pose2d(
+                new Translation2d(BLUE_TR_BASE.getX() + TANGENT_OFFSET * Math.sin(NORMAL_TR),
+                                BLUE_TR_BASE.getY() + TANGENT_OFFSET * -Math.cos(NORMAL_TR)),
+                new Rotation2d(NORMAL_TR));
+            public static final Pose2d BLUE_CORAL_SCORE_POSITION_J = new Pose2d(
+                new Translation2d(BLUE_TR_BASE.getX() - TANGENT_OFFSET * Math.sin(NORMAL_TR),
+                                BLUE_TR_BASE.getY() - TANGENT_OFFSET * -Math.cos(NORMAL_TR)),
+                new Rotation2d(NORMAL_TR));
+                // ALGAE REMOVAL position (midpoint on bottom-left side)
+            public static final Pose2d BLUE_ALGAE_REMOVAL_POSITION_IJ = new Pose2d(
+                BLUE_TR_BASE, new Rotation2d(NORMAL_TR));
+
+            // TOP-LEFT SIDE (normal = 2PI/3)
+            private static final double NORMAL_TL = 2 * Math.PI / 3;
+            private static final Translation2d BLUE_TL_BASE = 
+            new Translation2d(REEF_CENTER.getX() + APOTHEM * Math.cos(NORMAL_TL),
+                            REEF_CENTER.getY() + APOTHEM * Math.sin(NORMAL_TL));
+            public static final Pose2d BLUE_CORAL_SCORE_POSITION_K = new Pose2d(
+            new Translation2d(BLUE_TL_BASE.getX() + TANGENT_OFFSET * Math.sin(NORMAL_TL),
+                            BLUE_TL_BASE.getY() + TANGENT_OFFSET * -Math.cos(NORMAL_TL)),
+            new Rotation2d(NORMAL_TL));
+            public static final Pose2d BLUE_CORAL_SCORE_POSITION_L = new Pose2d(
+            new Translation2d(BLUE_TL_BASE.getX() - TANGENT_OFFSET * Math.sin(NORMAL_TL),
+                            BLUE_TL_BASE.getY() - TANGENT_OFFSET * -Math.cos(NORMAL_TL)),
+            new Rotation2d(NORMAL_TL));
+            // ALGAE REMOVAL position (midpoint on top-left side)
+            public static final Pose2d BLUE_ALGAE_REMOVAL_POSITION_KL = new Pose2d(
+            BLUE_TL_BASE, new Rotation2d(NORMAL_TL));
+
+            /* --- RED POSITIONS (rotated 180° about FIELD_ORIGIN) --- */
+            // Coral scoring positions
+            public static final Pose2d RED_CORAL_SCORE_POSITION_A = rotate180(BLUE_CORAL_SCORE_POSITION_A);
+            public static final Pose2d RED_CORAL_SCORE_POSITION_B = rotate180(BLUE_CORAL_SCORE_POSITION_B);
+            public static final Pose2d RED_CORAL_SCORE_POSITION_C = rotate180(BLUE_CORAL_SCORE_POSITION_C);
+            public static final Pose2d RED_CORAL_SCORE_POSITION_D = rotate180(BLUE_CORAL_SCORE_POSITION_D);
+            public static final Pose2d RED_CORAL_SCORE_POSITION_E = rotate180(BLUE_CORAL_SCORE_POSITION_E);
+            public static final Pose2d RED_CORAL_SCORE_POSITION_F = rotate180(BLUE_CORAL_SCORE_POSITION_F);
+            public static final Pose2d RED_CORAL_SCORE_POSITION_G = rotate180(BLUE_CORAL_SCORE_POSITION_G);
+            public static final Pose2d RED_CORAL_SCORE_POSITION_H = rotate180(BLUE_CORAL_SCORE_POSITION_H);
+            public static final Pose2d RED_CORAL_SCORE_POSITION_I = rotate180(BLUE_CORAL_SCORE_POSITION_I);
+            public static final Pose2d RED_CORAL_SCORE_POSITION_J = rotate180(BLUE_CORAL_SCORE_POSITION_J);
+            public static final Pose2d RED_CORAL_SCORE_POSITION_K = rotate180(BLUE_CORAL_SCORE_POSITION_K);
+            public static final Pose2d RED_CORAL_SCORE_POSITION_L = rotate180(BLUE_CORAL_SCORE_POSITION_L);
+            // Algae removal positions
+            public static final Pose2d RED_ALGAE_REMOVAL_POSITION_AB = rotate180(BLUE_ALGAE_REMOVAL_POSITION_AB);
+            public static final Pose2d RED_ALGAE_REMOVAL_POSITION_CD = rotate180(BLUE_ALGAE_REMOVAL_POSITION_CD);
+            public static final Pose2d RED_ALGAE_REMOVAL_POSITION_EF = rotate180(BLUE_ALGAE_REMOVAL_POSITION_EF);
+            public static final Pose2d RED_ALGAE_REMOVAL_POSITION_GH = rotate180(BLUE_ALGAE_REMOVAL_POSITION_GH);
+            public static final Pose2d RED_ALGAE_REMOVAL_POSITION_IJ = rotate180(BLUE_ALGAE_REMOVAL_POSITION_IJ);
+            public static final Pose2d RED_ALGAE_REMOVAL_POSITION_KL = rotate180(BLUE_ALGAE_REMOVAL_POSITION_KL);
+
+        }
+
+        public static class CoralStationConstants {
+            
+            // === Coral Station Intake Positions ===
+            private static final double CORAL_INTAKE_SPACING = 0.2032;
+
+            // Convert to a field–relative angle: add π/2 since the wall is vertical.
+            private static final Rotation2d FIELD_INTAKE_ANGLE = new Rotation2d(3.76971235639);
+
+            // Base pose for BLUE LEFT intake positions.
+            // Index 0 is given as (1.70244, 7.57545) with the computed intake angle.
+            private static final Pose2d BLUE_INTAKE_LEFT_BASE = new Pose2d(
+                    new Translation2d(1.761, 7.500), FIELD_INTAKE_ANGLE);
+
+            // Lists for the coral station intake poses.
+            // The human player’s list is from indices 0 to 8 (left-to-right from the driver perspective).
+            public static final List<Pose2d> BLUE_CORAL_INTAKE_LEFT;
+            public static final List<Pose2d> BLUE_CORAL_INTAKE_RIGHT;
+            public static final List<Pose2d> RED_CORAL_INTAKE_LEFT;
+            public static final List<Pose2d> RED_CORAL_INTAKE_RIGHT;
+
+            /**
+             * Create the list of intaking positions on the fly given preceding conditions. These arrays are immutable, 
+             * and cannot be changed.
+             */
+            static {
+
+                List<Pose2d> blueCoralIntakeLeft = new ArrayList<>();
+                List<Pose2d> blueCoralIntakeRight = new ArrayList<>();
+                List<Pose2d> redCoralIntakeLeft = new ArrayList<>();
+                List<Pose2d> redCoralIntakeRight = new ArrayList<>();
+                // Generate BLUE LEFT intake positions using Transform2d.
+                // Each position is obtained by moving forward (local x) by i * spacing.
+                for (int i = 0; i < 9; i++) {
+                    Pose2d pose = BLUE_INTAKE_LEFT_BASE.transformBy(
+                            new Transform2d(new Translation2d(i * CORAL_INTAKE_SPACING, 0), new Rotation2d(0.5 * Math.PI)));
+                            blueCoralIntakeLeft.add(pose);
+                }
+                // Generate BLUE RIGHT intake positions by mirroring across the horizontal line at y = FIELD_ORIGIN.getY()
+                // Reverse the order so that the human player's indices run left-to-right.
+                for (int i = blueCoralIntakeLeft.size() - 1; i >= 0; i--) {
+                    blueCoralIntakeRight.add(mirrorAcrossHorizontal(FIELD_ORIGIN.getY(), blueCoralIntakeLeft.get(i)));
+                }
+                // Generate corresponding RED positions by rotating the blue positions 180° about FIELD_ORIGIN.
+                for (Pose2d pose : blueCoralIntakeLeft) {
+                    redCoralIntakeLeft.add(rotate180(pose));
+                }
+                for (Pose2d pose : blueCoralIntakeRight) {
+                    redCoralIntakeRight.add(rotate180(pose));
+                }
+
+                // Save the arrays in an immutable way.
+                BLUE_CORAL_INTAKE_LEFT = Collections.unmodifiableList(blueCoralIntakeLeft);
+                BLUE_CORAL_INTAKE_RIGHT = Collections.unmodifiableList(blueCoralIntakeRight);
+                RED_CORAL_INTAKE_LEFT = Collections.unmodifiableList(redCoralIntakeLeft);
+                RED_CORAL_INTAKE_RIGHT = Collections.unmodifiableList(redCoralIntakeRight);
+            }
+
+        }
+
+        public static class StartingPoseConstants {
+
+            public static final Pose2d BLUE_LEFT_STARTING_POSE = new Pose2d(new Translation2d(7.247,6.16),new Rotation2d());
+            public static final Pose2d BLUE_CENTER_STARTING_POSE = new Pose2d(new Translation2d(7.247,4.19),new Rotation2d());
+            public static final Pose2d BLUE_RIGHT_STARTING_POSE = new Pose2d(new Translation2d(7.247,1.88),new Rotation2d());
+
+            public static final Pose2d RED_LEFT_STARTING_POSE = rotate180(BLUE_LEFT_STARTING_POSE);
+            public static final Pose2d RED_CENTER_STARTING_POSE = rotate180(BLUE_CENTER_STARTING_POSE);
+            public static final Pose2d RED_RIGHT_STARTING_POSE = rotate180(BLUE_RIGHT_STARTING_POSE);
+
+        }
+
     }
 }

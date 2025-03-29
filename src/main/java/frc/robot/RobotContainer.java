@@ -4,16 +4,16 @@
 
 package frc.robot;
 
+import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.OceanViewConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.commands.Autos;
-import frc.robot.commands.ExampleCommand;
 import frc.robot.network.TCPSender;
 import frc.robot.network.UDPReceiver;
-import frc.robot.commands.XboxParkerManualDriveCommand;
+import frc.robot.routines.CenterScoreRoutine;
+import frc.robot.routines.MultiScoreRoutine;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.narwhal.NarwhalUpperAssembly;
 import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
 import frc.robot.subsystems.vision.OceanViewManager;
 import frc.robot.subsystems.vision.odometry.PhotonVisionCamera;
@@ -25,13 +25,16 @@ import frc.robot.util.autonomous.StartingPosition;
 import frc.robot.util.swerve.DrivingMotorType;
 import frc.robot.util.upper_assembly.UpperAssemblyFactory;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
-
-import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -49,45 +52,39 @@ public class RobotContainer {
     private TCPSender tcpSender;
 
     // Subsystems
-    private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
     private DriveSubsystem driveSubsystem = new DriveSubsystem();
 
     private UpperAssemblyBase upperAssembly = UpperAssemblyFactory.createUpperAssembly(Constants.Defaults.DEFAULT_UPPER_ASSEMBLY);
 
-    private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator()); // TODO: Add logic to add cameras to adjust odometry. visionOdometry.addCamera(PhotonVisionCamera camera);
+    private VisionOdometry visionOdometry = new VisionOdometry(driveSubsystem.getSwerveDrivePoseEstimator());
 
     @SuppressWarnings("unused") // The class is used due to how WPILib treats and stores subsystems.
     private OceanViewManager oceanViewManager;
 
-    // Commands
-    Command manualDriveCommand = new XboxParkerManualDriveCommand(driveSubsystem, xBoxController);
-
     // Smart Dashboard Inputs
     private final SendableChooser<AutonomousRoutine> autonomousSelector = new SendableChooser<>();
-    private final SendableChooser<StartingPosition> positionSelector = new SendableChooser<>();
     private final SendableChooser<Alliance> allianceSelector = new SendableChooser<>();
 
     private final SendableChooser<UpperAssemblyType> upperAssemblySelector = new SendableChooser<>();
     private final SendableChooser<DrivingMotorType> drivingMotorSelector = new SendableChooser<>();
 
+    private double delayTimeSeconds = 0;
+    private boolean startWithTushPush = false;
+
     /**
      * Creates a new RobotContainer object and sets up SmartDashboard an the button inputs.
      */
     public RobotContainer() {
-        
         // Setup OceanView & all of its networking dependencies.
         setupOceanViewManager();
 
         // Add cameras to the VisionOdometry object.
-        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, new Transform3d()));
+        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, VisionConstants.FRONT_CAMERA_OFFSET));
         visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.RIGHT_CAMERA_NAME, VisionConstants.RIGHT_CAMERA_OFFSET));
         visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.LEFT_CAMERA_NAME, VisionConstants.LEFT_CAMERA_OFFSET)); 
 
         // Setup Dashboard
         setupSmartDashboard();
-
-        // Configure the trigger bindings
-        configureBindings();
     }
 
     /**
@@ -100,9 +97,9 @@ public class RobotContainer {
         try {
             this.udpReceiver = new UDPReceiver(OceanViewConstants.UDP_PORT_NUMBER);    
             this.tcpSender = new TCPSender(OceanViewConstants.PI_IP, OceanViewConstants.TCP_PORT_NUMBER);
-            System.out.println("Successfully created TCPSender and UDPReceiver object!");
+            System.out.println("[@@@ OceanView @@@]: --- Successfully created TCPSender and UDPReceiver object!");
         } catch (Exception e) {
-            System.err.println("Failed to construct TCPSender object: " + e.getMessage());
+            System.err.println("[@@@ OceanView @@@]: --- Failed to construct TCPSender object: " + e.getMessage());
         }
 
         // An OceanView manager instance cannot be created if either the TCPSender or UDPReceiver is null.
@@ -119,60 +116,47 @@ public class RobotContainer {
     }
 
     /**
-     * Use this method to define your trigger->command mappings. Triggers can be
-     * created via the {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
-     * an arbitrary predicate, or via the named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s 
-     * subclasses for {@link CommandXboxControllerXbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4ControllerPS4} 
-     * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
-     */
-    private void configureBindings() {
-        
-        // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-        new Trigger(exampleSubsystem::exampleCondition)
-                .onTrue(new ExampleCommand(exampleSubsystem));
-
-        // Schedule `exampleMethodCommand` when the Xbox controller's B button is
-        // pressed, cancelling on release.
-        // driverController.b().whileTrue(exampleSubsystem.exampleMethodCommand());
-    }
-
-    /**
      * This method sets up the dashboard so that the drivers can configure the robots settings.
      */
     private void setupSmartDashboard() {
         // Setup dropdowns from enumeration values
-        EnumPrettifier.setupSendableChooserFromEnum(this.autonomousSelector, AutonomousRoutine.class, AutonomousRoutine.DEFAULT);
-        EnumPrettifier.setupSendableChooserFromEnum(this.positionSelector, StartingPosition.class, StartingPosition.LEFT);
+        EnumPrettifier.setupSendableChooserFromEnum(this.autonomousSelector, AutonomousRoutine.class, AutonomousRoutine.CENTER);
         EnumPrettifier.setupSendableChooserFromEnum(this.allianceSelector, Alliance.class, Alliance.RED);
         EnumPrettifier.setupSendableChooserFromEnum(this.upperAssemblySelector, UpperAssemblyType.class, UpperAssemblyType.NARWHAL);
         EnumPrettifier.setupSendableChooserFromEnum(this.drivingMotorSelector, DrivingMotorType.class, DrivingMotorType.KRAKEN_X60);
 
         // Add the selectors to the dashboard.
         SmartDashboard.putData(this.autonomousSelector);
-        SmartDashboard.putData(this.positionSelector);
         SmartDashboard.putData(this.allianceSelector);
         SmartDashboard.putData(this.upperAssemblySelector);
         SmartDashboard.putData(this.drivingMotorSelector);
+
+        // Add narwhal upper assembly configuration options.
+        SmartDashboard.putNumber("Intake Angle", NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE.getDegrees());
+        SmartDashboard.putNumber("Intake Height", NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS);
+        SmartDashboard.putNumber("L1 Angle", NarwhalConstants.NarwhalWristConstants.L1_OUTTAKE_ANGLE.getDegrees());
+        SmartDashboard.putNumber("L1 Height", NarwhalConstants.NarwhalElevatorConstants.L1_ELEVATOR_HEIGHT);
+        SmartDashboard.putNumber("L2 Angle", NarwhalConstants.NarwhalWristConstants.L2_OUTTAKE_ANGLE.getDegrees());
+        SmartDashboard.putNumber("L2 Height", NarwhalConstants.NarwhalElevatorConstants.L2_ELEVATOR_HEIGHT);
+        SmartDashboard.putNumber("L3 Angle", NarwhalConstants.NarwhalWristConstants.L3_OUTTAKE_ANGLE.getDegrees());
+        SmartDashboard.putNumber("L3 Height", NarwhalConstants.NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT);
+        SmartDashboard.putNumber("L4 Angle", NarwhalConstants.NarwhalWristConstants.L4_OUTTAKE_ANGLE.getDegrees());
+        SmartDashboard.putNumber("L4 Height", NarwhalConstants.NarwhalElevatorConstants.L4_ELEVATOR_HEIGHT);
+
+        SmartDashboard.putNumber("Climb Rotations (degrees)", NarwhalConstants.NarwhalClimberConstants.CLIMB_WINCH_ROTATIONS.getDegrees());
+        SmartDashboard.putNumber("Deploy Rotations (degrees)", NarwhalConstants.NarwhalClimberConstants.DEPLOYED_WINCH_ROTATIONS.getDegrees());
+
+        // Add autonomous configuration options.
+        SmartDashboard.putNumber("Auto Score Offset X", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getX());
+        SmartDashboard.putNumber("Auto Score Offset Y", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getY());
+        SmartDashboard.putNumber("Auto Score Offset Rot", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getRotation().getDegrees());
+
+        SmartDashboard.putNumber("Auto Delay", this.delayTimeSeconds);
+        SmartDashboard.putBoolean("Tush Push Mode", this.startWithTushPush);
     }
 
     /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     */
-    public Command getAutonomousCommand() {
-        // Get and display the currently selected autonomous routine.
-        AutonomousRoutine selectedAutonomousRoutine = autonomousSelector.getSelected();
-        Alliance selectedAlliance = allianceSelector.getSelected();
-        SmartDashboard.putString("Selected Autonomous", selectedAutonomousRoutine.toString());
-        SmartDashboard.putString("Selected Alliance", selectedAlliance.toString());
-
-        this.upperAssembly = UpperAssemblyFactory.createUpperAssembly(this.upperAssemblySelector.getSelected());
-
-        // An example command will be run in autonomous
-        return Autos.exampleAuto(exampleSubsystem);
-    }
-
-    /**
-     * sets the upper assembly to the given type
+     * Sets the upper assembly to the given type
      * 
      * @param upperAssemblyType the type of upper assembly to set to
      */
@@ -181,11 +165,94 @@ public class RobotContainer {
     }
 
     /**
+     * Creates and schedules the selected autonomous routine. 
+     */
+    public void scheduleAutonomous() {
+        this.setWristValuesFromSmartDashbaord();
+        this.delayTimeSeconds = SmartDashboard.getNumber("Auto Delay", this.delayTimeSeconds);
+        this.startWithTushPush = SmartDashboard.getBoolean("Tush Push Mode", this.startWithTushPush);
+
+        double autoScoreOffsetX = SmartDashboard.getNumber("Auto Score Offset X", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getX());
+        double autoScoreOffsetY = SmartDashboard.getNumber("Auto Score Offset Y", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getY());
+        double autoScoreOffsetRot = SmartDashboard.getNumber("Auto Score Offset Rot", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getRotation().getDegrees());
+
+        NarwhalConstants.SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(autoScoreOffsetX, autoScoreOffsetY), Rotation2d.fromDegrees(autoScoreOffsetRot));
+
+        // Get and display the selected autonomous mode.
+        AutonomousRoutine autonomousRoutine = autonomousSelector.getSelected();
+        Alliance alliance = allianceSelector.getSelected();
+
+        // Update the robot`s subsystems to be configured for the selected autonomous routine.
+        driveSubsystem.setConfigs();
+        upperAssembly.setRobotInScoringPositionSupplier(driveSubsystem::getInScorePose);
+        upperAssembly.setRobotInIntakingPositionSupplier(driveSubsystem::getInIntakePose);
+        if (upperAssembly instanceof NarwhalUpperAssembly) {
+            ((NarwhalUpperAssembly)upperAssembly).setCanRaiseLiftSupplier(driveSubsystem::getNarwhalCanRaiseLift);
+        }
+
+        Command autonomousCommand;
+        switch (autonomousRoutine) {
+            case LEFT:
+            case RIGHT:
+                autonomousCommand = MultiScoreRoutine.getCommand(autonomousRoutine == AutonomousRoutine.LEFT ? StartingPosition.LEFT : StartingPosition.RIGHT, alliance, driveSubsystem, upperAssembly);
+                break;
+            case CENTER:
+                autonomousCommand = CenterScoreRoutine.getCommand(alliance, driveSubsystem, upperAssembly);
+                break;
+            default:
+                System.err.println("[System]: No alliance starting position selected!");
+                autonomousCommand = new InstantCommand(); // Do nothing if no valid auto routine is selected
+                break;
+        }
+
+        // Wait if specified, otherwise just execute auto command
+        if (this.delayTimeSeconds > 0) {
+            Command autoDelayCommand = new WaitCommand(this.delayTimeSeconds);
+            autoDelayCommand.andThen(autonomousCommand).schedule();
+        }
+        else {
+            autonomousCommand.schedule();
+        }
+    }
+
+    /**
      * Schedules commands used exclusively during TeleOp.
      */
     public void scheduleTeleOp() {
+        CommandScheduler.getInstance().cancelAll();
+        this.setWristValuesFromSmartDashbaord();
+        NarwhalConstants.NarwhalClimberConstants.CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(SmartDashboard.getNumber("Climb Rotations (degrees)", NarwhalConstants.NarwhalClimberConstants.CLIMB_WINCH_ROTATIONS.getDegrees()));
+        NarwhalConstants.NarwhalClimberConstants.DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(SmartDashboard.getNumber("Deploy Rotations (degrees)", NarwhalConstants.NarwhalClimberConstants.DEPLOYED_WINCH_ROTATIONS.getDegrees()));
+
+        Alliance alliance = allianceSelector.getSelected();
+        SmartDashboard.putString("Selected Alliance", alliance.toString());
+
         // The Drive Command
-        driveSubsystem.setDefaultCommand(manualDriveCommand);
+        driveSubsystem.setConfigs();
         upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
+        driveSubsystem.setDefaultCommand(driveSubsystem.getManualCommand(xBoxController, alliance));
+    }
+    
+    /**
+     * Updates the robot's odometry. This calls the {@code DriveSubsystem}'s {@code updateOdometry()} method and 
+     * the {@code VisionOdometry}'s {@code updateVisionPositionData()} method. 
+     */
+    public void updateOdometry() {
+        this.driveSubsystem.updateOdometry();
+        this.visionOdometry.updateVisionPositionData();
+    }
+
+    private void setWristValuesFromSmartDashbaord() {
+        NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("Intake Angle", NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE.getDegrees()));
+        NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS = SmartDashboard.getNumber("Intake Height", NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS);
+
+        NarwhalConstants.NarwhalWristConstants.L1_OUTTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("L1 Angle", NarwhalConstants.NarwhalWristConstants.L1_OUTTAKE_ANGLE.getDegrees()));
+        NarwhalConstants.NarwhalElevatorConstants.L1_ELEVATOR_HEIGHT = SmartDashboard.getNumber("L1 Height", NarwhalConstants.NarwhalElevatorConstants.L1_ELEVATOR_HEIGHT);
+        NarwhalConstants.NarwhalWristConstants.L2_OUTTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("L2 Angle", NarwhalConstants.NarwhalWristConstants.L2_OUTTAKE_ANGLE.getDegrees()));
+        NarwhalConstants.NarwhalElevatorConstants.L2_ELEVATOR_HEIGHT = SmartDashboard.getNumber("L2 Height", NarwhalConstants.NarwhalElevatorConstants.L2_ELEVATOR_HEIGHT);
+        NarwhalConstants.NarwhalWristConstants.L3_OUTTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("L3 Angle", NarwhalConstants.NarwhalWristConstants.L3_OUTTAKE_ANGLE.getDegrees()));
+        NarwhalConstants.NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT = SmartDashboard.getNumber("L3 Height", NarwhalConstants.NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT);
+        NarwhalConstants.NarwhalWristConstants.L4_OUTTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("L4 Angle", NarwhalConstants.NarwhalWristConstants.L4_OUTTAKE_ANGLE.getDegrees()));
+        NarwhalConstants.NarwhalElevatorConstants.L4_ELEVATOR_HEIGHT = SmartDashboard.getNumber("L4 Height", NarwhalConstants.NarwhalElevatorConstants.L4_ELEVATOR_HEIGHT);
     }
 }

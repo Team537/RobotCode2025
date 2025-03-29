@@ -24,19 +24,14 @@ public class NarwhalManualClimberCommand extends Command {
     
     @Override
     public void execute() {
-
-        // Cycle between state on start button being pressed
-        if(controller.getStartButtonPressed()){
-
-            // If it is not currently deployed, deploy
-            if (narwhalClimber.currentState != NarwhalClimberState.DEPLOYING){
-                narwhalClimber.goToDeploy();
-            }
+        // deploy
+        if (controller.getPOV() == 180){
+            narwhalClimber.goToDeploy();
+        }
             
-            // Otherwise, if it is deployed and not currently climbing, climb
-            else if(narwhalClimber.currentState != NarwhalClimberState.CLIMBING){
-                narwhalClimber.climb();
-            }
+        // climb
+        else if(controller.getPOV() == 0){
+            narwhalClimber.climb();
         }
     }
 
