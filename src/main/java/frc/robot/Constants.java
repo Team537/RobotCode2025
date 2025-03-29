@@ -299,13 +299,13 @@ public final class Constants {
             public static final double ENCODER_FACTOR = Math.PI * 2 / GEAR_REDUCTION; // Wrist target angles (radians) are multiplied by this to get the motor target position           
             
             // PID configurations
-            public static final double POSITION_PID_P = 0.3;
+            public static final double POSITION_PID_P = 1.6;
             public static final double POSITION_PID_I = 0;
             public static final double POSITION_PID_D = 0.2;
-            public static final double PID_OUTPUT_RANGE_MAX_VOLTAGE = 4.0;
-            public static final double PID_OUTPUT_RANGE_MIN_VOLTAGE = -4.0;
+            public static final double PID_OUTPUT_RANGE_MAX_VOLTAGE = 7.0;
+            public static final double PID_OUTPUT_RANGE_MIN_VOLTAGE = -7.0;
 
-            public static final double POSITION_FF_G = 0.2; // This is the offset of the center of mass of the wrist from the zero position (x-axis)
+            public static double POSITION_FF_G = 0.2;
             public static final Rotation2d PID_TOLERANCE = Rotation2d.fromDegrees(8);
 
             public static final Rotation2d WRIST_FEEDFORWARD_OFFSET_ANGLE = Rotation2d.fromDegrees(-30); // This is the offset of the center of mass of the wrist from the zero position (x-axis) 
@@ -361,15 +361,15 @@ public final class Constants {
             /** Meters */
             private static final double ELEVATOR_GEAR_RADIUS = 0.065; // Meters
             private static final double ELEVATOR_GEAR_CIRCUMFERENCE = ELEVATOR_GEAR_RADIUS * 2.0 * Math.PI; // Meters
-            private static final double MOTOR_GEAR_REDUCTION = 20.0;
+            private static final double MOTOR_GEAR_REDUCTION = 12.0;
             public static final double ENCODER_FACTOR = ELEVATOR_GEAR_CIRCUMFERENCE / MOTOR_GEAR_REDUCTION; // for every one rotation of the encoder, how many meters does the lift move
 
             // PID
             public static final double ELEVATOR_KP = 2.5;
             public static final double ELEVATOR_KI = 0;
             public static final double ELEVATOR_KD = 0.2;
-            public static final double ELEVATOR_MIN_OUTPUT = -0.6;
-            public static final double ELEVATOR_MAX_OUTPUT = 0.6;
+            public static final double ELEVATOR_MIN_OUTPUT = -0.9;
+            public static final double ELEVATOR_MAX_OUTPUT = 0.9;
 
             // Set positions for the length the elevator needs to extend to to score.
             public static final double MIN_HEIGHT_METERS = 0.0; // probably should leave at 0.0.

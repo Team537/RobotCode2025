@@ -237,7 +237,10 @@ public class NarwhalWrist extends SubsystemBase {
             this.updateMotor();
         // }
         SmartDashboard.putData("Wrist PID", wristMotorPIDController);
+        SmartDashboard.putNumber("Wrist Gravity FF", NarwhalWristConstants.POSITION_FF_G);
         SmartDashboard.putNumber("target_voltage", current_target_voltage);
+
+        NarwhalWristConstants.POSITION_FF_G = SmartDashboard.getNumber("Wrist Gravity FF", NarwhalWristConstants.POSITION_FF_G);
         this.wristMotorPIDController = (PIDController)SmartDashboard.getData("Wrist PID");
     }
 
