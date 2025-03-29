@@ -385,7 +385,7 @@ public final class Constants {
             /** Meters */
             private static final double ELEVATOR_GEAR_RADIUS = 0.065; // Meters
             private static final double ELEVATOR_GEAR_CIRCUMFERENCE = ELEVATOR_GEAR_RADIUS * 2.0 * Math.PI; // Meters
-            private static final double MOTOR_GEAR_REDUCTION = 20.0;
+            private static final double MOTOR_GEAR_REDUCTION = 12.0;
             public static final double ENCODER_FACTOR = ELEVATOR_GEAR_CIRCUMFERENCE / MOTOR_GEAR_REDUCTION; // for every one rotation of the encoder, how many meters does the lift move
 
             // PID
