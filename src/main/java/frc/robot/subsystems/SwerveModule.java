@@ -217,7 +217,7 @@ public class SwerveModule extends SubsystemBase {
             case NEO:
                 drivingNeo = new SparkMax(drivingCANID,MotorType.kBrushless);
                 drivingNeo.configure(Configs.Swerve.Driving.NEO_DRIVING_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-                drivingNeo.setControlFramePeriodMs(1 / DriveConstants.SENSOR_UPDATE_TIME_HZ);
+                drivingNeo.setControlFramePeriodMs((int) (1.0 / DriveConstants.SENSOR_UPDATE_TIME_HZ * 1000));
                 drivingNeo.getEncoder().setPosition(0.0);
                 drivingNeoSim = new SparkMaxSim(drivingNeo, DCMotor.getNEO(1));
                 break;
@@ -280,7 +280,7 @@ public class SwerveModule extends SubsystemBase {
             case NEO_550:
                 turningNeo550 = new SparkMax(turningCANID,MotorType.kBrushless);
                 turningNeo550.configure(Configs.Swerve.Turning.NEO_550_TURNING_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-                turningNeo550.setControlFramePeriodMs(1 / DriveConstants.SENSOR_UPDATE_TIME_HZ);
+                turningNeo550.setControlFramePeriodMs((int) (1.0 / DriveConstants.SENSOR_UPDATE_TIME_HZ * 1000));
                 turningNeo550Sim = new SparkMaxSim(turningNeo550, DCMotor.getNeo550(1));
                 break;
         }
