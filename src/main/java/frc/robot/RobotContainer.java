@@ -242,7 +242,7 @@ public class RobotContainer {
         this.visionOdometry.updateVisionPositionData();
     }
 
-    public void setWristValuesFromSmartDashbaord() {
+    private void setWristValuesFromSmartDashbaord() {
         NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("Intake Angle", NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE.getDegrees()));
         NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS = SmartDashboard.getNumber("Intake Height", NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS);
 
