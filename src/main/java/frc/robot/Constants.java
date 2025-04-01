@@ -300,6 +300,15 @@ public final class Constants {
         }
     }
 
+    public static class UpperAssemblyConstants {
+
+        /**
+         * The amount of time, in seconds, that the stub upper assembly will take to complete a simulated "task"
+         */
+        public static final double STUB_SIMULATED_TASK_TIME = 2.0;
+
+    }
+
     /**
      * <h2>NarwhalConstants</h2>
      * The {@code NarwhalConstants} class is a subclass contained within the {@code Constants} class.
@@ -312,7 +321,7 @@ public final class Constants {
         public static final double UPPER_ASSEMBLY_MOI = 0.995; //Kg m^2
 
         public static final Transform2d INTAKING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0),new Rotation2d(Math.PI));
-        public static final Transform2d SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.1524,0.0),new Rotation2d(0));
+        public static Transform2d SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.1524,0.0),new Rotation2d(0));
         public static final Transform2d ALGAE_REMOVAL_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0),new Rotation2d(0.0));
         public static final Transform2d CLIMB_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0),new Rotation2d(Math.PI));
  
@@ -388,8 +397,8 @@ public final class Constants {
             public static final double CLIMBER_PID_MIN_OUTPUT = -1.0;
             public static final double CLIMBER_PID_MAX_OUTPUT = 1.0;
             
-            public static final Rotation2d DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(1080);
-            public static final Rotation2d CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(270);
+            public static Rotation2d DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(1035);
+            public static Rotation2d CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(270);
 
             /** The angle tolerance for the climber to be considered at a specific state. */
             public static final Rotation2d CLIMBER_ANGLE_TOLERANCE = Rotation2d.fromDegrees(3);
@@ -406,7 +415,7 @@ public final class Constants {
             /** Meters */
             private static final double ELEVATOR_GEAR_RADIUS = 0.065; // Meters
             private static final double ELEVATOR_GEAR_CIRCUMFERENCE = ELEVATOR_GEAR_RADIUS * 2.0 * Math.PI; // Meters
-            private static final double MOTOR_GEAR_REDUCTION = 20.0;
+            private static final double MOTOR_GEAR_REDUCTION = 12.0;
             public static final double ENCODER_FACTOR = ELEVATOR_GEAR_CIRCUMFERENCE / MOTOR_GEAR_REDUCTION; // for every one rotation of the encoder, how many meters does the lift move
 
             // PID

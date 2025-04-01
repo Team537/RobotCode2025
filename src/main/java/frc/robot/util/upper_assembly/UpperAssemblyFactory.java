@@ -2,6 +2,7 @@ package frc.robot.util.upper_assembly;
 
 import frc.robot.subsystems.narwhal.NarwhalUpperAssembly;
 import frc.robot.subsystems.squid.SquidUpperAssembly;
+import frc.robot.subsystems.upper_assembly.StubUpperAssembly;
 import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
 
 /**
@@ -16,7 +17,7 @@ public class UpperAssemblyFactory {
             case NARWHAL:
                 return new NarwhalUpperAssembly();
             default:
-                return null;
+                return new StubUpperAssembly();
         }
     }
 }
