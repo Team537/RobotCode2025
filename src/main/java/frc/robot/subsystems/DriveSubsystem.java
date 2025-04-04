@@ -478,7 +478,7 @@ public class DriveSubsystem extends SubsystemBase {
             }
         }
 
-        if (upperAssemblyType == UpperAssemblyType.NARWHAL) {
+        if (upperAssemblyType == UpperAssemblyType.NARWHAL || upperAssemblyType == UpperAssemblyType.NONE) {
             targetPose = targetPose.transformBy(NarwhalConstants.SCORING_RELATIVE_TRANSFORM);
         }
 
@@ -526,7 +526,7 @@ public class DriveSubsystem extends SubsystemBase {
         }
 
         Command moveAfterUpperAssemblyCommand;
-        if (upperAssemblyType == UpperAssemblyType.NARWHAL) {
+        if (upperAssemblyType == UpperAssemblyType.NARWHAL || upperAssemblyType == UpperAssemblyType.NONE) {
             targetPose = targetPose.transformBy(NarwhalConstants.ALGAE_REMOVAL_RELATIVE_TRANSFORM);
             moveAfterUpperAssemblyCommand = new WaitUntilCommand(narwahlCanRemoveAlgaeSupplier::get)
                 .andThen(getPathfindingCommand(targetPose.transformBy(DriveConstants.NARWHAL_RAKE_ALAGE_TRANSFORM)));
@@ -575,7 +575,7 @@ public class DriveSubsystem extends SubsystemBase {
             }
         }
 
-        if (upperAssemblyType == UpperAssemblyType.NARWHAL) {
+        if (upperAssemblyType == UpperAssemblyType.NARWHAL || upperAssemblyType == UpperAssemblyType.NONE) {
             targetPose = targetPose.transformBy(NarwhalConstants.INTAKING_RELATIVE_TRANSFORM);
         }
 
