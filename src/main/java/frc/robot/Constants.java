@@ -94,13 +94,14 @@ public final class Constants {
         public static final double GRAVITY_ACCELERATION = 9.81; // Meters / sec^2
 
         public static final double TRANSLATION_THRESHOLD = 0.05; // Meters
-        public static final double ROTATION_THRESHOLD = 0.20; // Radians
+        public static final double ROTATION_THRESHOLD = 0.157; // Radians
 
         public static final double NARWHAL_CAN_RAISE_LIFT_DISTANCE = 1.0; // Meters
         public static final Transform2d NARWHAL_RAKE_ALAGE_TRANSFORM = new Transform2d(0.5,0.0,new Rotation2d());
 
         public static final double[] DRIVE_STANDARD_DEVIATION_COEFFICIENTS = {
             0.006611986432, 0.3500199104, 0
+
         };
 
         public static final double AUTO_DRIVING_TRANSLATIONAL_SPEED_SAFETY_FACTOR = 0.25;
@@ -110,6 +111,23 @@ public final class Constants {
         
         public static final Matrix<N3, N1> DRIVE_STANDARD_DEVIATION = new Matrix<>(N3.instance, N1.instance, DRIVE_STANDARD_DEVIATION_COEFFICIENTS);
     
+        public static final List<Integer> AVAILABLE_SENTINEL_TAGS = List.of(
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22
+        );
+        public static final double SENTINEL_DISTANCE_WEIGHT = 1.0;
+        public static final double SENTINEL_ORIENTATION_WEIGHT = 0.1;
+
         // Angular Offsets for Swerve Modules
         public static final Rotation2d FRONT_LEFT_MODULE_ANGULAR_OFFSET = new Rotation2d(-0.5 * Math.PI);
         public static final Rotation2d REAR_LEFT_MODULE_ANGULAR_OFFSET = new Rotation2d(Math.PI);
@@ -175,7 +193,7 @@ public final class Constants {
         public static final double LINEAR_KI = 0.0;
         public static final double LINEAR_KD = 0.0;
 
-        public static final double ROTATIONAL_KP = 1.2;
+        public static final double ROTATIONAL_KP = 2.0;
         public static final double ROTATIONAL_KI = 0.0;
         public static final double ROTATIONAL_KD = 0.1;
 
@@ -299,9 +317,9 @@ public final class Constants {
         public static final double UPPER_ASSEMBLY_MASS = 17.2; //Kg
         public static final double UPPER_ASSEMBLY_MOI = 0.995; //Kg m^2
 
-        public static final Transform2d INTAKING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0),new Rotation2d(Math.PI));
-        public static Transform2d SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.1524,0.0),new Rotation2d(0));
-        public static final Transform2d ALGAE_REMOVAL_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0),new Rotation2d(0.0));
+        public static final Transform2d INTAKING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,-0.019),new Rotation2d(Math.PI));
+        public static Transform2d SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.1524,0.019),new Rotation2d(0));
+        public static final Transform2d ALGAE_REMOVAL_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,-0.019),new Rotation2d(0.0));
         public static final Transform2d CLIMB_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0),new Rotation2d(Math.PI));
  
 
@@ -361,10 +379,8 @@ public final class Constants {
             public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d TRANSIT_ANGLE = Rotation2d.fromRadians(0.5 * Math.PI);
             
-
-
-            /** The angle tolerance for the wrist to be considered at a specific state. */
-            public static final Rotation2d WRIST_ANGLE_TOLERANCE = Rotation2d.fromRadians(0.89 * Math.PI);
+            /** The angle tolerance for the wrxist to be considered at a specific state. */
+            public static final Rotation2d WRIST_ANGLE_TOLERANCE = Rotation2d.fromRadians(0.2 * Math.PI);
         }
 
         public static class NarwhalClimberConstants {
@@ -383,8 +399,8 @@ public final class Constants {
             public static final double CLIMBER_PID_MIN_OUTPUT = -1.0;
             public static final double CLIMBER_PID_MAX_OUTPUT = 1.0;
             
-            public static Rotation2d DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(1035);
-            public static Rotation2d CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(270);
+            public static Rotation2d DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(390);
+            public static Rotation2d CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(-350);
 
             /** The angle tolerance for the climber to be considered at a specific state. */
             public static final Rotation2d CLIMBER_ANGLE_TOLERANCE = Rotation2d.fromDegrees(3);
@@ -415,9 +431,9 @@ public final class Constants {
             public static final double MIN_HEIGHT_METERS = 0.0; // probably should leave at 0.0.
             public static final double MAX_HEIGHT_METERS = 2.1336; // stops the robot from ending itself
             public static double L1_ELEVATOR_HEIGHT = 0.05; // Meters
-            public static double L2_ELEVATOR_HEIGHT = 0.07; // Meters
-            public static double L3_ELEVATOR_HEIGHT = 0.75; // Meters
-            public static double L4_ELEVATOR_HEIGHT = 1.7; // Meters
+            public static double L2_ELEVATOR_HEIGHT = 0.05; // Meters
+            public static double L3_ELEVATOR_HEIGHT = 0.6; // Meters
+            public static double L4_ELEVATOR_HEIGHT = 1.6; // Meters
             public static double INTAKE_ELEVATOR_HEIGHT_METERS = 0.08; // Meters
             public static final boolean MOTOR_INVERTED = true;
             public static final double ELEVATOR_POSITION_TOLERANCE = 0.05; // Meters
@@ -535,8 +551,12 @@ public final class Constants {
         public static final Transform3d RIGHT_CAMERA_OFFSET = new Transform3d(0.219837, 0.1762252, 0.65913, new Rotation3d(0, 0, Math.PI / 2.0 )); 
         public static final Transform3d LEFT_CAMERA_OFFSET = new Transform3d(-0.219837, 0.1760728, 0.65913, new Rotation3d(0, 0, -Math.PI / 2.0)); 
 
+        public static final List<Rotation2d> AVAILABLE_CAMERA_OFFSETS = List.of(
+            new Rotation2d(FRONT_CAMERA_OFFSET.getRotation().getMeasureZ())
+        );
+
         public static final double[] VISION_STANDARD_DEVIATION_COEFFICIENTS = { // PLACEHOLDER
-            0.0025, 0.0025, 0
+            0.01, 0.01, 999999999
         };
         
         public static final Matrix<N3, N1> VISION_STANDARD_DEVIATION = new Matrix<>(N3.instance, N1.instance, VISION_STANDARD_DEVIATION_COEFFICIENTS);
@@ -544,11 +564,11 @@ public final class Constants {
         // Pipeline settings
         public static final int APRIL_TAG_PIPELINE = 0;
         public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = AprilTagFieldLayout
-                .loadField(AprilTagFields.k2025ReefscapeAndyMark);
+                .loadField(AprilTagFields.k2025ReefscapeWelded);
 
         // Odometry Detection Strategy
         public static final PhotonPoseEstimator.PoseStrategy POSE_STRATEGY = PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
-        public static final PhotonPoseEstimator.PoseStrategy FALLBACK_STRATEGY = PhotonPoseEstimator.PoseStrategy.CLOSEST_TO_REFERENCE_POSE;
+        public static final PhotonPoseEstimator.PoseStrategy FALLBACK_STRATEGY = PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY;
     }
 
     /**
@@ -737,7 +757,7 @@ public final class Constants {
             // Base pose for BLUE LEFT intake positions.
             // Index 0 is given as (1.70244, 7.57545) with the computed intake angle.
             private static final Pose2d BLUE_INTAKE_LEFT_BASE = new Pose2d(
-                    new Translation2d(1.761, 7.500), FIELD_INTAKE_ANGLE);
+                    new Translation2d(1.70298, 7.57847), FIELD_INTAKE_ANGLE);
 
             // Lists for the coral station intake poses.
             // The human player’s list is from indices 0 to 8 (left-to-right from the driver perspective).
@@ -794,6 +814,12 @@ public final class Constants {
             public static final Pose2d RED_LEFT_STARTING_POSE = rotate180(BLUE_LEFT_STARTING_POSE);
             public static final Pose2d RED_CENTER_STARTING_POSE = rotate180(BLUE_CENTER_STARTING_POSE);
             public static final Pose2d RED_RIGHT_STARTING_POSE = rotate180(BLUE_RIGHT_STARTING_POSE);
+
+            // The offset if starting with a tush push (middle of the tape, rather than edge)
+            public static final Transform2d TUSH_PUSH_STARTING_TRANSFORM = new Transform2d(-0.0254,0.0,new Rotation2d());
+
+            // The offset tush push will move the robot. This is relative to the transformed starting pose.
+            public static final Transform2d TUSH_PUSH_TRANSFORM = new Transform2d(0.10,0.0,new Rotation2d());
 
         }
 

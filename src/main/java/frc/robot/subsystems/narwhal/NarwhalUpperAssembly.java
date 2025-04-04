@@ -91,8 +91,6 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
                 ).andThen(
                     new WaitUntilCommand(robotInScoringPositionSupplier::get)
                 ).andThen(
-                    new WaitCommand(1.0)
-                ).andThen(
                     new NarwhalOuttakeCommand(intakeOuttake)
                 ).andThen(
                     new WaitCommand(NarwhalIntakeOuttakeConstants.CORAL_INTAKE_DETECTION_DELAY)
