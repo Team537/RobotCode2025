@@ -357,7 +357,7 @@ public final class Constants {
             public static final Rotation2d TRANSIT_ANGLE = Rotation2d.fromRadians(0.5 * Math.PI);
             
             /** The angle tolerance for the wrxist to be considered at a specific state. */
-            public static final Rotation2d WRIST_ANGLE_TOLERANCE = Rotation2d.fromRadians(0.89 * Math.PI);
+            public static final Rotation2d WRIST_ANGLE_TOLERANCE = Rotation2d.fromRadians(0.2 * Math.PI);
         }
 
         public static class NarwhalClimberConstants {
