@@ -101,6 +101,7 @@ public final class Constants {
 
         public static final double[] DRIVE_STANDARD_DEVIATION_COEFFICIENTS = {
             0.006611986432, 0.3500199104, 0
+
         };
 
         public static final double AUTO_DRIVING_TRANSLATIONAL_SPEED_SAFETY_FACTOR = 0.25;
@@ -378,7 +379,7 @@ public final class Constants {
             public static final Rotation2d TRANSIT_ANGLE = Rotation2d.fromRadians(0.5 * Math.PI);
             
             /** The angle tolerance for the wrxist to be considered at a specific state. */
-            public static final Rotation2d WRIST_ANGLE_TOLERANCE = Rotation2d.fromRadians(0.89 * Math.PI);
+            public static final Rotation2d WRIST_ANGLE_TOLERANCE = Rotation2d.fromRadians(0.2 * Math.PI);
         }
 
         public static class NarwhalClimberConstants {
@@ -556,7 +557,7 @@ public final class Constants {
         );
 
         public static final double[] VISION_STANDARD_DEVIATION_COEFFICIENTS = { // PLACEHOLDER
-            0.0025, 0.0025, 0
+            0.01, 0.01, 999999999
         };
         
         public static final Matrix<N3, N1> VISION_STANDARD_DEVIATION = new Matrix<>(N3.instance, N1.instance, VISION_STANDARD_DEVIATION_COEFFICIENTS);
@@ -564,11 +565,11 @@ public final class Constants {
         // Pipeline settings
         public static final int APRIL_TAG_PIPELINE = 0;
         public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = AprilTagFieldLayout
-                .loadField(AprilTagFields.k2025ReefscapeAndyMark);
+                .loadField(AprilTagFields.k2025ReefscapeWelded);
 
         // Odometry Detection Strategy
         public static final PhotonPoseEstimator.PoseStrategy POSE_STRATEGY = PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
-        public static final PhotonPoseEstimator.PoseStrategy FALLBACK_STRATEGY = PhotonPoseEstimator.PoseStrategy.CLOSEST_TO_REFERENCE_POSE;
+        public static final PhotonPoseEstimator.PoseStrategy FALLBACK_STRATEGY = PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY;
     }
 
     /**
@@ -814,6 +815,12 @@ public final class Constants {
             public static final Pose2d RED_LEFT_STARTING_POSE = rotate180(BLUE_LEFT_STARTING_POSE);
             public static final Pose2d RED_CENTER_STARTING_POSE = rotate180(BLUE_CENTER_STARTING_POSE);
             public static final Pose2d RED_RIGHT_STARTING_POSE = rotate180(BLUE_RIGHT_STARTING_POSE);
+
+            // The offset if starting with a tush push (middle of the tape, rather than edge)
+            public static final Transform2d TUSH_PUSH_STARTING_TRANSFORM = new Transform2d(-0.0254,0.0,new Rotation2d());
+
+            // The offset tush push will move the robot. This is relative to the transformed starting pose.
+            public static final Transform2d TUSH_PUSH_TRANSFORM = new Transform2d(0.10,0.0,new Rotation2d());
 
         }
 

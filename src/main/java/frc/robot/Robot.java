@@ -6,9 +6,12 @@ package frc.robot;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.net.PortForwarder;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj.DataLogManager;
 
 /**
  * The methods in this class are called automatically corresponding to each
@@ -20,6 +23,8 @@ public class Robot extends TimedRobot {
 
     private Command autonomousCommand;
     private final RobotContainer robotContainer;
+
+    StringLogEntry frc537StringLog;
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -44,6 +49,10 @@ public class Robot extends TimedRobot {
         PortForwarder.add(5800, "photonvision.local", 5800);
         PortForwarder.add(5800, "photonvision2.local", 5800);
         PortForwarder.add(5000, "oceanview.local", 5000);
+
+        DataLogManager.start();
+        DataLog log = DataLogManager.getLog();
+        frc537StringLog = new StringLogEntry(log, "/frc537/string");
     }
 
     /**
@@ -71,6 +80,8 @@ public class Robot extends TimedRobot {
 
         CommandScheduler.getInstance().cancelAll();
         robotContainer.scheduleAutonomous();
+
+        frc537StringLog.append("Autonomous Init\n");
 
         // schedule the autonomous command (example)
         if (autonomousCommand != null) {
