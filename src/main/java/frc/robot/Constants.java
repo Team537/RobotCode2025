@@ -101,6 +101,7 @@ public final class Constants {
 
         public static final double[] DRIVE_STANDARD_DEVIATION_COEFFICIENTS = {
             0.006611986432, 0.3500199104, 0
+
         };
 
         public static final double AUTO_DRIVING_TRANSLATIONAL_SPEED_SAFETY_FACTOR = 0.25;
@@ -529,7 +530,7 @@ public final class Constants {
         public static final Transform3d LEFT_CAMERA_OFFSET = new Transform3d(-0.219837, 0.1760728, 0.65913, new Rotation3d(0, 0, -Math.PI / 2.0)); 
 
         public static final double[] VISION_STANDARD_DEVIATION_COEFFICIENTS = { // PLACEHOLDER
-            0.0025, 0.0025, 0
+            0.01, 0.01, 999999999
         };
         
         public static final Matrix<N3, N1> VISION_STANDARD_DEVIATION = new Matrix<>(N3.instance, N1.instance, VISION_STANDARD_DEVIATION_COEFFICIENTS);
@@ -541,7 +542,7 @@ public final class Constants {
 
         // Odometry Detection Strategy
         public static final PhotonPoseEstimator.PoseStrategy POSE_STRATEGY = PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
-        public static final PhotonPoseEstimator.PoseStrategy FALLBACK_STRATEGY = PhotonPoseEstimator.PoseStrategy.CLOSEST_TO_REFERENCE_POSE;
+        public static final PhotonPoseEstimator.PoseStrategy FALLBACK_STRATEGY = PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY;
     }
 
     /**

@@ -86,7 +86,7 @@ public class VisionOdometry extends SubsystemBase {
 
             // Attempt to get the latest vision-based pose estimate from the camera
             Optional<EstimatedRobotPose> visionPose = camera.getLatestPose();
-            if (visionPose.isPresent()) {
+            if (visionPose.isPresent() ) {
                 
                 // If a valid pose is available, retrieve it
                 EstimatedRobotPose estimatedPose = visionPose.get();
