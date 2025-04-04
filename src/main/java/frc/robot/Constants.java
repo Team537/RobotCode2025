@@ -357,9 +357,9 @@ public final class Constants {
             public static final double ENCODER_FACTOR = Math.PI * 2 / GEAR_REDUCTION; // Wrist target angles (radians) are multiplied by this to get the motor target position           
             
             // PID configurations
-            public static final double POSITION_PID_P = 0.2;
+            public static final double POSITION_PID_P = 0.3;
             public static final double POSITION_PID_I = 0.0;
-            public static final double POSITION_PID_D = 0.7;
+            public static final double POSITION_PID_D = 0.35;
             public static final double POSITION_PID_F = 0.0;
             public static final double PID_OUTPUT_RANGE_MAX = 0.45;
             public static final double PID_OUTPUT_RANGE_MIN = -0.4;        
@@ -394,8 +394,8 @@ public final class Constants {
             public static final double CLIMBER_PID_MIN_OUTPUT = -1.0;
             public static final double CLIMBER_PID_MAX_OUTPUT = 1.0;
             
-            public static Rotation2d DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(1035);
-            public static Rotation2d CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(270);
+            public static Rotation2d DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(350);
+            public static Rotation2d CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(-325);
 
             /** The angle tolerance for the climber to be considered at a specific state. */
             public static final Rotation2d CLIMBER_ANGLE_TOLERANCE = Rotation2d.fromDegrees(3);
@@ -427,7 +427,7 @@ public final class Constants {
             public static final double MAX_HEIGHT_METERS = 2.1336; // stops the robot from ending itself
             public static double L1_ELEVATOR_HEIGHT = 0.05; // Meters
             public static double L2_ELEVATOR_HEIGHT = 0.07; // Meters
-            public static double L3_ELEVATOR_HEIGHT = 0.75; // Meters
+            public static double L3_ELEVATOR_HEIGHT = 0.65; // Meters
             public static double L4_ELEVATOR_HEIGHT = 1.7; // Meters
             public static double INTAKE_ELEVATOR_HEIGHT_METERS = 0.08; // Meters
             public static final boolean MOTOR_INVERTED = true;
