@@ -229,18 +229,16 @@ public class RobotContainer {
 
         }
       
-        Command autonomousCommand;
         switch (autonomousRoutine) {
             case LEFT:
             case RIGHT:
-                autonomousCommand = MultiScoreRoutine.getCommand(autonomousRoutine == AutonomousRoutine.LEFT ? StartingPosition.LEFT : StartingPosition.RIGHT, alliance, driveSubsystem, upperAssembly);
+                autonomousCommand = autonomousCommand.andThen(MultiScoreRoutine.getCommand(autonomousRoutine == AutonomousRoutine.LEFT ? StartingPosition.LEFT : StartingPosition.RIGHT, alliance, driveSubsystem, upperAssembly));
                 break;
             case CENTER:
-                autonomousCommand = CenterScoreRoutine.getCommand(alliance, driveSubsystem, upperAssembly);
+                autonomousCommand = autonomousCommand.andThen(CenterScoreRoutine.getCommand(alliance, driveSubsystem, upperAssembly));
                 break;
             default:
                 System.err.println("[System]: No alliance starting position selected!");
-                autonomousCommand = new InstantCommand(); // Do nothing if no valid auto routine is selected
                 break;
         }
 
