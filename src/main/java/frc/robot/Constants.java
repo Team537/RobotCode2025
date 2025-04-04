@@ -426,9 +426,9 @@ public final class Constants {
             public static final double MIN_HEIGHT_METERS = 0.0; // probably should leave at 0.0.
             public static final double MAX_HEIGHT_METERS = 2.1336; // stops the robot from ending itself
             public static double L1_ELEVATOR_HEIGHT = 0.05; // Meters
-            public static double L2_ELEVATOR_HEIGHT = 0.07; // Meters
-            public static double L3_ELEVATOR_HEIGHT = 0.65; // Meters
-            public static double L4_ELEVATOR_HEIGHT = 1.7; // Meters
+            public static double L2_ELEVATOR_HEIGHT = 0.05; // Meters
+            public static double L3_ELEVATOR_HEIGHT = 0.6; // Meters
+            public static double L4_ELEVATOR_HEIGHT = 1.6; // Meters
             public static double INTAKE_ELEVATOR_HEIGHT_METERS = 0.08; // Meters
             public static final boolean MOTOR_INVERTED = true;
             public static final double ELEVATOR_POSITION_TOLERANCE = 0.05; // Meters
