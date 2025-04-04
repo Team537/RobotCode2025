@@ -80,6 +80,12 @@ public class PhotonVisionCamera extends SubsystemBase {
                 // Skip frames with no targets
                 continue;
             }
+
+            // Skip the frame if it isn`t trustworthy.
+            if (result.getBestTarget().poseAmbiguity >= 0.2) {
+                continue;
+            }
+
             // Attempt to get a vision-based global field pose
             var maybePose = photonPoseEstimator.update(result);
             if (maybePose.isPresent()) {
