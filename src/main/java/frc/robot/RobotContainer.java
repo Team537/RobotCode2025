@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.OceanViewConstants;
 import frc.robot.Constants.OperatorConstants;
@@ -25,6 +26,7 @@ import frc.robot.util.autonomous.StartingPosition;
 import frc.robot.util.swerve.DrivingMotorType;
 import frc.robot.util.upper_assembly.UpperAssemblyFactory;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -190,18 +192,53 @@ public class RobotContainer {
             ((NarwhalUpperAssembly)upperAssembly).setCanRaiseLiftSupplier(driveSubsystem::getNarwhalCanRaiseLift);
         }
 
-        Command autonomousCommand;
+        Pose2d startingPose;
+
+        // Determine the starting position for the specified autonomous routine and alliance.
         switch (autonomousRoutine) {
             case LEFT:
-            case RIGHT:
-                autonomousCommand = MultiScoreRoutine.getCommand(autonomousRoutine == AutonomousRoutine.LEFT ? StartingPosition.LEFT : StartingPosition.RIGHT, alliance, driveSubsystem, upperAssembly);
+                startingPose = StartingPosition.LEFT.getPose(alliance);
                 break;
             case CENTER:
-                autonomousCommand = CenterScoreRoutine.getCommand(alliance, driveSubsystem, upperAssembly);
+                startingPose = StartingPosition.CENTER.getPose(alliance);
+                break;
+            case RIGHT:
+                startingPose = StartingPosition.RIGHT.getPose(alliance);
                 break;
             default:
                 System.err.println("[System]: No alliance starting position selected!");
-                autonomousCommand = new InstantCommand(); // Do nothing if no valid auto routine is selected
+                startingPose = null;
+                break;
+        }
+
+        if (startWithTushPush) {
+            startingPose.transformBy(FieldConstants.StartingPoseConstants.TUSH_PUSH_STARTING_TRANSFORM);
+        }
+
+        // If a valid starting pose was determined, set the robot pose.
+        if (startingPose != null) {
+            driveSubsystem.setRobotPose(startingPose);
+        }
+
+        // Construct the autonomous program for the selected starting position.
+        Command autonomousCommand = new InstantCommand();
+
+        if (startWithTushPush) {
+            
+            autonomousCommand = autonomousCommand.andThen(driveSubsystem.getDriveToPoseCommand(startingPose.transformBy(FieldConstants.StartingPoseConstants.TUSH_PUSH_TRANSFORM)));
+
+        }
+      
+        switch (autonomousRoutine) {
+            case LEFT:
+            case RIGHT:
+                autonomousCommand = autonomousCommand.andThen(MultiScoreRoutine.getCommand(autonomousRoutine == AutonomousRoutine.LEFT ? StartingPosition.LEFT : StartingPosition.RIGHT, alliance, driveSubsystem, upperAssembly));
+                break;
+            case CENTER:
+                autonomousCommand = autonomousCommand.andThen(CenterScoreRoutine.getCommand(alliance, driveSubsystem, upperAssembly));
+                break;
+            default:
+                System.err.println("[System]: No alliance starting position selected!");
                 break;
         }
 
