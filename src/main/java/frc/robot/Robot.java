@@ -50,7 +50,7 @@ public class Robot extends TimedRobot {
 
         // Allow the camera stream to be viewed via the robots network.
         PortForwarder.add(5800, "photonvision.local", 5800);
-        PortForwarder.add(5000, "photonvision2.local", 5800);
+        PortForwarder.add(5800, "photonvision2.local", 5800);
         PortForwarder.add(5000, "oceanview.local", 5000);
 
         // Allow oceanview`s stream to be viewed.
