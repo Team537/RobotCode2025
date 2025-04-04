@@ -245,9 +245,9 @@ public class NarwhalWrist extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
-        // if (currentState != NarwhalWristState.STOPPED) {
+        if (currentState != NarwhalWristState.STOPPED) {
             this.updateMotor();
-        // }
+        }
         SmartDashboard.putData("Wrist PID", wristMotorPIDController);
         SmartDashboard.putNumber("Wrist Gravity FF", NarwhalWristConstants.POSITION_FF_G);
         SmartDashboard.putNumber("target_voltage", current_target_voltage);
