@@ -394,8 +394,8 @@ public final class Constants {
             public static final double CLIMBER_PID_MIN_OUTPUT = -1.0;
             public static final double CLIMBER_PID_MAX_OUTPUT = 1.0;
             
-            public static Rotation2d DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(350);
-            public static Rotation2d CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(-325);
+            public static Rotation2d DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(390);
+            public static Rotation2d CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(-350);
 
             /** The angle tolerance for the climber to be considered at a specific state. */
             public static final Rotation2d CLIMBER_ANGLE_TOLERANCE = Rotation2d.fromDegrees(3);
@@ -547,9 +547,7 @@ public final class Constants {
         public static final Transform3d LEFT_CAMERA_OFFSET = new Transform3d(-0.219837, 0.1760728, 0.65913, new Rotation3d(0, 0, -Math.PI / 2.0)); 
 
         public static final List<Rotation2d> AVAILABLE_CAMERA_OFFSETS = List.of(
-            new Rotation2d(FRONT_CAMERA_OFFSET.getRotation().getMeasureZ()),
-            new Rotation2d(RIGHT_CAMERA_OFFSET.getRotation().getMeasureZ()),
-            new Rotation2d(LEFT_CAMERA_OFFSET.getRotation().getMeasureZ())
+            new Rotation2d(FRONT_CAMERA_OFFSET.getRotation().getMeasureZ())
         );
 
         public static final double[] VISION_STANDARD_DEVIATION_COEFFICIENTS = { // PLACEHOLDER
