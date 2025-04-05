@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.OceanViewConstants;
@@ -132,7 +133,7 @@ public class RobotContainer {
         SmartDashboard.putData(this.allianceSelector);
         SmartDashboard.putData(this.upperAssemblySelector);
         SmartDashboard.putData(this.drivingMotorSelector);
-
+        
         // Add narwhal upper assembly configuration options.
         SmartDashboard.putNumber("Intake Angle", NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE.getDegrees());
         SmartDashboard.putNumber("Intake Height", NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS);
@@ -152,6 +153,10 @@ public class RobotContainer {
         SmartDashboard.putNumber("Auto Score Offset X", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getX());
         SmartDashboard.putNumber("Auto Score Offset Y", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getY());
         SmartDashboard.putNumber("Auto Score Offset Rot", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getRotation().getDegrees());
+
+        SmartDashboard.putNumber("Kraken Kp", DriveConstants.KrakenX60Driving.KP);
+        SmartDashboard.putNumber("Kraken Ki", DriveConstants.KrakenX60Driving.KI);
+        SmartDashboard.putNumber("Kraken Kd", DriveConstants.KrakenX60Driving.KD);
 
         SmartDashboard.putNumber("Auto Delay", this.delayTimeSeconds);
         SmartDashboard.putBoolean("Tush Push Mode", this.startWithTushPush);
@@ -179,6 +184,13 @@ public class RobotContainer {
         double autoScoreOffsetRot = SmartDashboard.getNumber("Auto Score Offset Rot", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getRotation().getDegrees());
 
         NarwhalConstants.SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(autoScoreOffsetX, autoScoreOffsetY), Rotation2d.fromDegrees(autoScoreOffsetRot));
+
+        // Set the kraken drive motor`s PID coefficients to the specified values.
+        double kp = SmartDashboard.getNumber("Kraken Kp", DriveConstants.KrakenX60Driving.KP);
+        double ki = SmartDashboard.getNumber("Kraken Ki", DriveConstants.KrakenX60Driving.KI);
+        double kd = SmartDashboard.getNumber("Kraken Kd", DriveConstants.KrakenX60Driving.KD);
+
+        this.driveSubsystem.setDriveMotorPIDCoefficients(kp, ki, kd);
 
         // Get and display the selected autonomous mode.
         AutonomousRoutine autonomousRoutine = autonomousSelector.getSelected();

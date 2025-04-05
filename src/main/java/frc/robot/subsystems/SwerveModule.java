@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.SlotConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -324,6 +327,27 @@ public class SwerveModule extends SubsystemBase {
         setDrivingVelocity(correctedDesiredState.speedMetersPerSecond);
         setTurningAngle(correctedDesiredState.angle);
     }
+
+    /**
+     * Sets the drive motor`s PID coefficients to the given values. 
+     * Currently this only works for the KrakenX60 motor.
+     * 
+     * @param kp The proportional term.
+     * @param ki The integral term.
+     * @param kd The derivative term.
+     */
+    public void setDriveMotorPIDCoefficients(double kp, double ki, double kd) {
+        
+        // Create a configuration object for the PID coefficients.
+        var slot0Configs = new SlotConfigs();
+        slot0Configs.kP = kp;
+        slot0Configs.kI = ki;
+        slot0Configs.kD = kd;
+
+        // Update the PID coefficients.
+        this.drivingKrakenX60.getConfigurator().apply(slot0Configs);
+    }
+
 
     SparkMaxSim drivingNeoSim;
     TalonFXSimState drivingKrakenX60Sim;

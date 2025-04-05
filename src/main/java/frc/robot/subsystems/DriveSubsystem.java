@@ -877,6 +877,21 @@ public class DriveSubsystem extends SubsystemBase {
         return commandedVelocities.omegaRadiansPerSecond;
     }
 
+    /**
+     * Sets each module`s drive motor`s PID coefficients to the given values. 
+     * Currently this only works for the KrakenX60 motor.
+     * 
+     * @param kp The proportional term.
+     * @param ki The integral term.
+     * @param kd The derivative term.
+     */
+    public void setDriveMotorPIDCoefficients(double kp, double ki, double kd) {
+        this.frontLeftModule.setDriveMotorPIDCoefficients(kp, ki, kd);
+        this.frontRightModule.setDriveMotorPIDCoefficients(kp, ki, kd);
+        this.rearRightModule.setDriveMotorPIDCoefficients(kp, ki, kd);
+        this.rearLeftModule.setDriveMotorPIDCoefficients(kp, ki, kd);
+    }
+
     //////////////////////////////////////////////////////////////////////////////
     // Periodic Update Method
     //////////////////////////////////////////////////////////////////////////////
