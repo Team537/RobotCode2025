@@ -186,11 +186,18 @@ public class RobotContainer {
         NarwhalConstants.SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(autoScoreOffsetX, autoScoreOffsetY), Rotation2d.fromDegrees(autoScoreOffsetRot));
 
         // Set the kraken drive motor`s PID coefficients to the specified values.
-        double kp = SmartDashboard.getNumber("Kraken Kp", DriveConstants.KrakenX60Driving.KP);
-        double ki = SmartDashboard.getNumber("Kraken Ki", DriveConstants.KrakenX60Driving.KI);
-        double kd = SmartDashboard.getNumber("Kraken Kd", DriveConstants.KrakenX60Driving.KD);
+        double driveKp = SmartDashboard.getNumber("Kraken Kp", DriveConstants.KrakenX60Driving.KP);
+        double driveKi = SmartDashboard.getNumber("Kraken Ki", DriveConstants.KrakenX60Driving.KI);
+        double driveKd = SmartDashboard.getNumber("Kraken Kd", DriveConstants.KrakenX60Driving.KD);
 
-        this.driveSubsystem.setDriveMotorPIDCoefficients(kp, ki, kd);
+        this.driveSubsystem.setDriveMotorPIDCoefficients(driveKp, driveKi, driveKd);
+        
+        // Get and set the path follower`s PID coefficients.
+        double followerKp = SmartDashboard.getNumber("Drive Kp", DriveConstants.KrakenX60Driving.KP);
+        double followerKi = SmartDashboard.getNumber("Drive Ki", DriveConstants.KrakenX60Driving.KI);
+        double followerKd = SmartDashboard.getNumber("Drive Kd", DriveConstants.KrakenX60Driving.KD);
+
+        this.driveSubsystem.setFollowerPIDCoefficients(followerKp, followerKi, followerKd);
 
         // Get and display the selected autonomous mode.
         AutonomousRoutine autonomousRoutine = autonomousSelector.getSelected();

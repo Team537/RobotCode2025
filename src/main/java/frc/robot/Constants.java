@@ -93,7 +93,7 @@ public final class Constants {
         public static final double DRIVETRAIN_MOI = 2.285; //Kg meters
         public static final double GRAVITY_ACCELERATION = 9.81; // Meters / sec^2
 
-        public static final double TRANSLATION_THRESHOLD = 0.05; // Meters
+        public static final double TRANSLATION_THRESHOLD = 0.05; // Meters Set to .35
         public static final double ROTATION_THRESHOLD = 0.157; // Radians
 
         public static final double NARWHAL_CAN_RAISE_LIFT_DISTANCE = 1.0; // Meters

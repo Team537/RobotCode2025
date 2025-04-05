@@ -892,6 +892,26 @@ public class DriveSubsystem extends SubsystemBase {
         this.rearLeftModule.setDriveMotorPIDCoefficients(kp, ki, kd);
     }
 
+     /**
+     * Sets the path follower`s PID coefficients to the given values. 
+     * 
+     * @param kp The proportional term.
+     * @param ki The integral term.
+     * @param kd The derivative term.
+     */
+    public void setFollowerPIDCoefficients(double kp, double ki, double kd) {
+
+        // Configure X controller.
+        this.xController.setP(kp);
+        this.xController.setI(ki);
+        this.xController.setD(kd);
+
+        // Configure Y controller.
+        this.yController.setP(kp);
+        this.yController.setI(ki);
+        this.yController.setD(kd);
+    }
+
     //////////////////////////////////////////////////////////////////////////////
     // Periodic Update Method
     //////////////////////////////////////////////////////////////////////////////
