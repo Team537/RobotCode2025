@@ -32,11 +32,13 @@ public class NarwhalManualClimberCommand extends Command {
         else if(controller.getPOV() == 0){
             narwhalClimber.climb();
         }
+
         else if(controller.getPOV() == 90){
-            narwhalClimber.climbManualUp();
-        }
-        else if(controller.getPOV() == 270){
             narwhalClimber.climbManualDown();
+        }
+
+        else if(controller.getPOV() == 270){
+            narwhalClimber.climbManualUp();
         }
     }
 
