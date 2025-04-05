@@ -28,10 +28,17 @@ public class NarwhalManualClimberCommand extends Command {
         if (controller.getPOV() == 180){
             narwhalClimber.goToDeploy();
         }
-            
         // climb
         else if(controller.getPOV() == 0){
             narwhalClimber.climb();
+        }
+
+        else if(controller.getPOV() == 90){
+            narwhalClimber.climbManualDown(); // will rotate climb out
+        }
+
+        else if(controller.getPOV() == 270){
+            narwhalClimber.climbManualUp(); // will rotate climb in
         }
     }
 
