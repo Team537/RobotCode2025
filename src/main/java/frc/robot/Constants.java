@@ -53,7 +53,7 @@ public final class Constants {
      * <h2>OperatorConstants</h2>
      * The {@code OperatorConstants} class is a subclass contained within the {@code Constants} class.
      * This subclass contains all of the constants relating to how the robot is manually controlled.
-     * This includes things like the maximum boost mode speed, the driver controller port, driver rotational offsets, etc.
+     * This includes things like the maximum boost mode speed, the driver controller port, driver rotational 0s, etc.
      */
     public static class OperatorConstants {
 
@@ -104,8 +104,8 @@ public final class Constants {
 
         };
 
-        public static final double AUTO_DRIVING_TRANSLATIONAL_SPEED_SAFETY_FACTOR = 0.25;
-        public static final double AUTO_DRIVING_TRANSLATIONAL_ACCELERATION_SAFETY_FACTOR = 0.5;
+        public static final double AUTO_DRIVING_TRANSLATIONAL_SPEED_SAFETY_FACTOR = 0.15; // was 0.2
+        public static final double AUTO_DRIVING_TRANSLATIONAL_ACCELERATION_SAFETY_FACTOR = 0.4; // was 0.5
         public static final double AUTO_DRIVING_ROTATIONAL_SPEED_SAFETY_FACTOR = 0.25;
         public static final double AUTO_DRIVING_ROTATIONAL_ACCELERATION_FACTOR = 0.5;
         
@@ -317,9 +317,9 @@ public final class Constants {
         public static final double UPPER_ASSEMBLY_MASS = 17.2; //Kg
         public static final double UPPER_ASSEMBLY_MOI = 0.995; //Kg m^2
 
-        public static final Transform2d INTAKING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,-0.019),new Rotation2d(Math.PI));
-        public static Transform2d SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.1524,0.019),new Rotation2d(0));
-        public static final Transform2d ALGAE_REMOVAL_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,-0.019),new Rotation2d(0.0));
+        public static final Transform2d INTAKING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0, -0.019),new Rotation2d(Math.PI));
+        public static Transform2d SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.1524 + 0.15, 0.019),new Rotation2d(0));
+        public static final Transform2d ALGAE_REMOVAL_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0, -0.019),new Rotation2d(0.0));
         public static final Transform2d CLIMB_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0),new Rotation2d(Math.PI));
  
 
