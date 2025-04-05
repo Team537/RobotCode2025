@@ -34,11 +34,11 @@ public class NarwhalManualClimberCommand extends Command {
         }
 
         else if(controller.getPOV() == 90){
-            narwhalClimber.climbManualDown();
+            narwhalClimber.climbManualDown(); // will rotate climb out
         }
 
         else if(controller.getPOV() == 270){
-            narwhalClimber.climbManualUp();
+            narwhalClimber.climbManualUp(); // will rotate climb in
         }
     }
 

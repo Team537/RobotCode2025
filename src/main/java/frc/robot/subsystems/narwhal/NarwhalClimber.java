@@ -109,11 +109,11 @@ public class NarwhalClimber extends SubsystemBase {
     }
     
     public void climbManualUp() {
-        setCurrentMotorAngle(currentTarget.getRotations() + Rotation2d.fromDegrees(0.02).getRotations());
+        setCurrentMotorAngle(currentTarget.getRotations() + Rotation2d.fromDegrees(0.02 * 25).getRotations());
     }
 
     public void climbManualDown() {
-        setCurrentMotorAngle(currentTarget.getRotations() + Rotation2d.fromDegrees(-0.02).getRotations());
+        setCurrentMotorAngle(currentTarget.getRotations() + Rotation2d.fromDegrees(-0.02 * 25).getRotations());
     }
 
     /**
@@ -135,7 +135,7 @@ public class NarwhalClimber extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Climber pos", climber.getEncoder().getPosition());
-        SmartDashboard.putNumber("Climber target", currentTarget.getDegrees());
+        SmartDashboard.putNumber("Climber target", currentTarget.getRotations());
         // This method will be called once per scheduler run
     }
 
