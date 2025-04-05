@@ -186,6 +186,10 @@ public class DriveSubsystem extends SubsystemBase {
 
     private DeltaTime testTime = new DeltaTime();
 
+    // Temp 
+    private double translationThreshold;
+    private double rotationThreshold;
+
     //////////////////////////////////////////////////////////////////////////////
     // Constructor
     //////////////////////////////////////////////////////////////////////////////
@@ -210,6 +214,10 @@ public class DriveSubsystem extends SubsystemBase {
         pathfinder.setWeights(DriveConstants.SENTINEL_DISTANCE_WEIGHT, DriveConstants.SENTINEL_ORIENTATION_WEIGHT);
         Pathfinding.ensureInitialized();
         PathfindingCommand.warmupCommand();
+
+        // Setup thresholds
+        this.translationThreshold = DriveConstants.TRANSLATION_THRESHOLD;
+        this.rotationThreshold = DriveConstants.ROTATION_THRESHOLD;
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -431,9 +439,20 @@ public class DriveSubsystem extends SubsystemBase {
      * @return a Command that, when executed, will drive to the target pose
      */
     public Command getDriveToPoseCommand(Pose2d pose) {
-        return new DriveToPoseCommand(this, pose, DriveConstants.TRANSLATION_THRESHOLD,DriveConstants.ROTATION_THRESHOLD);
+        return new DriveToPoseCommand(this, pose, this.translationThreshold, this.rotationThreshold);
     }
 
+    /**
+     * Set the translational and rotational thresholds.
+     * 
+     * @param translationalThreshold The translational threshold.
+     * @param rotationalThreshold The rotational threshold.
+     */
+     public void setThresholds(double translationalThreshold, double rotationalThreshold) {
+        this.translationThreshold = translationalThreshold;
+        this.rotationThreshold = rotationalThreshold;
+     }
+     
     /**
      * Creates a scoring command using a specific scoring location.
      *

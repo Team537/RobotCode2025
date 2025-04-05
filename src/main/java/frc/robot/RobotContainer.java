@@ -158,6 +158,9 @@ public class RobotContainer {
         SmartDashboard.putNumber("Kraken Ki", DriveConstants.KrakenX60Driving.KI);
         SmartDashboard.putNumber("Kraken Kd", DriveConstants.KrakenX60Driving.KD);
 
+        SmartDashboard.putNumber("Translational Threshold", DriveConstants.TRANSLATION_THRESHOLD);
+        SmartDashboard.putNumber("Rotational Threshold", DriveConstants.ROTATION_THRESHOLD);
+
         SmartDashboard.putNumber("Auto Delay", this.delayTimeSeconds);
         SmartDashboard.putBoolean("Tush Push Mode", this.startWithTushPush);
     }
@@ -196,8 +199,14 @@ public class RobotContainer {
         double followerKp = SmartDashboard.getNumber("Drive Kp", DriveConstants.KrakenX60Driving.KP);
         double followerKi = SmartDashboard.getNumber("Drive Ki", DriveConstants.KrakenX60Driving.KI);
         double followerKd = SmartDashboard.getNumber("Drive Kd", DriveConstants.KrakenX60Driving.KD);
-
+  
         this.driveSubsystem.setFollowerPIDCoefficients(followerKp, followerKi, followerKd);
+
+        // Set the thresholds for autonomous pathing.
+        double translationalThreshold = SmartDashboard.getNumber("Translational Threshold", DriveConstants.TRANSLATION_THRESHOLD);
+        double rotationalThreshold = SmartDashboard.getNumber("Translational Threshold", DriveConstants.TRANSLATION_THRESHOLD);
+
+        this.driveSubsystem.setThresholds(translationalThreshold, rotationalThreshold);
 
         // Get and display the selected autonomous mode.
         AutonomousRoutine autonomousRoutine = autonomousSelector.getSelected();
