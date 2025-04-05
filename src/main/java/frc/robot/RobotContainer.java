@@ -239,6 +239,8 @@ public class RobotContainer {
                 break;
         }
 
+        System.out.println(StartingPosition.CENTER.getPose(alliance)); 
+
         if (startWithTushPush) {
             startingPose.transformBy(FieldConstants.StartingPoseConstants.TUSH_PUSH_STARTING_TRANSFORM);
         }
@@ -256,6 +258,7 @@ public class RobotContainer {
             autonomousCommand = autonomousCommand.andThen(driveSubsystem.getDriveToPoseCommand(startingPose.transformBy(FieldConstants.StartingPoseConstants.TUSH_PUSH_TRANSFORM)));
 
         }
+        
       
         switch (autonomousRoutine) {
             case LEFT:

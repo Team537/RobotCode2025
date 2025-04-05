@@ -452,7 +452,7 @@ public class DriveSubsystem extends SubsystemBase {
         this.translationThreshold = translationalThreshold;
         this.rotationThreshold = rotationalThreshold;
      }
-     
+
     /**
      * Creates a scoring command using a specific scoring location.
      *
@@ -501,6 +501,8 @@ public class DriveSubsystem extends SubsystemBase {
             targetPose = targetPose.transformBy(NarwhalConstants.SCORING_RELATIVE_TRANSFORM);
         }
 
+        System.out.println(targetPose);
+        
         return 
             (
                 new InstantCommand(() -> {state = DriveState.SCORING;inScorePose = false;})
