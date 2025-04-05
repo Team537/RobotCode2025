@@ -363,10 +363,10 @@ public final class Constants {
             public static final double PID_OUTPUT_RANGE_MAX_VOLTAGE = 7.0;
             public static final double PID_OUTPUT_RANGE_MIN_VOLTAGE = -7.0;
 
-            public static double POSITION_FF_G = 0.2;
+            public static double POSITION_FF_G = 0.6;
             public static final Rotation2d PID_TOLERANCE = Rotation2d.fromDegrees(8);
 
-            public static final Rotation2d WRIST_FEEDFORWARD_OFFSET_ANGLE = Rotation2d.fromDegrees(-30); // This is the offset of the center of mass of the wrist from the zero position (x-axis) 
+            public static final Rotation2d WRIST_FEEDFORWARD_OFFSET_ANGLE = Rotation2d.fromDegrees(20); // This is the offset of the center of mass of the wrist from the zero position (x-axis) 
 
 
             // Set position for wrist angles (Angle is relative to the world, with 0 being the down position and rotating away from 0 being positive)
