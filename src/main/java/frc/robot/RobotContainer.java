@@ -158,6 +158,10 @@ public class RobotContainer {
         SmartDashboard.putNumber("Kraken Ki", DriveConstants.KrakenX60Driving.KI);
         SmartDashboard.putNumber("Kraken Kd", DriveConstants.KrakenX60Driving.KD);
 
+        SmartDashboard.putNumber("Drive Kp", DriveConstants.LINEAR_KP);
+        SmartDashboard.putNumber("Drive Ki", DriveConstants.LINEAR_KI);
+        SmartDashboard.putNumber("Drive Kd", DriveConstants.LINEAR_KD);
+
         SmartDashboard.putNumber("Translational Threshold", DriveConstants.TRANSLATION_THRESHOLD);
         SmartDashboard.putNumber("Rotational Threshold", DriveConstants.ROTATION_THRESHOLD);
 
@@ -193,20 +197,20 @@ public class RobotContainer {
         double driveKi = SmartDashboard.getNumber("Kraken Ki", DriveConstants.KrakenX60Driving.KI);
         double driveKd = SmartDashboard.getNumber("Kraken Kd", DriveConstants.KrakenX60Driving.KD);
 
-        this.driveSubsystem.setDriveMotorPIDCoefficients(driveKp, driveKi, driveKd);
+        // this.driveSubsystem.setDriveMotorPIDCoefficients(driveKp, driveKi, driveKd);
         
         // Get and set the path follower`s PID coefficients.
-        double followerKp = SmartDashboard.getNumber("Drive Kp", DriveConstants.KrakenX60Driving.KP);
-        double followerKi = SmartDashboard.getNumber("Drive Ki", DriveConstants.KrakenX60Driving.KI);
-        double followerKd = SmartDashboard.getNumber("Drive Kd", DriveConstants.KrakenX60Driving.KD);
+        double followerKp = SmartDashboard.getNumber("Drive Kp", DriveConstants.LINEAR_KP);
+        double followerKi = SmartDashboard.getNumber("Drive Ki", DriveConstants.LINEAR_KI);
+        double followerKd = SmartDashboard.getNumber("Drive Kd", DriveConstants.LINEAR_KD);
   
-        this.driveSubsystem.setFollowerPIDCoefficients(followerKp, followerKi, followerKd);
+        // this.driveSubsystem.setFollowerPIDCoefficients(followerKp, followerKi, followerKd);
 
         // Set the thresholds for autonomous pathing.
         double translationalThreshold = SmartDashboard.getNumber("Translational Threshold", DriveConstants.TRANSLATION_THRESHOLD);
-        double rotationalThreshold = SmartDashboard.getNumber("Translational Threshold", DriveConstants.TRANSLATION_THRESHOLD);
+        double rotationalThreshold = SmartDashboard.getNumber("Rotational Threshold", DriveConstants.ROTATION_THRESHOLD);
 
-        this.driveSubsystem.setThresholds(translationalThreshold, rotationalThreshold);
+        // this.driveSubsystem.setThresholds(translationalThreshold, rotationalThreshold);
 
         // Get and display the selected autonomous mode.
         AutonomousRoutine autonomousRoutine = autonomousSelector.getSelected();
