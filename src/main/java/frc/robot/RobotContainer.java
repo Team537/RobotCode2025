@@ -133,7 +133,7 @@ public class RobotContainer {
         SmartDashboard.putData(this.allianceSelector);
         SmartDashboard.putData(this.upperAssemblySelector);
         SmartDashboard.putData(this.drivingMotorSelector);
-        
+
         // Add narwhal upper assembly configuration options.
         SmartDashboard.putNumber("Intake Angle", NarwhalConstants.NarwhalWristConstants.INTAKE_ANGLE.getDegrees());
         SmartDashboard.putNumber("Intake Height", NarwhalConstants.NarwhalElevatorConstants.INTAKE_ELEVATOR_HEIGHT_METERS);
@@ -243,8 +243,6 @@ public class RobotContainer {
                 break;
         }
 
-        System.out.println(StartingPosition.CENTER.getPose(alliance)); 
-
         if (startWithTushPush) {
             startingPose.transformBy(FieldConstants.StartingPoseConstants.TUSH_PUSH_STARTING_TRANSFORM);
         }
@@ -262,8 +260,7 @@ public class RobotContainer {
             autonomousCommand = autonomousCommand.andThen(driveSubsystem.getDriveToPoseCommand(startingPose.transformBy(FieldConstants.StartingPoseConstants.TUSH_PUSH_TRANSFORM)));
 
         }
-        
-      
+
         switch (autonomousRoutine) {
             case LEFT:
             case RIGHT:

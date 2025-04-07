@@ -53,7 +53,7 @@ public final class Constants {
      * <h2>OperatorConstants</h2>
      * The {@code OperatorConstants} class is a subclass contained within the {@code Constants} class.
      * This subclass contains all of the constants relating to how the robot is manually controlled.
-     * This includes things like the maximum boost mode speed, the driver controller port, driver rotational 0s, etc.
+     * This includes things like the maximum boost mode speed, the driver controller port, driver rotational offsets, etc.
      */
     public static class OperatorConstants {
 
@@ -93,7 +93,7 @@ public final class Constants {
         public static final double DRIVETRAIN_MOI = 2.285; //Kg meters
         public static final double GRAVITY_ACCELERATION = 9.81; // Meters / sec^2
 
-        public static final double TRANSLATION_THRESHOLD = 0.04; // Meters Set to .35
+        public static final double TRANSLATION_THRESHOLD = 0.04; // Meters
         public static final double ROTATION_THRESHOLD = 0.157; // Radians
 
         public static final double NARWHAL_CAN_RAISE_LIFT_DISTANCE = 1.0; // Meters
@@ -104,8 +104,8 @@ public final class Constants {
 
         };
 
-        public static final double AUTO_DRIVING_TRANSLATIONAL_SPEED_SAFETY_FACTOR = 0.15; // was 0.2
-        public static final double AUTO_DRIVING_TRANSLATIONAL_ACCELERATION_SAFETY_FACTOR = 0.4; // was 0.5
+        public static final double AUTO_DRIVING_TRANSLATIONAL_SPEED_SAFETY_FACTOR = 0.15;
+        public static final double AUTO_DRIVING_TRANSLATIONAL_ACCELERATION_SAFETY_FACTOR = 0.4;
         public static final double AUTO_DRIVING_ROTATIONAL_SPEED_SAFETY_FACTOR = 0.25;
         public static final double AUTO_DRIVING_ROTATIONAL_ACCELERATION_FACTOR = 0.5;
         

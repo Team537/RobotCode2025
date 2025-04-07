@@ -6,8 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.HttpCamera;
-import edu.wpi.first.cscore.VideoSink;
-import edu.wpi.first.cscore.VideoSource;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.StringLogEntry;
@@ -53,7 +51,7 @@ public class Robot extends TimedRobot {
         PortForwarder.add(5800, "photonvision2.local", 5800);
         PortForwarder.add(5000, "oceanview.local", 5000);
 
-        // Allow oceanview`s stream to be viewed.
+        // Allow oceanview's stream to be viewed.
         HttpCamera externalCamera = new HttpCamera("Oceanview Output", "http://oceanview.local:5000/camera-stream");
         CameraServer.addCamera(externalCamera);
 

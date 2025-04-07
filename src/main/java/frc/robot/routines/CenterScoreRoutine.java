@@ -11,7 +11,6 @@ import frc.robot.util.upper_assembly.ScoringHeight;
 public class CenterScoreRoutine {
     public static Command getCommand(Alliance alliance, DriveSubsystem driveSubsystem, UpperAssembly upperAssembly) {
         driveSubsystem.setRobotPose(StartingPosition.CENTER.getPose(alliance));
-        System.out.println(ReefScoringLocation.H);
 
         return driveSubsystem
             .getScoringCommand(alliance, ReefScoringLocation.H)
