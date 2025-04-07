@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems.narwhal;
 
-import java.lang.annotation.Target;
-
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -16,13 +14,10 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.NarwhalConstants.NarwhalClimberConstants;
-import frc.robot.util.math.DeltaTime;
 import frc.robot.util.upper_assembly.narwhal.NarwhalClimberState;
 
 /**
@@ -109,11 +104,11 @@ public class NarwhalClimber extends SubsystemBase {
     }
     
     public void climbManualUp() {
-        setCurrentMotorAngle(currentTarget.getRotations() + Rotation2d.fromDegrees(0.02 * 25).getRotations());
+        setCurrentMotorAngle(currentTarget.getRotations() + Rotation2d.fromDegrees(0.5).getRotations());
     }
 
     public void climbManualDown() {
-        setCurrentMotorAngle(currentTarget.getRotations() + Rotation2d.fromDegrees(-0.02 * 25).getRotations());
+        setCurrentMotorAngle(currentTarget.getRotations() + Rotation2d.fromDegrees(-0.5).getRotations());
     }
 
     /**
