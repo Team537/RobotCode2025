@@ -27,6 +27,10 @@ public class NarwhalManualIntakeOuttakeCommand extends Command {
         //addRequirements(narwhalIntakeOuttake);
     }
 
+    public void init() {
+        narwhalIntakeOuttake.hold();
+    }
+
     @Override
     public void execute() {
         // X button (outtake) = outtake
