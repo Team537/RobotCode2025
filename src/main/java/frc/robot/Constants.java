@@ -43,9 +43,9 @@ public final class Constants {
     public static class Defaults {
 
         // Default motor values
-        public static final DrivingMotorType DEFAULT_DRIVING_MOTOR = DrivingMotorType.KRAKEN_X60;
+        public static final DrivingMotorType DEFAULT_DRIVING_MOTOR = DrivingMotorType.NEO;
         public static final TurningMotorType DEFAULT_TURNING_MOTOR = TurningMotorType.NEO_550;
-        public static final UpperAssemblyType DEFAULT_UPPER_ASSEMBLY = UpperAssemblyType.NARWHAL;
+        public static final UpperAssemblyType DEFAULT_UPPER_ASSEMBLY = UpperAssemblyType.NONE;
 
     }
 
@@ -234,6 +234,7 @@ public final class Constants {
             public static final double KD = 0.01;
             public static final double KV = 2.36;
             public static final double KA = 0.18;
+            public static final double KS = 0;
 
             public static final double PID_MIN_OUTPUT = -1;
             public static final double PID_MAX_OUTPUT = 1;

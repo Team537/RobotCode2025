@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.OceanViewConstants;
@@ -26,6 +27,9 @@ import frc.robot.util.autonomous.StartingPosition;
 import frc.robot.util.swerve.DrivingMotorType;
 import frc.robot.util.upper_assembly.UpperAssemblyFactory;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
+
+import static edu.wpi.first.units.Units.derive;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -148,6 +152,13 @@ public class RobotContainer {
         SmartDashboard.putNumber("Climb Rotations (degrees)", NarwhalConstants.NarwhalClimberConstants.CLIMB_WINCH_ROTATIONS.getDegrees());
         SmartDashboard.putNumber("Deploy Rotations (degrees)", NarwhalConstants.NarwhalClimberConstants.DEPLOYED_WINCH_ROTATIONS.getDegrees());
 
+        SmartDashboard.putNumber("Kraken Kp", DriveConstants.KrakenX60Driving.KP);
+        SmartDashboard.putNumber("Kraken Ki", DriveConstants.KrakenX60Driving.KI);
+        SmartDashboard.putNumber("Kraken Kd", DriveConstants.KrakenX60Driving.KD);
+        SmartDashboard.putNumber("Kraken Ks", DriveConstants.KrakenX60Driving.KS);
+        SmartDashboard.putNumber("Kraken Kv", DriveConstants.KrakenX60Driving.KV);
+        SmartDashboard.putNumber("Kraken Ka", DriveConstants.KrakenX60Driving.KA);
+
         // Add autonomous configuration options.
         SmartDashboard.putNumber("Auto Score Offset X", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getX());
         SmartDashboard.putNumber("Auto Score Offset Y", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getY());
@@ -170,6 +181,10 @@ public class RobotContainer {
      * Creates and schedules the selected autonomous routine. 
      */
     public void scheduleAutonomous() {
+
+        // Update PID values to set values
+        updatePIDValues();
+
         this.setWristValuesFromSmartDashbaord();
         this.delayTimeSeconds = SmartDashboard.getNumber("Auto Delay", this.delayTimeSeconds);
         this.startWithTushPush = SmartDashboard.getBoolean("Tush Push Mode", this.startWithTushPush);
@@ -256,6 +271,10 @@ public class RobotContainer {
      * Schedules commands used exclusively during TeleOp.
      */
     public void scheduleTeleOp() {
+
+        // Update PID values to set values
+        updatePIDValues();
+
         CommandScheduler.getInstance().cancelAll();
         this.setWristValuesFromSmartDashbaord();
         NarwhalConstants.NarwhalClimberConstants.CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(SmartDashboard.getNumber("Climb Rotations (degrees)", NarwhalConstants.NarwhalClimberConstants.CLIMB_WINCH_ROTATIONS.getDegrees()));
@@ -268,6 +287,14 @@ public class RobotContainer {
         driveSubsystem.setConfigs();
         upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
         driveSubsystem.setDefaultCommand(driveSubsystem.getManualCommand(xBoxController, alliance));
+    }
+
+    public void scheduleTest() {
+
+        driveSubsystem.setRobotPose(new Pose2d(0.0,0.0,new Rotation2d()));
+        Command command = driveSubsystem.getPathfindingCommand(new Pose2d(1.83,0,new Rotation2d()));
+        command.schedule();
+
     }
     
     /**
@@ -291,5 +318,18 @@ public class RobotContainer {
         NarwhalConstants.NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT = SmartDashboard.getNumber("L3 Height", NarwhalConstants.NarwhalElevatorConstants.L3_ELEVATOR_HEIGHT);
         NarwhalConstants.NarwhalWristConstants.L4_OUTTAKE_ANGLE = Rotation2d.fromDegrees(SmartDashboard.getNumber("L4 Angle", NarwhalConstants.NarwhalWristConstants.L4_OUTTAKE_ANGLE.getDegrees()));
         NarwhalConstants.NarwhalElevatorConstants.L4_ELEVATOR_HEIGHT = SmartDashboard.getNumber("L4 Height", NarwhalConstants.NarwhalElevatorConstants.L4_ELEVATOR_HEIGHT);
+    }
+
+    private void updatePIDValues() {
+
+        // Set the kraken drive motor`s PID coefficients to the specified values.
+        double driveKp = SmartDashboard.getNumber("Kraken Kp", DriveConstants.KrakenX60Driving.KP);
+        double driveKi = SmartDashboard.getNumber("Kraken Ki", DriveConstants.KrakenX60Driving.KI);
+        double driveKd = SmartDashboard.getNumber("Kraken Kd", DriveConstants.KrakenX60Driving.KD);
+        double driveKs = SmartDashboard.getNumber("Kraken ks", DriveConstants.KrakenX60Driving.KS);
+        double driveKv = SmartDashboard.getNumber("Kraken Kv", DriveConstants.KrakenX60Driving.KV);
+        double driveKa = SmartDashboard.getNumber("Kraken Ka", DriveConstants.KrakenX60Driving.KA);
+
+        this.driveSubsystem.setDriveMotorPIDCoefficients(driveKp, driveKi, driveKd, driveKs, driveKv, driveKa);
     }
 }
