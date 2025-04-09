@@ -257,7 +257,7 @@ public class RobotContainer {
 
         // Construct the autonomous program for the selected starting position.
         Command autonomousCommand = new InstantCommand();
-        Command autonomousCommand = new InstantCommand(driveSubsystem::setDriveMotorPos,driveSubsystem);
+        
 
         if (startWithTushPush) {
             
@@ -268,10 +268,12 @@ public class RobotContainer {
         switch (autonomousRoutine) {
             case LEFT:
             case RIGHT:
-                autonomousCommand = autonomousCommand.andThen(MultiScoreRoutine.getCommand(autonomousRoutine == AutonomousRoutine.LEFT ? StartingPosition.LEFT : StartingPosition.RIGHT, alliance, driveSubsystem, upperAssembly));
+                autonomousCommand = autonomousCommand.andThen(new InstantCommand(driveSubsystem::setDriveMotorPos,driveSubsystem));
+                // autonomousCommand = autonomousCommand.andThen(MultiScoreRoutine.getCommand(autonomousRoutine == AutonomousRoutine.LEFT ? StartingPosition.LEFT : StartingPosition.RIGHT, alliance, driveSubsystem, upperAssembly));
                 break;
             case CENTER:
-                autonomousCommand = autonomousCommand.andThen(CenterScoreRoutine.getCommand(alliance, driveSubsystem, upperAssembly));
+                autonomousCommand = autonomousCommand.andThen(new InstantCommand(driveSubsystem::setDriveMotorPos,driveSubsystem));
+                // autonomousCommand = autonomousCommand.andThen(CenterScoreRoutine.getCommand(alliance, driveSubsystem, upperAssembly));
                 break;
             default:
                 System.err.println("[System]: No alliance starting position selected!");
