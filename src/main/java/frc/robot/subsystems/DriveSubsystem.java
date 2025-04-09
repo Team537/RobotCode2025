@@ -57,6 +57,7 @@ import frc.robot.util.field.ReefScoringLocation;
 import frc.robot.util.swerve.TurningMotorType;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
 import frc.robot.util.math.Vector2d;
+import frc.robot.util.TalonUtils;
 
 /**
  * <h2> DriveSubsystem </h2>
@@ -946,6 +947,9 @@ public class DriveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Y Position",getRobotPose().getY());
         SmartDashboard.putNumber("Theta Rotation", getRobotPose().getRotation().getRadians());
     }
+    public void setDriveMotorPos() {
+        TalonUtils.TalonArmMotionMagicControl(rearLeftModule.drivingKrakenX60, 100);
+    }
 
     /**
      * Periodically updates the drive subsystem.
@@ -962,6 +966,10 @@ public class DriveSubsystem extends SubsystemBase {
     public void periodic() {
         // Update module states using the target velocities.
         setModules(targetVelocities);
+        System.out.println(targetVelocities);
+        SmartDashboard.putNumber("drive motor velocity", rearLeftModule.drivingKrakenX60.getVelocity().getValueAsDouble());
+        SmartDashboard.putNumber("drive motor position", rearLeftModule.drivingKrakenX60.getPosition().getValueAsDouble());
+
 
         // Refresh dynamic pathfinding obstacles.
         /*pathfindingObstacles.clear();
@@ -976,3 +984,4 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
 }
+ 

@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
 import frc.robot.Constants.Defaults;
@@ -312,6 +313,7 @@ public class SwerveModule extends SubsystemBase {
         correctedDesiredState.speedMetersPerSecond = state.speedMetersPerSecond;
         correctedDesiredState.angle = state.angle.times(1.0);
 
+        SmartDashboard.putNumber("expected motor velocity", state.speedMetersPerSecond);
         // Optimize the desired state so that the robot will never rotate more than PI/2 radians
         correctedDesiredState.optimize(getPosition().angle);
 
