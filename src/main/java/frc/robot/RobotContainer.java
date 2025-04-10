@@ -10,6 +10,7 @@ import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.OceanViewConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.commands.DriveToPoseCommand;
 import frc.robot.network.TCPSender;
 import frc.robot.network.UDPReceiver;
 import frc.robot.routines.CenterScoreRoutine;
@@ -264,15 +265,20 @@ public class RobotContainer {
             autonomousCommand = autonomousCommand.andThen(driveSubsystem.getDriveToPoseCommand(startingPose.transformBy(FieldConstants.StartingPoseConstants.TUSH_PUSH_TRANSFORM)));
 
         }
-
+        Translation2d translation = new Translation2d(10.1,3.4);
+        Rotation2d rotate = new Rotation2d(90);
+        Pose2d newpos = new Pose2d(translation,rotate);
+        DriveToPoseCommand drivetopos = new DriveToPoseCommand(driveSubsystem, newpos, 0.01, rotationalThreshold);
+        // DriveToPoseCommand drivetopos = new DriveToPoseCommand(driveSubsystem, newpos, 0.01, 0.01);
         switch (autonomousRoutine) {
             case LEFT:
             case RIGHT:
-                autonomousCommand = autonomousCommand.andThen(new InstantCommand(driveSubsystem::setDriveMotorPos,driveSubsystem));
+                // autonomousCommand = autonomousCommand.andThen(new InstantCommand(driveSubsystem::setDriveMotorPos,driveSubsystem));
                 // autonomousCommand = autonomousCommand.andThen(MultiScoreRoutine.getCommand(autonomousRoutine == AutonomousRoutine.LEFT ? StartingPosition.LEFT : StartingPosition.RIGHT, alliance, driveSubsystem, upperAssembly));
                 break;
             case CENTER:
-                autonomousCommand = autonomousCommand.andThen(new InstantCommand(driveSubsystem::setDriveMotorPos,driveSubsystem));
+                autonomousCommand = autonomousCommand.andThen(drivetopos);
+                // autonomousCommand = autonomousCommand.andThen(new InstantCommand(driveSubsystem::setDriveMotorPos,driveSubsystem));
                 // autonomousCommand = autonomousCommand.andThen(CenterScoreRoutine.getCommand(alliance, driveSubsystem, upperAssembly));
                 break;
             default:

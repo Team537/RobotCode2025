@@ -946,6 +946,9 @@ public class DriveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("X Position",getRobotPose().getX());
         SmartDashboard.putNumber("Y Position",getRobotPose().getY());
         SmartDashboard.putNumber("Theta Rotation", getRobotPose().getRotation().getRadians());
+        SmartDashboard.putNumber("X Velocity",targetVelocities.vxMetersPerSecond);
+        SmartDashboard.putNumber("Y Velocity",targetVelocities.vyMetersPerSecond);
+        SmartDashboard.putNumber("Theta Rotational Velocity", getChassisSpeeds().omegaRadiansPerSecond);
     }
     public void setDriveMotorPos() {
         TalonUtils.TalonArmMotionMagicControl(rearLeftModule.drivingKrakenX60, 100);
@@ -966,9 +969,10 @@ public class DriveSubsystem extends SubsystemBase {
     public void periodic() {
         // Update module states using the target velocities.
         setModules(targetVelocities);
-        System.out.println(targetVelocities);
+        // System.out.println(targetVelocities);
         SmartDashboard.putNumber("drive motor velocity", rearLeftModule.drivingKrakenX60.getVelocity().getValueAsDouble());
         SmartDashboard.putNumber("drive motor position", rearLeftModule.drivingKrakenX60.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("angle", gyroscope.getRotation2d().getDegrees());
 
 
         // Refresh dynamic pathfinding obstacles.

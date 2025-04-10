@@ -53,7 +53,6 @@ public class DriveToPoseCommand extends Command {
         Vector2d linearFeedback = driveSubsystem.getLinearFeedback(targetPose.getTranslation());
         // getRotationalFeedback returns a rotational speed based on the heading error.
         double rotationalFeedback = driveSubsystem.getRotationalFeedback(targetPose.getRotation());
-
         // Create chassis speeds from the computed feedback.
         ChassisSpeeds chassisSpeeds = new ChassisSpeeds(
                 linearFeedback.getX(),
