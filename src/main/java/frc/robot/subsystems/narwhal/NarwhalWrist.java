@@ -48,7 +48,8 @@ public class NarwhalWrist extends SubsystemBase {
         wristConfig 
             .idleMode(IdleMode.kBrake)
             .smartCurrentLimit(NarwhalWristConstants.WRIST_MOTOR_CURRENT_LIMIT)
-            .inverted(true);
+            .inverted(true)
+            .voltageCompensation(12.65);
 
         // Update motor PID values.
         wristConfig.closedLoop 
