@@ -273,7 +273,7 @@ public class RobotContainer {
     public void scheduleTeleOp() {
 
         // Update PID values to set values
-        updatePIDValues();
+        // updatePIDValues();
 
         CommandScheduler.getInstance().cancelAll();
         this.setWristValuesFromSmartDashbaord();
@@ -293,7 +293,7 @@ public class RobotContainer {
 
         driveSubsystem.setRobotPose(new Pose2d(0.0,0.0,new Rotation2d()));
         Command command = driveSubsystem.getPathfindingCommand(new Pose2d(1.83,0,new Rotation2d()));
-        command.schedule();
+        //command.schedule();
 
     }
     
@@ -330,6 +330,6 @@ public class RobotContainer {
         double driveKv = SmartDashboard.getNumber("Kraken Kv", DriveConstants.KrakenX60Driving.KV);
         double driveKa = SmartDashboard.getNumber("Kraken Ka", DriveConstants.KrakenX60Driving.KA);
 
-        this.driveSubsystem.setDriveMotorPIDCoefficients(driveKp, driveKi, driveKd, driveKs, driveKv, driveKa);
+        //this.driveSubsystem.setDriveMotorPIDCoefficients(driveKp, driveKi, driveKd, driveKs, driveKv, driveKa);
     }
 }

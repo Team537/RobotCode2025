@@ -319,8 +319,8 @@ public class SwerveModule extends SubsystemBase {
         slot0Configs.kI = ki;
         slot0Configs.kD = kd;
         slot0Configs.kV = kv;
-        slot0Configs.kS = kv;
-        slot0Configs.kA = kv;
+        slot0Configs.kS = ks;
+        slot0Configs.kA = ka;
         
 
         // Update the PID coefficients.

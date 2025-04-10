@@ -211,10 +211,10 @@ public final class Constants {
             public static final double ENCODER_POSITION_FACTOR = WHEEL_CIRCUMFERENCE / MOTOR_REDUCTION;
             public static final double ENCODER_VELOCITY_FACTOR = ENCODER_POSITION_FACTOR / 60.0;
 
-            public static final double KP = 0.04;
-            public static final double KI = 0;
+            public static final double KP = 0.0;
+            public static final double KI = 0.0;
             public static final double KD = 0;
-            public static final double FF = 1 / DRIVE_WHEEL_FREE_SPEED;
+            public static final double FF = 0.01;//1 / DRIVE_WHEEL_FREE_SPEED;
             public static final double PID_MIN_OUTPUT = -1;
             public static final double PID_MAX_OUTPUT = 1;
 
