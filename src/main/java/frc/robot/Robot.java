@@ -54,6 +54,7 @@ public class Robot extends TimedRobot {
         // Allow oceanview's stream to be viewed.
         HttpCamera externalCamera = new HttpCamera("Oceanview Output", "http://oceanview.local:5000/camera-stream");
         CameraServer.addCamera(externalCamera);
+        //Test
 
         // Start logging data.
         DataLogManager.start();
