@@ -375,7 +375,7 @@ public final class Constants {
 
             // Set position for wrist angles (Angle is relative to the world, with 0 being the down position and rotating away from 0 being positive)
             public static Rotation2d INTAKE_ANGLE = Rotation2d.fromDegrees(50); // there's a lot of slop so this is going to be ~10 degreses over the actual position
-            public static Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromDegrees(230);   
+            public static Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromDegrees(250);   
             public static Rotation2d L2_OUTTAKE_ANGLE = Rotation2d.fromDegrees(211.6);
             public static Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);
             public static Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI);

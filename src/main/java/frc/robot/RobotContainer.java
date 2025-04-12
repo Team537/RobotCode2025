@@ -290,9 +290,7 @@ public class RobotContainer {
     public void scheduleTeleOp() {
         CommandScheduler.getInstance().cancelAll();
         this.setWristValuesFromSmartDashbaord();
-        NarwhalConstants.NarwhalClimberConstants.CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(SmartDashboard.getNumber("Climb Rotations (degrees)", NarwhalConstants.NarwhalClimberConstants.CLIMB_WINCH_ROTATIONS.getDegrees()));
-        NarwhalConstants.NarwhalClimberConstants.DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(SmartDashboard.getNumber("Deploy Rotations (degrees)", NarwhalConstants.NarwhalClimberConstants.DEPLOYED_WINCH_ROTATIONS.getDegrees()));
-
+        
         Alliance alliance = allianceSelector.getSelected();
         SmartDashboard.putString("Selected Alliance", alliance.toString());
 
