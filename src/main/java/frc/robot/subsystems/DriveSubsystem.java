@@ -490,12 +490,7 @@ public class DriveSubsystem extends SubsystemBase {
         }
 
         if (upperAssemblyType == UpperAssemblyType.NARWHAL || upperAssemblyType == UpperAssemblyType.NONE) {
-            Transform2d offset = NarwhalConstants.SCORING_RELATIVE_TRANSFORM;
-            if (alliance == Alliance.RED) {
-                offset = new Transform2d(-offset.getX(), -offset.getY(), offset.getRotation());
-            }
-
-            targetPose = targetPose.transformBy(offset);
+            targetPose = targetPose.transformBy(NarwhalConstants.SCORING_RELATIVE_TRANSFORM);
         }
 
         System.out.println("Going to drive to position ("+ targetPose.getX() + ", " + targetPose.getY() + ')');
