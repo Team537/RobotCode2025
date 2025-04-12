@@ -3,7 +3,6 @@ package frc.robot.commands.narwhal;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.narwhal.NarwhalClimber;
-import frc.robot.util.upper_assembly.narwhal.NarwhalClimberState;
 
 public class NarwhalManualClimberCommand extends Command {
     
@@ -28,10 +27,17 @@ public class NarwhalManualClimberCommand extends Command {
         if (controller.getPOV() == 180){
             narwhalClimber.goToDeploy();
         }
-            
         // climb
         else if(controller.getPOV() == 0){
             narwhalClimber.climb();
+        }
+
+        else if(controller.getPOV() == 90){
+            narwhalClimber.climbManualDown(); // will rotate climb out
+        }
+
+        else if(controller.getPOV() == 270){
+            narwhalClimber.climbManualUp(); // will rotate climb in
         }
     }
 

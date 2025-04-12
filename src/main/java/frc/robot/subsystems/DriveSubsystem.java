@@ -3,8 +3,6 @@ package frc.robot.subsystems;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -14,7 +12,6 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
@@ -186,6 +183,10 @@ public class DriveSubsystem extends SubsystemBase {
 
     private DeltaTime testTime = new DeltaTime();
 
+    // Temp 
+    private double translationThreshold;
+    private double rotationThreshold;
+
     //////////////////////////////////////////////////////////////////////////////
     // Constructor
     //////////////////////////////////////////////////////////////////////////////
@@ -210,6 +211,10 @@ public class DriveSubsystem extends SubsystemBase {
         pathfinder.setWeights(DriveConstants.SENTINEL_DISTANCE_WEIGHT, DriveConstants.SENTINEL_ORIENTATION_WEIGHT);
         Pathfinding.ensureInitialized();
         PathfindingCommand.warmupCommand();
+
+        // Setup thresholds
+        this.translationThreshold = DriveConstants.TRANSLATION_THRESHOLD;
+        this.rotationThreshold = DriveConstants.ROTATION_THRESHOLD;
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -431,8 +436,19 @@ public class DriveSubsystem extends SubsystemBase {
      * @return a Command that, when executed, will drive to the target pose
      */
     public Command getDriveToPoseCommand(Pose2d pose) {
-        return new DriveToPoseCommand(this, pose, DriveConstants.TRANSLATION_THRESHOLD,DriveConstants.ROTATION_THRESHOLD);
+        return new DriveToPoseCommand(this, pose, this.translationThreshold, this.rotationThreshold);
     }
+
+    /**
+     * Set the translational and rotational thresholds.
+     * 
+     * @param translationalThreshold The translational threshold.
+     * @param rotationalThreshold The rotational threshold.
+     */
+     public void setThresholds(double translationalThreshold, double rotationalThreshold) {
+        this.translationThreshold = translationalThreshold;
+        this.rotationThreshold = rotationalThreshold;
+     }
 
     /**
      * Creates a scoring command using a specific scoring location.
@@ -875,6 +891,41 @@ public class DriveSubsystem extends SubsystemBase {
      */
     public double getCommandedRotationalVelocity() {
         return commandedVelocities.omegaRadiansPerSecond;
+    }
+
+    /**
+     * Sets each module`s drive motor`s PID coefficients to the given values. 
+     * Currently this only works for the KrakenX60 motor.
+     * 
+     * @param kp The proportional term.
+     * @param ki The integral term.
+     * @param kd The derivative term.
+     */
+    public void setDriveMotorPIDCoefficients(double kp, double ki, double kd) {
+        this.frontLeftModule.setDriveMotorPIDCoefficients(kp, ki, kd);
+        this.frontRightModule.setDriveMotorPIDCoefficients(kp, ki, kd);
+        this.rearRightModule.setDriveMotorPIDCoefficients(kp, ki, kd);
+        this.rearLeftModule.setDriveMotorPIDCoefficients(kp, ki, kd);
+    }
+
+     /**
+     * Sets the path follower`s PID coefficients to the given values. 
+     * 
+     * @param kp The proportional term.
+     * @param ki The integral term.
+     * @param kd The derivative term.
+     */
+    public void setFollowerPIDCoefficients(double kp, double ki, double kd) {
+
+        // Configure X controller.
+        this.xController.setP(kp);
+        this.xController.setI(ki);
+        this.xController.setD(kd);
+
+        // Configure Y controller.
+        this.yController.setP(kp);
+        this.yController.setI(ki);
+        this.yController.setD(kd);
     }
 
     //////////////////////////////////////////////////////////////////////////////

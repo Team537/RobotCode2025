@@ -93,7 +93,7 @@ public final class Constants {
         public static final double DRIVETRAIN_MOI = 2.285; //Kg meters
         public static final double GRAVITY_ACCELERATION = 9.81; // Meters / sec^2
 
-        public static final double TRANSLATION_THRESHOLD = 0.05; // Meters
+        public static final double TRANSLATION_THRESHOLD = 0.04; // Meters
         public static final double ROTATION_THRESHOLD = 0.157; // Radians
 
         public static final double NARWHAL_CAN_RAISE_LIFT_DISTANCE = 1.0; // Meters
@@ -104,8 +104,8 @@ public final class Constants {
 
         };
 
-        public static final double AUTO_DRIVING_TRANSLATIONAL_SPEED_SAFETY_FACTOR = 0.25;
-        public static final double AUTO_DRIVING_TRANSLATIONAL_ACCELERATION_SAFETY_FACTOR = 0.5;
+        public static final double AUTO_DRIVING_TRANSLATIONAL_SPEED_SAFETY_FACTOR = 0.15;
+        public static final double AUTO_DRIVING_TRANSLATIONAL_ACCELERATION_SAFETY_FACTOR = 0.4;
         public static final double AUTO_DRIVING_ROTATIONAL_SPEED_SAFETY_FACTOR = 0.25;
         public static final double AUTO_DRIVING_ROTATIONAL_ACCELERATION_FACTOR = 0.5;
         
@@ -317,9 +317,9 @@ public final class Constants {
         public static final double UPPER_ASSEMBLY_MASS = 17.2; //Kg
         public static final double UPPER_ASSEMBLY_MOI = 0.995; //Kg m^2
 
-        public static final Transform2d INTAKING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,-0.019),new Rotation2d(Math.PI));
-        public static Transform2d SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.1524,0.019),new Rotation2d(0));
-        public static final Transform2d ALGAE_REMOVAL_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,-0.019),new Rotation2d(0.0));
+        public static final Transform2d INTAKING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0, -0.019),new Rotation2d(Math.PI));
+        public static Transform2d SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.4, 0.019),new Rotation2d(0));
+        public static final Transform2d ALGAE_REMOVAL_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0, -0.019),new Rotation2d(0.0));
         public static final Transform2d CLIMB_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0),new Rotation2d(Math.PI));
  
 
@@ -400,7 +400,7 @@ public final class Constants {
             public static final double CLIMBER_PID_MAX_OUTPUT = 1.0;
             
             public static Rotation2d DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(390);
-            public static Rotation2d CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(-350);
+            public static Rotation2d CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(-300);
 
             /** The angle tolerance for the climber to be considered at a specific state. */
             public static final Rotation2d CLIMBER_ANGLE_TOLERANCE = Rotation2d.fromDegrees(3);
@@ -432,9 +432,9 @@ public final class Constants {
             public static final double MAX_HEIGHT_METERS = 2.1336; // stops the robot from ending itself
             public static double L1_ELEVATOR_HEIGHT = 0.05; // Meters
             public static double L2_ELEVATOR_HEIGHT = 0.05; // Meters
-            public static double L3_ELEVATOR_HEIGHT = 0.6; // Meters
-            public static double L4_ELEVATOR_HEIGHT = 1.6; // Meters
-            public static double INTAKE_ELEVATOR_HEIGHT_METERS = 0.08; // Meters
+            public static double L3_ELEVATOR_HEIGHT = 0.65; // Meters
+            public static double L4_ELEVATOR_HEIGHT = 1.65; // Meters
+            public static double INTAKE_ELEVATOR_HEIGHT_METERS = 0.09; // Meters
             public static final boolean MOTOR_INVERTED = true;
             public static final double ELEVATOR_POSITION_TOLERANCE = 0.05; // Meters
             public static final double ALGAE_DESCORE_HEIGHT_METERS_TOP_ROW = -0.4; // Meters (negative to go down)

@@ -48,7 +48,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
 
         // Configure the intake motor settings.
         intakeOuttakeMotorConfig
-            .inverted(true)
+            .inverted(false)
             .idleMode(IdleMode.kBrake)
             .smartCurrentLimit(NarwhalIntakeOuttakeConstants.INTAKE_OUTTAKE_MOTOR_CURRENT_LIMIT);
         
