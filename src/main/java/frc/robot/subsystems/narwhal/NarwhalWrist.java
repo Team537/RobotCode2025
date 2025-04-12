@@ -4,12 +4,10 @@
 
 package frc.robot.subsystems.narwhal;
 
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
@@ -19,10 +17,9 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.NarwhalWristState;
-import frc.robot.Constants.NarwhalConstants;
-import frc.robot.util.upper_assembly.ScoringHeight;
 import frc.robot.Constants.NarwhalConstants.NarwhalWristConstants;
+import frc.robot.util.NarwhalWristState;
+import frc.robot.util.upper_assembly.ScoringHeight;
 
 /**
  * <h2> NarwhalWrist </h2>
@@ -111,22 +108,28 @@ public class NarwhalWrist extends SubsystemBase {
         double currentEncoderPosition = wrist.getEncoder().getPosition();
         double currentEncoderVelocity = wrist.getEncoder().getVelocity();
 
-        double raw_output = wristMotorPIDController.calculate(currentEncoderPosition);
-        raw_output += wristFeedForward.calculate(currentEncoderPosition + NarwhalWristConstants.WRIST_FEEDFORWARD_OFFSET_ANGLE.getRadians(), currentEncoderVelocity);
-        
-        wrist.setVoltage(
-            // Math.min + Math.max is used to clamp the output to the motor's range
-            MathUtil.clamp(
-                raw_output,
-                NarwhalWristConstants.PID_OUTPUT_RANGE_MIN_VOLTAGE,
-                NarwhalWristConstants.PID_OUTPUT_RANGE_MAX_VOLTAGE
-            )
+        double pidOutput = wristMotorPIDController.calculate(currentEncoderPosition);
+        pidOutput = MathUtil.clamp(
+            pidOutput,
+            NarwhalWristConstants.PID_OUTPUT_RANGE_MIN_VOLTAGE,
+            NarwhalWristConstants.PID_OUTPUT_RANGE_MAX_VOLTAGE
+        );
+
+        double gravityFeedForward = wristFeedForward.calculate(currentEncoderPosition + NarwhalWristConstants.WRIST_FEEDFORWARD_OFFSET_ANGLE.getRadians(), currentEncoderVelocity);
+        gravityFeedForward = MathUtil.clamp(
+            gravityFeedForward,
+            NarwhalWristConstants.POSITION_FF_G_RANGE_MIN_VOLTAGE,
+            NarwhalWristConstants.POSITION_FF_G_RANGE_MAX_VOLTAGE
         );
 
         this.current_target_voltage = MathUtil.clamp(
-            raw_output,
-            NarwhalWristConstants.PID_OUTPUT_RANGE_MIN_VOLTAGE,
-            NarwhalWristConstants.PID_OUTPUT_RANGE_MAX_VOLTAGE
+            pidOutput + gravityFeedForward,
+            -10, // i am a scared
+            10 // little code boy
+        );
+
+        wrist.setVoltage(
+            this.current_target_voltage
         );
     }
 
@@ -251,13 +254,23 @@ public class NarwhalWrist extends SubsystemBase {
         }
         SmartDashboard.putData("Wrist PID", wristMotorPIDController);
         SmartDashboard.putNumber("target_voltage", current_target_voltage);
-        SmartDashboard.putNumber("Wrist Position", wrist.getEncoder().getPosition());
-        SmartDashboard.putNumber("Wrist Target Position", currentTargetAngle);
+        SmartDashboard.putNumber("Wrist Position", wrist.getEncoder().getPosition());   
 
         NarwhalWristConstants.POSITION_FF_G = SmartDashboard.getNumber("Wrist Gravity FF", NarwhalWristConstants.POSITION_FF_G);
         SmartDashboard.putNumber("Wrist Gravity FF", NarwhalWristConstants.POSITION_FF_G);
         wristFeedForward.setKg(NarwhalWristConstants.POSITION_FF_G);
         this.wristMotorPIDController = (PIDController)SmartDashboard.getData("Wrist PID");
+
+        NarwhalWristConstants.POSITION_FF_G_RANGE_MIN_VOLTAGE = SmartDashboard.getNumber("FF Min Wrist", NarwhalWristConstants.POSITION_FF_G_RANGE_MIN_VOLTAGE);
+        NarwhalWristConstants.POSITION_FF_G_RANGE_MAX_VOLTAGE = SmartDashboard.getNumber("FF Max Wrist", NarwhalWristConstants.POSITION_FF_G_RANGE_MAX_VOLTAGE);
+
+        NarwhalWristConstants.PID_OUTPUT_RANGE_MIN_VOLTAGE = SmartDashboard.getNumber("PID Min Wrist", NarwhalWristConstants.PID_OUTPUT_RANGE_MIN_VOLTAGE);
+        NarwhalWristConstants.PID_OUTPUT_RANGE_MAX_VOLTAGE = SmartDashboard.getNumber("PID Max Wrist", NarwhalWristConstants.PID_OUTPUT_RANGE_MAX_VOLTAGE);
+        
+        SmartDashboard.putNumber("FF Min Wrist", NarwhalWristConstants.POSITION_FF_G_RANGE_MIN_VOLTAGE);
+        SmartDashboard.putNumber("FF Max Wrist", NarwhalWristConstants.POSITION_FF_G_RANGE_MAX_VOLTAGE);
+        SmartDashboard.putNumber("PID Min Wrist", NarwhalWristConstants.PID_OUTPUT_RANGE_MIN_VOLTAGE);
+        SmartDashboard.putNumber("PID Max Wrist", NarwhalWristConstants.PID_OUTPUT_RANGE_MAX_VOLTAGE);
     }
 
     @Override
