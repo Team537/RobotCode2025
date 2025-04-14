@@ -247,7 +247,7 @@ public class RobotContainer {
 
         // If a valid starting pose was determined, set the robot pose.
         if (startingPose != null) {
-            System.out.println("Setting robot pose to (" + startingPose.getX() + ", " + startingPose.getY());
+            System.out.println("Setting robot pose to (" + startingPose.getX() + ", " + startingPose.getY() + ")");
             driveSubsystem.setRobotPose(startingPose);
         }
 
