@@ -18,8 +18,6 @@ public class MultiScoreRoutine {
     private static boolean useClockwiseFillingScheme = false;
 
     public static Command getCommand(StartingPosition startingPosition, Alliance alliance, DriveSubsystem driveSubsystem, UpperAssembly upperAssembly) {
-        driveSubsystem.setRobotPose(startingPosition.getPose(alliance));
-
         // From the left side, start at J (maybe this should be I?) then rotate counter clockwise around the reef
         if (startingPosition == StartingPosition.LEFT) {
             scoringLocation = ReefScoringLocation.J;
