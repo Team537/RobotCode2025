@@ -9,6 +9,7 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.OceanViewConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.network.TCPSender;
 import frc.robot.network.UDPReceiver;
 import frc.robot.routines.CenterScoreRoutine;
@@ -17,6 +18,7 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.narwhal.NarwhalUpperAssembly;
 import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
 import frc.robot.subsystems.vision.OceanViewManager;
+import frc.robot.subsystems.vision.odometry.PhotonVisionCamera;
 import frc.robot.subsystems.vision.odometry.VisionOdometry;
 import frc.robot.util.EnumPrettifier;
 import frc.robot.util.autonomous.Alliance;
@@ -80,9 +82,9 @@ public class RobotContainer {
         setupOceanViewManager();
 
         // Add cameras to the VisionOdometry object.
-        // visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, VisionConstants.FRONT_CAMERA_OFFSET));
-        // visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.RIGHT_CAMERA_NAME, VisionConstants.RIGHT_CAMERA_OFFSET));
-        // visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.LEFT_CAMERA_NAME, VisionConstants.LEFT_CAMERA_OFFSET)); 
+        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.FRONT_CAMERA_NAME, VisionConstants.FRONT_CAMERA_OFFSET));
+        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.RIGHT_CAMERA_NAME, VisionConstants.RIGHT_CAMERA_OFFSET));
+        visionOdometry.addCamera(new PhotonVisionCamera(VisionConstants.LEFT_CAMERA_NAME, VisionConstants.LEFT_CAMERA_OFFSET)); 
 
         // Setup Dashboard
         setupSmartDashboard();
@@ -191,22 +193,22 @@ public class RobotContainer {
         NarwhalConstants.SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(autoScoreOffsetX, autoScoreOffsetY), Rotation2d.fromDegrees(autoScoreOffsetRot));
 
         // Set the kraken drive motor`s PID coefficients to the specified values.
-        // double driveKp = SmartDashboard.getNumber("Kraken Kp", DriveConstants.KrakenX60Driving.KP);
-        // double driveKi = SmartDashboard.getNumber("Kraken Ki", DriveConstants.KrakenX60Driving.KI);
-        // double driveKd = SmartDashboard.getNumber("Kraken Kd", DriveConstants.KrakenX60Driving.KD);
+        double driveKp = SmartDashboard.getNumber("Kraken Kp", DriveConstants.KrakenX60Driving.KP);
+        double driveKi = SmartDashboard.getNumber("Kraken Ki", DriveConstants.KrakenX60Driving.KI);
+        double driveKd = SmartDashboard.getNumber("Kraken Kd", DriveConstants.KrakenX60Driving.KD);
 
         // this.driveSubsystem.setDriveMotorPIDCoefficients(driveKp, driveKi, driveKd);
         
         // Get and set the path follower`s PID coefficients.
-        // double followerKp = SmartDashboard.getNumber("Drive Kp", DriveConstants.LINEAR_KP);
-        // double followerKi = SmartDashboard.getNumber("Drive Ki", DriveConstants.LINEAR_KI);
-        // double followerKd = SmartDashboard.getNumber("Drive Kd", DriveConstants.LINEAR_KD);
+        double followerKp = SmartDashboard.getNumber("Drive Kp", DriveConstants.LINEAR_KP);
+        double followerKi = SmartDashboard.getNumber("Drive Ki", DriveConstants.LINEAR_KI);
+        double followerKd = SmartDashboard.getNumber("Drive Kd", DriveConstants.LINEAR_KD);
   
         // this.driveSubsystem.setFollowerPIDCoefficients(followerKp, followerKi, followerKd);
 
         // Set the thresholds for autonomous pathing.
-        // double translationalThreshold = SmartDashboard.getNumber("Translational Threshold", DriveConstants.TRANSLATION_THRESHOLD);
-        // double rotationalThreshold = SmartDashboard.getNumber("Rotational Threshold", DriveConstants.ROTATION_THRESHOLD);
+        double translationalThreshold = SmartDashboard.getNumber("Translational Threshold", DriveConstants.TRANSLATION_THRESHOLD);
+        double rotationalThreshold = SmartDashboard.getNumber("Rotational Threshold", DriveConstants.ROTATION_THRESHOLD);
 
         // this.driveSubsystem.setThresholds(translationalThreshold, rotationalThreshold);
 
@@ -247,39 +249,33 @@ public class RobotContainer {
 
         // If a valid starting pose was determined, set the robot pose.
         if (startingPose != null) {
-            System.out.println("Setting robot pose to (" + startingPose.getX() + ", " + startingPose.getY() + ")");
             driveSubsystem.setRobotPose(startingPose);
         }
 
-        // Choose which side of the field routine to use
-        Command locationRoutine;
+        // Construct the autonomous program for the selected starting position.
+        Command autonomousCommand = new InstantCommand();
+
+        if (startWithTushPush) {
+            
+            autonomousCommand = autonomousCommand.andThen(driveSubsystem.getDriveToPoseCommand(startingPose.transformBy(FieldConstants.StartingPoseConstants.TUSH_PUSH_TRANSFORM)));
+
+        }
+
         switch (autonomousRoutine) {
             case LEFT:
             case RIGHT:
-                locationRoutine = MultiScoreRoutine.getCommand(autonomousRoutine == AutonomousRoutine.LEFT ? StartingPosition.LEFT : StartingPosition.RIGHT, alliance, driveSubsystem, upperAssembly);
+                autonomousCommand = autonomousCommand.andThen(MultiScoreRoutine.getCommand(autonomousRoutine == AutonomousRoutine.LEFT ? StartingPosition.LEFT : StartingPosition.RIGHT, alliance, driveSubsystem, upperAssembly));
                 break;
             case CENTER:
-                locationRoutine = CenterScoreRoutine.getCommand(alliance, driveSubsystem, upperAssembly);
+                autonomousCommand = autonomousCommand.andThen(CenterScoreRoutine.getCommand(alliance, driveSubsystem, upperAssembly));
                 break;
             default:
                 System.err.println("[System]: No alliance starting position selected!");
-                locationRoutine = new InstantCommand();
                 break;
-        }
-
-        // Construct our list of commands to execute based on extra factors (tush push / delay)
-        Command autonomousCommand;
-
-        if (startWithTushPush) {
-            System.out.println("Beginning routine with tush push before continuing");
-            autonomousCommand = driveSubsystem.getDriveToPoseCommand(startingPose.transformBy(FieldConstants.StartingPoseConstants.TUSH_PUSH_TRANSFORM)).andThen(locationRoutine);
-        } else {
-            autonomousCommand = locationRoutine;
         }
 
         // Wait if specified, otherwise just execute auto command
         if (this.delayTimeSeconds > 0) {
-            System.out.println("Waiting " + this.delayTimeSeconds + " seconds before starting auto");
             Command autoDelayCommand = new WaitCommand(this.delayTimeSeconds);
             autoDelayCommand.andThen(autonomousCommand).schedule();
         }
@@ -294,7 +290,9 @@ public class RobotContainer {
     public void scheduleTeleOp() {
         CommandScheduler.getInstance().cancelAll();
         this.setWristValuesFromSmartDashbaord();
-        
+        NarwhalConstants.NarwhalClimberConstants.CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(SmartDashboard.getNumber("Climb Rotations (degrees)", NarwhalConstants.NarwhalClimberConstants.CLIMB_WINCH_ROTATIONS.getDegrees()));
+        NarwhalConstants.NarwhalClimberConstants.DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(SmartDashboard.getNumber("Deploy Rotations (degrees)", NarwhalConstants.NarwhalClimberConstants.DEPLOYED_WINCH_ROTATIONS.getDegrees()));
+
         Alliance alliance = allianceSelector.getSelected();
         SmartDashboard.putString("Selected Alliance", alliance.toString());
 
