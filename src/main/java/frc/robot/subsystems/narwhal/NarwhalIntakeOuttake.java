@@ -97,6 +97,14 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
     }
 
     /**
+     * Set the intake-outtake motor to the outtake motor percentage (defined in constants).
+     */
+    public void slowOuttake() {
+        setIntakeOuttakeMotorPercent(NarwhalIntakeOuttakeConstants.SLOW_OUTTAKE_MOTOR_PERCENT);
+        currentState = NarwhalIntakeOuttakeState.OUTTAKING; // must be after the set function because the set function will default to CUSTOM state
+    }
+
+    /**
      * Set the intake-outtake motor to 0 percentage (will use the idle-mode to decide if it should brake or coast).
      */
     public void stop() {
@@ -119,8 +127,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
      * @return boolean
      */
     public boolean isCoralSensorTriggered(){
-        // return !intakeSensor.get(); // negated so that true means it is pressed, and false means it is not
-        return false; // disabled
+        return !intakeSensor.get(); // negated so that true means it is pressed, and false means it is not
     }
     
     @Override
