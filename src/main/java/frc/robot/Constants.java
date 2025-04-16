@@ -810,10 +810,13 @@ public final class Constants {
         }
 
         public static class StartingPoseConstants {
+            private static final double BLUE_STARTING_LINE_X_STRAIGHT = 7.247;
+            private static final double BLUE_STARTING_LINE_X_ANGLED = 7.42;
+            private static final double REEF_FACE_ANGLE = Math.PI / 3.0;
 
-            public static final Pose2d BLUE_LEFT_STARTING_POSE = new Pose2d(new Translation2d(7.247,6.16),new Rotation2d());
-            public static final Pose2d BLUE_CENTER_STARTING_POSE = new Pose2d(new Translation2d(7.247,4.209),new Rotation2d());
-            public static final Pose2d BLUE_RIGHT_STARTING_POSE = new Pose2d(new Translation2d(7.247,1.88),new Rotation2d());
+            public static final Pose2d BLUE_LEFT_STARTING_POSE = new Pose2d(new Translation2d(BLUE_STARTING_LINE_X_ANGLED, 5.51), Rotation2d.fromRadians(REEF_FACE_ANGLE));
+            public static final Pose2d BLUE_CENTER_STARTING_POSE = new Pose2d(new Translation2d(BLUE_STARTING_LINE_X_STRAIGHT, 4.209), new Rotation2d());
+            public static final Pose2d BLUE_RIGHT_STARTING_POSE = new Pose2d(new Translation2d(BLUE_STARTING_LINE_X_ANGLED, 2.55), Rotation2d.fromRadians(-REEF_FACE_ANGLE));
 
             public static final Pose2d RED_LEFT_STARTING_POSE = rotate180(BLUE_LEFT_STARTING_POSE);
             public static final Pose2d RED_CENTER_STARTING_POSE = rotate180(BLUE_CENTER_STARTING_POSE);
