@@ -357,12 +357,19 @@ public final class Constants {
             public static final double ENCODER_FACTOR = Math.PI * 2 / GEAR_REDUCTION; // Wrist target angles (radians) are multiplied by this to get the motor target position           
             
             // PID configurations
-            public static final double POSITION_PID_P = 0.3;
-            public static final double POSITION_PID_I = 0.0;
-            public static final double POSITION_PID_D = 0.35;
-            public static final double POSITION_PID_F = 0.0;
-            public static final double PID_OUTPUT_RANGE_MAX = 0.45;
-            public static final double PID_OUTPUT_RANGE_MIN = -0.4;        
+            public static final double POSITION_PID_P = 11.0;
+            public static final double POSITION_PID_I = 0;
+            public static final double POSITION_PID_D = 0.5;
+            public static double PID_OUTPUT_RANGE_MAX_VOLTAGE = 3.0;
+            public static double PID_OUTPUT_RANGE_MIN_VOLTAGE = -1.5;
+
+            public static double POSITION_FF_G = 1.0;
+            public static double POSITION_FF_G_RANGE_MAX_VOLTAGE = 4.0;
+            public static double POSITION_FF_G_RANGE_MIN_VOLTAGE = -4.0;
+            public static final Rotation2d PID_TOLERANCE = Rotation2d.fromDegrees(8);
+
+            public static final Rotation2d WRIST_FEEDFORWARD_OFFSET_ANGLE = Rotation2d.fromDegrees(20); // This is the offset of the center of mass of the wrist from the zero position (x-axis) 
+
 
             // Set position for wrist angles (Angle is relative to the world, with 0 being the down position and rotating away from 0 being positive)
             public static Rotation2d INTAKE_ANGLE = Rotation2d.fromDegrees(50); // there's a lot of slop so this is going to be ~10 degreses over the actual position

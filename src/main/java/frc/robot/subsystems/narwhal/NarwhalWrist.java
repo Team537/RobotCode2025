@@ -4,20 +4,22 @@
 
 package frc.robot.subsystems.narwhal;
 
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.NarwhalConstants.NarwhalWristConstants;
 import frc.robot.util.NarwhalWristState;
 import frc.robot.util.upper_assembly.ScoringHeight;
-import frc.robot.Constants.NarwhalConstants.NarwhalWristConstants;
 
 /**
  * <h2> NarwhalWrist </h2>
@@ -28,13 +30,21 @@ import frc.robot.Constants.NarwhalConstants.NarwhalWristConstants;
  * @since v1.2.0
  */
 public class NarwhalWrist extends SubsystemBase {
+
     public NarwhalWristState currentState;
-    private double currentTargetAngle; // in radians
 
     /** In radians */
+    private double currentTargetAngle;
+    /** In radians */
     public final SparkMax wrist;
+    /** In radians */
     private final SparkMaxConfig wristConfig;
-    private final SparkClosedLoopController wristMotorPIDController;
+    /** In radians */
+    private final ArmFeedforward wristFeedForward;
+    /** In radians */
+    private PIDController wristMotorPIDController;
+    
+    private double current_target_voltage;
     
     /**
      * Create a new instance of the NarwhalWrist class, setting up necessary hardware in the process.
@@ -52,13 +62,19 @@ public class NarwhalWrist extends SubsystemBase {
             .voltageCompensation(12.65);
 
         // Update motor PID values.
-        wristConfig.closedLoop 
-            .pid(
-                NarwhalWristConstants.POSITION_PID_P, 
-                NarwhalWristConstants.POSITION_PID_I, 
-                NarwhalWristConstants.POSITION_PID_D
-            )
-            .outputRange(NarwhalWristConstants.PID_OUTPUT_RANGE_MIN, NarwhalWristConstants.PID_OUTPUT_RANGE_MAX); // uses external encoder
+        wristMotorPIDController = new PIDController(
+            NarwhalWristConstants.POSITION_PID_P,
+            NarwhalWristConstants.POSITION_PID_I,
+            NarwhalWristConstants.POSITION_PID_D
+        );
+        wristMotorPIDController.setTolerance(NarwhalWristConstants.PID_TOLERANCE.getRadians());
+
+        wristFeedForward = new ArmFeedforward(
+            0,
+            NarwhalWristConstants.POSITION_FF_G,
+            0
+        );
+
         // configs for the encoder
         // NOTE FOR THE ENCODER: WHEN VIEWED FROM THE RIGHT, THE ANGLE OF THE WRIST IS BASED ON A UNIT CIRCLE WITH 0 DEGREES POINTING STRAIGHT UP
         wristConfig.encoder
@@ -69,7 +85,6 @@ public class NarwhalWrist extends SubsystemBase {
         wrist = new SparkMax(NarwhalWristConstants.WRIST_MOTOR_CAN_ID, MotorType.kBrushless);
         wrist.configure(wristConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        wristMotorPIDController = wrist.getClosedLoopController();
         currentState = NarwhalWristState.STOPPED;
     }
 
@@ -80,9 +95,42 @@ public class NarwhalWrist extends SubsystemBase {
      */
     public void setCurrentMotorAngle(Rotation2d targetAngle){
         double targetAngleRadians = targetAngle.getRadians();
-        wristMotorPIDController.setReference(targetAngleRadians, ControlType.kPosition);
+        wristMotorPIDController.setSetpoint(targetAngleRadians);
+
         currentState = NarwhalWristState.CUSTOM;
         currentTargetAngle = targetAngleRadians;
+    }
+
+    /**
+     * Updates the current motor voltage based on the recalculated PID outputs
+     */
+    public void updateMotor(){
+        double currentEncoderPosition = wrist.getEncoder().getPosition();
+        double currentEncoderVelocity = wrist.getEncoder().getVelocity();
+
+        double pidOutput = wristMotorPIDController.calculate(currentEncoderPosition);
+        pidOutput = MathUtil.clamp(
+            pidOutput,
+            NarwhalWristConstants.PID_OUTPUT_RANGE_MIN_VOLTAGE,
+            NarwhalWristConstants.PID_OUTPUT_RANGE_MAX_VOLTAGE
+        );
+
+        double gravityFeedForward = wristFeedForward.calculate(currentEncoderPosition + NarwhalWristConstants.WRIST_FEEDFORWARD_OFFSET_ANGLE.getRadians(), currentEncoderVelocity);
+        gravityFeedForward = MathUtil.clamp(
+            gravityFeedForward,
+            NarwhalWristConstants.POSITION_FF_G_RANGE_MIN_VOLTAGE,
+            NarwhalWristConstants.POSITION_FF_G_RANGE_MAX_VOLTAGE
+        );
+
+        this.current_target_voltage = MathUtil.clamp(
+            pidOutput + gravityFeedForward,
+            -10, // i am a scared
+            10 // little code boy
+        );
+
+        wrist.setVoltage(
+            this.current_target_voltage
+        );
     }
 
     /**
@@ -201,6 +249,28 @@ public class NarwhalWrist extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+        if (currentState != NarwhalWristState.STOPPED) {
+            this.updateMotor();
+        }
+        SmartDashboard.putData("Wrist PID", wristMotorPIDController);
+        SmartDashboard.putNumber("target_voltage", current_target_voltage);
+        SmartDashboard.putNumber("Wrist Position", wrist.getEncoder().getPosition());   
+
+        NarwhalWristConstants.POSITION_FF_G = SmartDashboard.getNumber("Wrist Gravity FF", NarwhalWristConstants.POSITION_FF_G);
+        SmartDashboard.putNumber("Wrist Gravity FF", NarwhalWristConstants.POSITION_FF_G);
+        wristFeedForward.setKg(NarwhalWristConstants.POSITION_FF_G);
+        this.wristMotorPIDController = (PIDController)SmartDashboard.getData("Wrist PID");
+
+        NarwhalWristConstants.POSITION_FF_G_RANGE_MIN_VOLTAGE = SmartDashboard.getNumber("FF Min Wrist", NarwhalWristConstants.POSITION_FF_G_RANGE_MIN_VOLTAGE);
+        NarwhalWristConstants.POSITION_FF_G_RANGE_MAX_VOLTAGE = SmartDashboard.getNumber("FF Max Wrist", NarwhalWristConstants.POSITION_FF_G_RANGE_MAX_VOLTAGE);
+
+        NarwhalWristConstants.PID_OUTPUT_RANGE_MIN_VOLTAGE = SmartDashboard.getNumber("PID Min Wrist", NarwhalWristConstants.PID_OUTPUT_RANGE_MIN_VOLTAGE);
+        NarwhalWristConstants.PID_OUTPUT_RANGE_MAX_VOLTAGE = SmartDashboard.getNumber("PID Max Wrist", NarwhalWristConstants.PID_OUTPUT_RANGE_MAX_VOLTAGE);
+        
+        SmartDashboard.putNumber("FF Min Wrist", NarwhalWristConstants.POSITION_FF_G_RANGE_MIN_VOLTAGE);
+        SmartDashboard.putNumber("FF Max Wrist", NarwhalWristConstants.POSITION_FF_G_RANGE_MAX_VOLTAGE);
+        SmartDashboard.putNumber("PID Min Wrist", NarwhalWristConstants.PID_OUTPUT_RANGE_MIN_VOLTAGE);
+        SmartDashboard.putNumber("PID Max Wrist", NarwhalWristConstants.PID_OUTPUT_RANGE_MAX_VOLTAGE);
     }
 
     @Override
