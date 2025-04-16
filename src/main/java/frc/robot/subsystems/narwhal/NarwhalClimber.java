@@ -16,7 +16,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.NarwhalConstants;
+
 import frc.robot.Constants.NarwhalConstants.NarwhalClimberConstants;
 import frc.robot.util.upper_assembly.narwhal.NarwhalClimberState;
 
@@ -129,12 +129,9 @@ public class NarwhalClimber extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // This method will be called once per scheduler run
-        NarwhalClimberConstants.CLIMB_WINCH_ROTATIONS = Rotation2d.fromDegrees(SmartDashboard.getNumber("Climb Rotations (degrees)", NarwhalConstants.NarwhalClimberConstants.CLIMB_WINCH_ROTATIONS.getDegrees()));
-        NarwhalClimberConstants.DEPLOYED_WINCH_ROTATIONS = Rotation2d.fromDegrees(SmartDashboard.getNumber("Deploy Rotations (degrees)", NarwhalConstants.NarwhalClimberConstants.DEPLOYED_WINCH_ROTATIONS.getDegrees()));
-
         SmartDashboard.putNumber("Climber pos", climber.getEncoder().getPosition());
         SmartDashboard.putNumber("Climber target", currentTarget.getRotations());
+        // This method will be called once per scheduler run
     }
 
     @Override

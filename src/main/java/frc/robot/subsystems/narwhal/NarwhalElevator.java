@@ -165,13 +165,6 @@ public class NarwhalElevator extends SubsystemBase {
         return Math.abs(leadElevator.getEncoder().getPosition() - currentTargetPosition) < NarwhalElevatorConstants.ELEVATOR_POSITION_TOLERANCE;
     }
 
-    /**
-     * Gets the current state of the elevtaor
-     */
-    public NarwhalElevatorState getCurrentState(){
-        return this.currentState;
-    }
-
     @Override
     public void periodic(){
         // This method will be called once per scheduler run during simulation

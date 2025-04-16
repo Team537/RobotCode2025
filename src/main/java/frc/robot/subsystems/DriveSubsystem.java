@@ -6,14 +6,17 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -45,6 +48,7 @@ import frc.robot.commands.XboxManualDriveCommand;
 import frc.robot.util.math.DeltaTime;
 import frc.robot.util.swerve.DriveState;
 import frc.robot.util.swerve.DrivingMotorType;
+import frc.robot.util.autonomous.ADSentinel;
 import frc.robot.util.autonomous.Alliance;
 import frc.robot.util.autonomous.Obstacle;
 import frc.robot.util.field.AlgaeRemovalPosition;
@@ -169,6 +173,8 @@ public class DriveSubsystem extends SubsystemBase {
     private PathConstraints constraints;
     private List<Supplier<List<Obstacle>>> pathfindingObstaclesSuppliers = new ArrayList<>();
 
+    private ADSentinel pathfinder = new ADSentinel();
+
     private DriveState state = DriveState.MANUAL;
     private boolean inScorePose = false;
     private boolean inIntakePose = false;
@@ -199,12 +205,12 @@ public class DriveSubsystem extends SubsystemBase {
         // Update all configuration settings (motor types, module configurations, etc.).
         setConfigs();
 
-        // Pathfinding.setPathfinder(pathfinder);
-        // pathfinder.setAvailableTags(AprilTagFields.k2025ReefscapeWelded, DriveConstants.AVAILABLE_SENTINEL_TAGS);
-        // pathfinder.setAvailableCameraOffsets(VisionConstants.AVAILABLE_CAMERA_OFFSETS);
-        // pathfinder.setWeights(DriveConstants.SENTINEL_DISTANCE_WEIGHT, DriveConstants.SENTINEL_ORIENTATION_WEIGHT);
-        // Pathfinding.ensureInitialized();
-        // PathfindingCommand.warmupCommand();
+        Pathfinding.setPathfinder(pathfinder);
+        pathfinder.setAvailableTags(AprilTagFields.k2025ReefscapeWelded, DriveConstants.AVAILABLE_SENTINEL_TAGS);
+        pathfinder.setAvailableCameraOffsets(VisionConstants.AVAILABLE_CAMERA_OFFSETS);
+        pathfinder.setWeights(DriveConstants.SENTINEL_DISTANCE_WEIGHT, DriveConstants.SENTINEL_ORIENTATION_WEIGHT);
+        Pathfinding.ensureInitialized();
+        PathfindingCommand.warmupCommand();
 
         // Setup thresholds
         this.translationThreshold = DriveConstants.TRANSLATION_THRESHOLD;
@@ -492,7 +498,6 @@ public class DriveSubsystem extends SubsystemBase {
             targetPose = targetPose.transformBy(NarwhalConstants.SCORING_RELATIVE_TRANSFORM);
         }
 
-        System.out.println("Going to drive to position ("+ targetPose.getX() + ", " + targetPose.getY() + ')');
         return 
             (
                 new InstantCommand(() -> {state = DriveState.SCORING;inScorePose = false;})
