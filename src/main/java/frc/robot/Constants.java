@@ -352,14 +352,14 @@ public final class Constants {
 
         public static class NarwhalWristConstants {
             public static final int WRIST_MOTOR_CAN_ID = 14;
-            public static final int WRIST_MOTOR_CURRENT_LIMIT = 40;
+            public static final int WRIST_MOTOR_CURRENT_LIMIT = 20;
 
             // Calculating encoder conversion factor
             public static final double GEAR_REDUCTION = 20;
             public static final double ENCODER_FACTOR = Math.PI * 2 / GEAR_REDUCTION; // Wrist target angles (radians) are multiplied by this to get the motor target position           
             
             // PID configurations
-            public static final double POSITION_PID_P = 11.0;
+            public static final double POSITION_PID_P = 7;
             public static final double POSITION_PID_I = 0;
             public static final double POSITION_PID_D = 0.5;
             public static double PID_OUTPUT_RANGE_MAX_VOLTAGE = 3.0;
@@ -384,7 +384,7 @@ public final class Constants {
             public static final Rotation2d TRANSIT_ANGLE = Rotation2d.fromRadians(0.5 * Math.PI);
             
             /** The angle tolerance for the wrxist to be considered at a specific state. */
-            public static final Rotation2d WRIST_ANGLE_TOLERANCE = Rotation2d.fromRadians(0.2 * Math.PI);
+            public static final Rotation2d WRIST_ANGLE_TOLERANCE = Rotation2d.fromDegrees(8);
         }
 
         public static class NarwhalClimberConstants {

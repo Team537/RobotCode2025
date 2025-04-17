@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SoftLimitConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
@@ -74,7 +75,14 @@ public class NarwhalWrist extends SubsystemBase {
             NarwhalWristConstants.POSITION_FF_G,
             0
         );
+        
+        // final SoftLimitConfig softlimit = new SoftLimitConfig();
+        // softlimit.forwardSoftLimit(0);
+        // softlimit.forwardSoftLimitEnabled(true);
+        // softlimit.reverseSoftLimitEnabled(true);
+        // softlimit.reverseSoftLimit(4.3);
 
+        // wristConfig. = softlimit;
         // configs for the encoder
         // NOTE FOR THE ENCODER: WHEN VIEWED FROM THE RIGHT, THE ANGLE OF THE WRIST IS BASED ON A UNIT CIRCLE WITH 0 DEGREES POINTING STRAIGHT UP
         wristConfig.encoder
@@ -208,6 +216,11 @@ public class NarwhalWrist extends SubsystemBase {
         currentState = NarwhalWristState.TRANSIT;
     }
 
+    public void warmupMove() {
+        setCurrentMotorAngle(Rotation2d.fromDegrees(5));
+        currentState = NarwhalWristState.CUSTOM;
+    }
+
     /**
      * Uses a PID to actively hold the position of the motor when this function is called.
      */
@@ -252,6 +265,8 @@ public class NarwhalWrist extends SubsystemBase {
         if (currentState != NarwhalWristState.STOPPED) {
             this.updateMotor();
         }
+        SmartDashboard.putString("Wrist State", currentState.toString());
+
         SmartDashboard.putData("Wrist PID", wristMotorPIDController);
         SmartDashboard.putNumber("target_voltage", current_target_voltage);
         SmartDashboard.putNumber("Wrist Position", wrist.getEncoder().getPosition());   
@@ -260,6 +275,7 @@ public class NarwhalWrist extends SubsystemBase {
         SmartDashboard.putNumber("Wrist Gravity FF", NarwhalWristConstants.POSITION_FF_G);
         wristFeedForward.setKg(NarwhalWristConstants.POSITION_FF_G);
         this.wristMotorPIDController = (PIDController)SmartDashboard.getData("Wrist PID");
+        SmartDashboard.putNumber("Wrist SetPoint", wristMotorPIDController.getSetpoint());
 
         NarwhalWristConstants.POSITION_FF_G_RANGE_MIN_VOLTAGE = SmartDashboard.getNumber("FF Min Wrist", NarwhalWristConstants.POSITION_FF_G_RANGE_MIN_VOLTAGE);
         NarwhalWristConstants.POSITION_FF_G_RANGE_MAX_VOLTAGE = SmartDashboard.getNumber("FF Max Wrist", NarwhalWristConstants.POSITION_FF_G_RANGE_MAX_VOLTAGE);
