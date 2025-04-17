@@ -21,6 +21,7 @@ import frc.robot.commands.narwhal.NarwhalOuttakeCommand;
 import frc.robot.commands.narwhal.NarwhalScorePositionCommand;
 import frc.robot.commands.narwhal.NarwhalStopOuttakeCommand;
 import frc.robot.commands.narwhal.NarwhalTransitPositionCommand;
+import frc.robot.commands.narwhal.NarwhalWristEnergizeCommand;
 import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
 import frc.robot.util.field.AlgaeRemovalPosition;
 import frc.robot.util.upper_assembly.ScoringHeight;
@@ -84,6 +85,9 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
         Command command = 
             (
                 (
+                    new WaitCommand(0.5)
+                    .deadlineFor(new NarwhalWristEnergizeCommand(wrist))
+                ).andThen(
                     new WaitUntilCommand(canRaiseLiftSupplier::get)
                     .deadlineFor(new NarwhalTransitPositionCommand(elevator,wrist))
                 ).andThen(

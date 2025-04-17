@@ -293,6 +293,7 @@ public class RobotContainer {
      */
     public void scheduleTeleOp() {
         CommandScheduler.getInstance().cancelAll();
+        CommandScheduler.getInstance().clearComposedCommands();
         this.setWristValuesFromSmartDashbaord();
         
         Alliance alliance = allianceSelector.getSelected();

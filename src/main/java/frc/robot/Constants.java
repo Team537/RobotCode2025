@@ -359,13 +359,17 @@ public final class Constants {
             public static final double ENCODER_FACTOR = Math.PI * 2 / GEAR_REDUCTION; // Wrist target angles (radians) are multiplied by this to get the motor target position           
             
             // PID configurations
-            public static final double POSITION_PID_P = 11.0;
+            public static final double POSITION_PID_P = 9;
             public static final double POSITION_PID_I = 0;
             public static final double POSITION_PID_D = 0.5;
             public static double PID_OUTPUT_RANGE_MAX_VOLTAGE = 3.0;
             public static double PID_OUTPUT_RANGE_MIN_VOLTAGE = -1.5;
+            /** Wrist Velocity */
+            public static double MOTION_MAGIC_MAX_RDPS = 2 * Math.PI * 0.6; // Measured in Radians per Second
+            /** Wrist Accleration */
+            public static double MOTION_MAGIC_MAX_RDPSPS = 2 * Math.PI * 2; // Measured in Radians per Second Squared
 
-            public static double POSITION_FF_G = 1.0;
+            public static double POSITION_FF_G = 0.0;
             public static double POSITION_FF_G_RANGE_MAX_VOLTAGE = 4.0;
             public static double POSITION_FF_G_RANGE_MIN_VOLTAGE = -4.0;
             public static final Rotation2d PID_TOLERANCE = Rotation2d.fromDegrees(8);
@@ -376,7 +380,7 @@ public final class Constants {
             // Set position for wrist angles (Angle is relative to the world, with 0 being the down position and rotating away from 0 being positive)
             public static Rotation2d INTAKE_ANGLE = Rotation2d.fromDegrees(34); // there's a lot of slop so this is going to be ~10 degrees over the actual position
             public static Rotation2d L1_OUTTAKE_ANGLE = Rotation2d.fromDegrees(215.6);   
-            public static Rotation2d L2_OUTTAKE_ANGLE = Rotation2d.fromDegrees(219.6);
+            public static Rotation2d L2_OUTTAKE_ANGLE = Rotation2d.fromDegrees(215.6);
             public static Rotation2d L3_OUTTAKE_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI); //RADIANS ***
             public static Rotation2d L4_OUTTAKE_ANGLE = Rotation2d.fromDegrees(215.6);
             public static final Rotation2d CLIMB_ANGLE = Rotation2d.fromRadians(1.12 * Math.PI); // This is the angle the wrist should be at when climbing
@@ -384,7 +388,7 @@ public final class Constants {
             public static final Rotation2d TRANSIT_ANGLE = Rotation2d.fromRadians(0.5 * Math.PI);
             
             /** The angle tolerance for the wrxist to be considered at a specific state. */
-            public static final Rotation2d WRIST_ANGLE_TOLERANCE = Rotation2d.fromRadians(0.2 * Math.PI);
+            public static final Rotation2d WRIST_ANGLE_TOLERANCE = Rotation2d.fromDegrees(8);
         }
 
         public static class NarwhalClimberConstants {
@@ -435,10 +439,10 @@ public final class Constants {
             public static final double MIN_HEIGHT_METERS = 0.0; // probably should leave at 0.0.
             public static final double MAX_HEIGHT_METERS = 2.1336; // stops the robot from ending itself
             public static double L1_ELEVATOR_HEIGHT = 0.12; // Meters
-            public static double L2_ELEVATOR_HEIGHT = 0.01; // Meters
-            public static double L3_ELEVATOR_HEIGHT = 0.4; // Meters
-            public static double L4_ELEVATOR_HEIGHT = 1.65; // Meters
-            public static double INTAKE_ELEVATOR_HEIGHT_METERS = 0.05; // Meters
+            public static double L2_ELEVATOR_HEIGHT = 0.07; // Meters
+            public static double L3_ELEVATOR_HEIGHT = 0.55; // Meters
+            public static double L4_ELEVATOR_HEIGHT = 1.77; // Meters
+            public static double INTAKE_ELEVATOR_HEIGHT_METERS = 0.01; // Meters
             public static final boolean MOTOR_INVERTED = true;
             public static final double ELEVATOR_POSITION_TOLERANCE = 0.05; // Meters
             public static final double ALGAE_DESCORE_HEIGHT_METERS_TOP_ROW = -0.4; // Meters (negative to go down)
