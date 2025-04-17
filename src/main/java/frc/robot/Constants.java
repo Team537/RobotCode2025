@@ -441,7 +441,7 @@ public final class Constants {
             public static double L1_ELEVATOR_HEIGHT = 0.12; // Meters
             public static double L2_ELEVATOR_HEIGHT = 0.07; // Meters
             public static double L3_ELEVATOR_HEIGHT = 0.55; // Meters
-            public static double L4_ELEVATOR_HEIGHT = 1.77; // Meters
+            public static double L4_ELEVATOR_HEIGHT = 1.75; // Meters
             public static double INTAKE_ELEVATOR_HEIGHT_METERS = 0.01; // Meters
             public static final boolean MOTOR_INVERTED = true;
             public static final double ELEVATOR_POSITION_TOLERANCE = 0.05; // Meters
