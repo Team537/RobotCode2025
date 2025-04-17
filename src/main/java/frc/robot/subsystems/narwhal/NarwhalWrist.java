@@ -78,14 +78,7 @@ public class NarwhalWrist extends SubsystemBase {
             NarwhalWristConstants.POSITION_FF_G,
             0
         );
-        
-        // final SoftLimitConfig softlimit = new SoftLimitConfig();
-        // softlimit.forwardSoftLimit(0);
-        // softlimit.forwardSoftLimitEnabled(true);
-        // softlimit.reverseSoftLimitEnabled(true);
-        // softlimit.reverseSoftLimit(4.3);
 
-        // wristConfig. = softlimit;
         // configs for the encoder
         // NOTE FOR THE ENCODER: WHEN VIEWED FROM THE RIGHT, THE ANGLE OF THE WRIST IS BASED ON A UNIT CIRCLE WITH 0 DEGREES POINTING STRAIGHT UP
         wristConfig.encoder

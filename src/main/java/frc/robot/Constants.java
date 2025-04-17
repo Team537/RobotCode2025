@@ -365,9 +365,9 @@ public final class Constants {
             public static double PID_OUTPUT_RANGE_MAX_VOLTAGE = 3.0;
             public static double PID_OUTPUT_RANGE_MIN_VOLTAGE = -1.5;
             /** Wrist Velocity */
-            public static double MOTION_MAGIC_MAX_RDPS = 2 * Math.PI * 0.6; // 2 seconds for full revolution
+            public static double MOTION_MAGIC_MAX_RDPS = 2 * Math.PI * 0.6; // Measured in Radians per Second
             /** Wrist Accleration */
-            public static double MOTION_MAGIC_MAX_RDPSPS = 2 * Math.PI * 2; // 1/6th second to reach max velocity
+            public static double MOTION_MAGIC_MAX_RDPSPS = 2 * Math.PI * 2; // Measured in Radians per Second Squared
 
             public static double POSITION_FF_G = 0.0;
             public static double POSITION_FF_G_RANGE_MAX_VOLTAGE = 4.0;
