@@ -2,6 +2,7 @@ package frc.robot.subsystems.narwhal;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -11,6 +12,7 @@ import frc.robot.Constants.NarwhalConstants.NarwhalIntakeOuttakeConstants;
 import frc.robot.commands.narwhal.NarwhalAlgaePreparePositionCommand;
 import frc.robot.commands.narwhal.NarwhalAlgaeRemoveCommand;
 import frc.robot.commands.narwhal.NarwhalClimbCommand;
+import frc.robot.commands.narwhal.NarwhalElevatorTransitPosition;
 import frc.robot.commands.narwhal.NarwhalIntakeCommand;
 import frc.robot.commands.narwhal.NarwhalIntakePositionCommand;
 import frc.robot.commands.narwhal.NarwhalManualClimberCommand;
@@ -22,6 +24,7 @@ import frc.robot.commands.narwhal.NarwhalScorePositionCommand;
 import frc.robot.commands.narwhal.NarwhalStopOuttakeCommand;
 import frc.robot.commands.narwhal.NarwhalTransitPositionCommand;
 import frc.robot.commands.narwhal.NarwhalWristEnergizeCommand;
+import frc.robot.commands.narwhal.NarwhalWristTransitPosition;
 import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
 import frc.robot.util.field.AlgaeRemovalPosition;
 import frc.robot.util.upper_assembly.ScoringHeight;
@@ -150,7 +153,7 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
      */
     public Command getLowerCommand() {
         System.out.println("Get lower command");
-        return new NarwhalTransitPositionCommand(elevator, wrist);
+        return new WaitCommand(0.5).deadlineFor(new NarwhalWristTransitPosition(wrist)).andThen(new NarwhalElevatorTransitPosition(elevator));
     }
 
     /**
@@ -173,7 +176,7 @@ public class NarwhalUpperAssembly extends UpperAssemblyBase {
     public Command getManualCommand(XboxController controller) {
         NarwhalManualIntakeOuttakeCommand narwhalManualIntakeOuttakeCommand = new NarwhalManualIntakeOuttakeCommand(intakeOuttake, controller, elevator::getCurrentState);
         NarwhalManualWristCommand narwhalManualWristCommand = new NarwhalManualWristCommand(wrist, controller);
-        NarwhalManualElevatorCommand narwhalManualElevatorCommand = new NarwhalManualElevatorCommand(elevator, controller);
+        NarwhalManualElevatorCommand narwhalManualElevatorCommand = new NarwhalManualElevatorCommand(elevator, controller, () -> {return wrist.isAtPos(Rotation2d.fromRadians(0), Rotation2d.fromRadians(Math.PI));});
         NarwhalManualClimberCommand narwhalManualClimberCommand = new NarwhalManualClimberCommand(climber, controller);
 
         ParallelCommandGroup manualParallelCommandGroup = new ParallelCommandGroup(

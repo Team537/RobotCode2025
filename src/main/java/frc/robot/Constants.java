@@ -372,7 +372,7 @@ public final class Constants {
             public static double POSITION_FF_G = 0.0;
             public static double POSITION_FF_G_RANGE_MAX_VOLTAGE = 4.0;
             public static double POSITION_FF_G_RANGE_MIN_VOLTAGE = -4.0;
-            public static final Rotation2d PID_TOLERANCE = Rotation2d.fromDegrees(8);
+            public static final Rotation2d PID_TOLERANCE = Rotation2d.fromDegrees(16);
 
             public static final Rotation2d WRIST_FEEDFORWARD_OFFSET_ANGLE = Rotation2d.fromDegrees(20); // This is the offset of the center of mass of the wrist from the zero position (x-axis) 
 

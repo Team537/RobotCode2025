@@ -144,7 +144,16 @@ public class NarwhalWrist extends SubsystemBase {
         setCurrentMotorAngle(NarwhalWristConstants.INTAKE_ANGLE);
         currentState = NarwhalWristState.INTAKING; // must be after the set function because the set function will default to CUSTOM state
     }
+
+    /**
+     * Checks if the wrist is being pos1 and pos2
+     * @param height
+     */
     
+     public boolean isAtPos(Rotation2d pos1, Rotation2d pos2){
+        return pos1.getRadians() < this.wrist.getEncoder().getPosition() && this.wrist.getEncoder().getPosition() < pos2.getRadians();
+     }
+
     /**
      * Set the wrist motor to the angle for the specified scoring height.
      *
