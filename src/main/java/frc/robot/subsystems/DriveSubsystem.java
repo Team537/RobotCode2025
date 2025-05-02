@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -204,7 +205,7 @@ public class DriveSubsystem extends SubsystemBase {
         // pathfinder.setAvailableCameraOffsets(VisionConstants.AVAILABLE_CAMERA_OFFSETS);
         // pathfinder.setWeights(DriveConstants.SENTINEL_DISTANCE_WEIGHT, DriveConstants.SENTINEL_ORIENTATION_WEIGHT);
         // Pathfinding.ensureInitialized();
-        // PathfindingCommand.warmupCommand();
+        PathfindingCommand.warmupCommand();
 
         // Setup thresholds
         this.translationThreshold = DriveConstants.TRANSLATION_THRESHOLD;

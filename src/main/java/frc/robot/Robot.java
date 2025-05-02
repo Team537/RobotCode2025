@@ -87,12 +87,8 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().cancelAll();
         robotContainer.scheduleAutonomous();
 
-        frc537StringLog.append("Autonomous Init\n");
+        //frc537StringLog.append("Autonomous Init\n");
 
-        // schedule the autonomous command (example)
-        if (autonomousCommand != null) {
-            autonomousCommand.schedule();
-        }
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
