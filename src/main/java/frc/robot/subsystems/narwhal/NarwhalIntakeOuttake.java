@@ -127,8 +127,7 @@ public class NarwhalIntakeOuttake extends SubsystemBase {
      * @return boolean
      */
     public boolean isCoralSensorTriggered(){
-        // return !intakeSensor.get(); // negated so that true means it is pressed, and false means it is not
-        return false; // disabled
+        return !intakeSensor.get(); // negated so that true means it is pressed, and false means it is not
     }
     
     @Override

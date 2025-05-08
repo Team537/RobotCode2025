@@ -180,123 +180,92 @@ public class RobotContainer {
      * Creates and schedules the selected autonomous routine. 
      */
     public void scheduleAutonomous() {
-        //this.setWristValuesFromSmartDashbaord();
-        //this.delayTimeSeconds = SmartDashboard.getNumber("Auto Delay", this.delayTimeSeconds);
-        //this.startWithTushPush = SmartDashboard.getBoolean("Tush Push Mode", this.startWithTushPush);
+        this.setWristValuesFromSmartDashbaord();
+        this.delayTimeSeconds = SmartDashboard.getNumber("Auto Delay", this.delayTimeSeconds);
+        this.startWithTushPush = SmartDashboard.getBoolean("Tush Push Mode", this.startWithTushPush);
 
-        //double autoScoreOffsetX = SmartDashboard.getNumber("Auto Score Offset X", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getX());
-        //double autoScoreOffsetY = SmartDashboard.getNumber("Auto Score Offset Y", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getY());
-        //double autoScoreOffsetRot = SmartDashboard.getNumber("Auto Score Offset Rot", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getRotation().getDegrees());
+        double autoScoreOffsetX = SmartDashboard.getNumber("Auto Score Offset X", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getX());
+        double autoScoreOffsetY = SmartDashboard.getNumber("Auto Score Offset Y", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getY());
+        double autoScoreOffsetRot = SmartDashboard.getNumber("Auto Score Offset Rot", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getRotation().getDegrees());
 
-        //NarwhalConstants.SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(autoScoreOffsetX, autoScoreOffsetY), Rotation2d.fromDegrees(autoScoreOffsetRot));
+        NarwhalConstants.SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(autoScoreOffsetX, autoScoreOffsetY), Rotation2d.fromDegrees(autoScoreOffsetRot));
 
-        // Set the kraken drive motor`s PID coefficients to the specified values.
-        // double driveKp = SmartDashboard.getNumber("Kraken Kp", DriveConstants.KrakenX60Driving.KP);
-        // double driveKi = SmartDashboard.getNumber("Kraken Ki", DriveConstants.KrakenX60Driving.KI);
-        // double driveKd = SmartDashboard.getNumber("Kraken Kd", DriveConstants.KrakenX60Driving.KD);
+        // --- Section: Get routine/alliance selections
+        AutonomousRoutine autonomousRoutine = autonomousSelector.getSelected();
+        Alliance alliance = allianceSelector.getSelected();
 
-        // this.driveSubsystem.setDriveMotorPIDCoefficients(driveKp, driveKi, driveKd);
-        
-        // Get and set the path follower`s PID coefficients.
-        // double followerKp = SmartDashboard.getNumber("Drive Kp", DriveConstants.LINEAR_KP);
-        // double followerKi = SmartDashboard.getNumber("Drive Ki", DriveConstants.LINEAR_KI);
-        // double followerKd = SmartDashboard.getNumber("Drive Kd", DriveConstants.LINEAR_KD);
-  
-        // this.driveSubsystem.setFollowerPIDCoefficients(followerKp, followerKi, followerKd);
+        // --- Section: Subsystem setup
+        driveSubsystem.setConfigs();
 
-        // Set the thresholds for autonomous pathing.
-        // double translationalThreshold = SmartDashboard.getNumber("Translational Threshold", DriveConstants.TRANSLATION_THRESHOLD);
-        // double rotationalThreshold = SmartDashboard.getNumber("Rotational Threshold", DriveConstants.ROTATION_THRESHOLD);
+        upperAssembly.setRobotInScoringPositionSupplier(driveSubsystem::getInScorePose);
+        upperAssembly.setRobotInIntakingPositionSupplier(driveSubsystem::getInIntakePose);
+        if (upperAssembly instanceof NarwhalUpperAssembly) {
+            ((NarwhalUpperAssembly)upperAssembly).setCanRaiseLiftSupplier(driveSubsystem::getNarwhalCanRaiseLift);
+        }
 
-        // this.driveSubsystem.setThresholds(translationalThreshold, rotationalThreshold);
+        // --- Section: Starting pose
+        Pose2d startingPose;
+        switch (autonomousRoutine) {
+            case LEFT:
+                startingPose = StartingPosition.LEFT.getPose(alliance);
+                break;
+            case CENTER:
+                startingPose = StartingPosition.CENTER.getPose(alliance);
+                break;
+            case RIGHT:
+                startingPose = StartingPosition.RIGHT.getPose(alliance);
+                break;
+            default:
+                System.err.println("[System]: No alliance starting position selected!");
+                startingPose = null;
+                break;
+        }
 
-        long startTime = System.currentTimeMillis();
-System.out.println("[Timer] Starting scheduleAutonomous...");
+        if (startWithTushPush && startingPose != null) {
+            startingPose = startingPose.transformBy(FieldConstants.StartingPoseConstants.TUSH_PUSH_STARTING_TRANSFORM);
+        }
 
-// --- Section: Get routine/alliance selections
-AutonomousRoutine autonomousRoutine = autonomousSelector.getSelected();
-Alliance alliance = allianceSelector.getSelected();
-System.out.println("[Timer] After getting selections: " + (System.currentTimeMillis() - startTime) + " ms");
+        // --- Section: Set robot pose
+        if (startingPose != null) {
+            driveSubsystem.setRobotPose(startingPose);
+        }
 
-// --- Section: Subsystem setup
-driveSubsystem.setConfigs();
-System.out.println("[Timer] After driveSubsystem.setConfigs(): " + (System.currentTimeMillis() - startTime) + " ms");
+        // --- Section: Build autonomous command
+        Command locationRoutine;
+        switch (autonomousRoutine) {
+            case LEFT:
+            case RIGHT:
+                locationRoutine = MultiScoreRoutine.getCommand(
+                    autonomousRoutine == AutonomousRoutine.LEFT ? StartingPosition.LEFT : StartingPosition.RIGHT,
+                    alliance,
+                    driveSubsystem,
+                    upperAssembly
+                );
+                break;
+            case CENTER:
+                locationRoutine = CenterScoreRoutine.getCommand(alliance, driveSubsystem, upperAssembly);
+                break;
+            default:
+                locationRoutine = new InstantCommand();
+                break;
+        }
 
-upperAssembly.setRobotInScoringPositionSupplier(driveSubsystem::getInScorePose);
-upperAssembly.setRobotInIntakingPositionSupplier(driveSubsystem::getInIntakePose);
-if (upperAssembly instanceof NarwhalUpperAssembly) {
-    ((NarwhalUpperAssembly)upperAssembly).setCanRaiseLiftSupplier(driveSubsystem::getNarwhalCanRaiseLift);
-}
-System.out.println("[Timer] After upperAssembly setup: " + (System.currentTimeMillis() - startTime) + " ms");
+        Command autonomousCommand;
+        if (startWithTushPush && startingPose != null) {
+            autonomousCommand = driveSubsystem.getDriveToPoseCommand(
+                startingPose.transformBy(FieldConstants.StartingPoseConstants.TUSH_PUSH_TRANSFORM)
+            ).andThen(locationRoutine);
+        } else {
+            autonomousCommand = locationRoutine;
+        }
 
-// --- Section: Starting pose
-Pose2d startingPose;
-switch (autonomousRoutine) {
-    case LEFT:
-        startingPose = StartingPosition.LEFT.getPose(alliance);
-        break;
-    case CENTER:
-        startingPose = StartingPosition.CENTER.getPose(alliance);
-        break;
-    case RIGHT:
-        startingPose = StartingPosition.RIGHT.getPose(alliance);
-        break;
-    default:
-        System.err.println("[System]: No alliance starting position selected!");
-        startingPose = null;
-        break;
-}
-System.out.println("[Timer] After starting pose determination: " + (System.currentTimeMillis() - startTime) + " ms");
+        // --- Section: Delay + schedule
+        if (this.delayTimeSeconds > 0) {
+            new WaitCommand(this.delayTimeSeconds).andThen(autonomousCommand).schedule();
+        } else {
+            autonomousCommand.schedule();
+        }
 
-if (startWithTushPush && startingPose != null) {
-    startingPose = startingPose.transformBy(FieldConstants.StartingPoseConstants.TUSH_PUSH_STARTING_TRANSFORM);
-}
-System.out.println("[Timer] After optional tush push transform: " + (System.currentTimeMillis() - startTime) + " ms");
-
-// --- Section: Set robot pose
-if (startingPose != null) {
-    driveSubsystem.setRobotPose(startingPose);
-}
-System.out.println("[Timer] After driveSubsystem.setRobotPose: " + (System.currentTimeMillis() - startTime) + " ms");
-
-// --- Section: Build autonomous command
-Command locationRoutine;
-switch (autonomousRoutine) {
-    case LEFT:
-    case RIGHT:
-        locationRoutine = MultiScoreRoutine.getCommand(
-            autonomousRoutine == AutonomousRoutine.LEFT ? StartingPosition.LEFT : StartingPosition.RIGHT,
-            alliance,
-            driveSubsystem,
-            upperAssembly
-        );
-        break;
-    case CENTER:
-        locationRoutine = CenterScoreRoutine.getCommand(alliance, driveSubsystem, upperAssembly);
-        break;
-    default:
-        locationRoutine = new InstantCommand();
-        break;
-}
-System.out.println("[Timer] After locationRoutine creation: " + (System.currentTimeMillis() - startTime) + " ms");
-
-Command autonomousCommand;
-if (startWithTushPush && startingPose != null) {
-    autonomousCommand = driveSubsystem.getDriveToPoseCommand(
-        startingPose.transformBy(FieldConstants.StartingPoseConstants.TUSH_PUSH_TRANSFORM)
-    ).andThen(locationRoutine);
-} else {
-    autonomousCommand = locationRoutine;
-}
-System.out.println("[Timer] After building full autonomousCommand: " + (System.currentTimeMillis() - startTime) + " ms");
-
-// --- Section: Delay + schedule
-if (this.delayTimeSeconds > 0) {
-    new WaitCommand(this.delayTimeSeconds).andThen(autonomousCommand).schedule();
-} else {
-    autonomousCommand.schedule();
-}
-System.out.println("[Timer] After scheduling: " + (System.currentTimeMillis() - startTime) + " ms");
     }
 
     /**
