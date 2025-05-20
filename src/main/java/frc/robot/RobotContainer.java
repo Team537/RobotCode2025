@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.OceanViewConstants;
 import frc.robot.Constants.OperatorConstants;
@@ -14,11 +15,13 @@ import frc.robot.network.UDPReceiver;
 import frc.robot.routines.CenterScoreRoutine;
 import frc.robot.routines.MultiScoreRoutine;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.LEDManager;
 import frc.robot.subsystems.narwhal.NarwhalUpperAssembly;
 import frc.robot.subsystems.upper_assembly.UpperAssemblyBase;
 import frc.robot.subsystems.vision.OceanViewManager;
 import frc.robot.subsystems.vision.odometry.VisionOdometry;
 import frc.robot.util.EnumPrettifier;
+import frc.robot.util.LEDs.LEDConfiguration;
 import frc.robot.util.autonomous.Alliance;
 import frc.robot.util.autonomous.AutonomousRoutine;
 import frc.robot.util.autonomous.StartingPosition;
@@ -86,6 +89,8 @@ public class RobotContainer {
 
         // Setup Dashboard
         setupSmartDashboard();
+
+        LEDManager.initialize(LEDConstants.LED_ID, LEDConstants.STRIP_TOTAL_LENGTH);
     }
 
     /**
