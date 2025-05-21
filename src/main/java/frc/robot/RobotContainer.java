@@ -227,6 +227,7 @@ public class RobotContainer {
 
         // --- Section: Set robot pose
         if (startingPose != null) {
+            System.out.println("Robot start position: (" + startingPose.getX() + ", " + startingPose.getY() + ")");
             driveSubsystem.setRobotPose(startingPose);
         }
 
@@ -246,6 +247,7 @@ public class RobotContainer {
                 locationRoutine = CenterScoreRoutine.getCommand(alliance, driveSubsystem, upperAssembly);
                 break;
             default:
+                System.err.println("No routine selected; running empty starting command");
                 locationRoutine = new InstantCommand();
                 break;
         }
@@ -261,11 +263,11 @@ public class RobotContainer {
 
         // --- Section: Delay + schedule
         if (this.delayTimeSeconds > 0) {
+            System.out.println("Waiting " + this.delayTimeSeconds + " seconds before starting auto");
             new WaitCommand(this.delayTimeSeconds).andThen(autonomousCommand).schedule();
         } else {
             autonomousCommand.schedule();
         }
-
     }
 
     /**
