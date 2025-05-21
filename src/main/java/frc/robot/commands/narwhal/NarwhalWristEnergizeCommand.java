@@ -1,7 +1,6 @@
 package frc.robot.commands.narwhal;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.narwhal.NarwhalElevator;
 import frc.robot.subsystems.narwhal.NarwhalWrist;
 
 /**
