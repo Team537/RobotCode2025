@@ -20,6 +20,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -34,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Configs;
 import frc.robot.Constants.Defaults;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants.CoralStationConstants;
@@ -490,7 +492,8 @@ public class DriveSubsystem extends SubsystemBase {
         }
 
         if (upperAssemblyType == UpperAssemblyType.NARWHAL || upperAssemblyType == UpperAssemblyType.NONE) {
-            targetPose = targetPose.transformBy(NarwhalConstants.SCORING_RELATIVE_TRANSFORM);
+            Translation2d positionOffset = Configs.Offsets.CORAL_SCORE_POSITION_OFFSETS.get(location);
+            targetPose = targetPose.transformBy(new Transform2d(positionOffset, Rotation2d.kZero));
         }
 
         System.out.println("Going to drive to position ("+ targetPose.getX() + ", " + targetPose.getY() + ')');
@@ -502,7 +505,6 @@ public class DriveSubsystem extends SubsystemBase {
             ).andThen(
                 new InstantCommand(() -> {inScorePose = true;})
             );
-            
     }
 
     /**

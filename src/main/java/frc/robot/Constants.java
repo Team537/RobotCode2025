@@ -317,7 +317,6 @@ public final class Constants {
         public static final double UPPER_ASSEMBLY_MOI = 0.995; //Kg m^2
 
         public static final Transform2d INTAKING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0, -0.019), Rotation2d.kPi);
-        public static Transform2d SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.4, 0.019), Rotation2d.kZero);
         public static final Transform2d ALGAE_REMOVAL_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0, -0.019), Rotation2d.kZero);
         public static final Transform2d CLIMB_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(0.0,0.0), Rotation2d.kPi);
  
