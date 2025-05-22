@@ -20,7 +20,7 @@ public abstract class ManualDriveCommand extends Command {
     /**
      * The rotational offset of the driver
      */
-    private Rotation2d driverRotationalOffset = new Rotation2d(0.0);
+    private Rotation2d driverRotationalOffset = Rotation2d.kZero;
 
     /**
      * Indicates whether target translation is active.
@@ -55,7 +55,7 @@ public abstract class ManualDriveCommand extends Command {
     /**
      * The rotation (angle) where the robot is locked.
      */
-    // private Rotation2d thetaLockRotation = new Rotation2d(0.0);
+    // private Rotation2d thetaLockRotation = Rotation2d.kZero;
     
     /**
      * Tracks whether rotational velocity has been reset.
@@ -70,7 +70,7 @@ public abstract class ManualDriveCommand extends Command {
     /**
      * The origin angle for target rotation calculations.
      */
-    private Rotation2d targetRotationOrigin = new Rotation2d(0.0);
+    private Rotation2d targetRotationOrigin = Rotation2d.kZero;
 
     /**
      * Creates a new manual drive command to allow for the robot to be controlled manually during teleop.
