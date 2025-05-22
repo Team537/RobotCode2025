@@ -148,8 +148,8 @@ public class RobotContainer {
 
         // Add autonomous configuration options.
         for (var offset : Configs.Offsets.CORAL_SCORE_POSITION_OFFSETS.entrySet()) {
-            SmartDashboard.putNumber("Auto Score " + offset.getKey().toString() + " Offset X", offset.getValue().getX());
-            SmartDashboard.putNumber("Auto Score " + offset.getKey().toString() + " Offset Y", offset.getValue().getY());
+            SmartDashboard.putNumber("Reef " + offset.getKey().toString() + " Offset X", offset.getValue().getX());
+            SmartDashboard.putNumber("Reef " + offset.getKey().toString() + " Offset Y", offset.getValue().getY());
         }
 
         SmartDashboard.putNumber("Kraken Kp", DriveConstants.KrakenX60Driving.KP);
@@ -188,8 +188,8 @@ public class RobotContainer {
             var key = offset.getKey();
             var value = offset.getValue();
             value = new Translation2d(
-                SmartDashboard.getNumber("Auto Score " + key.toString() + " Offset X", value.getX()),
-                SmartDashboard.getNumber("Auto Score " + key.toString() + " Offset Y", value.getY())
+                SmartDashboard.getNumber("Reef " + key.toString() + " Offset X", value.getX()),
+                SmartDashboard.getNumber("Reef " + key.toString() + " Offset Y", value.getY())
             );
         }
 
