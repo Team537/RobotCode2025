@@ -42,9 +42,9 @@ public class LEDManager {
     public static LEDManager getInstance() {
         if (instance == null) {
             throw new IllegalStateException("LEDManager has not been initialized. Call initialize() first.");
-        } else {
-            return instance;
         }
+
+        return instance;
     }
 
     /**
