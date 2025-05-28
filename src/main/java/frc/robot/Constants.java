@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -559,6 +560,8 @@ public final class Constants {
         public static final Transform3d RIGHT_CAMERA_OFFSET = new Transform3d(0.219837, 0.1762252, 0.65913, new Rotation3d(0, 0, Math.PI / 2.0 )); 
         public static final Transform3d LEFT_CAMERA_OFFSET = new Transform3d(-0.219837, 0.1760728, 0.65913, new Rotation3d(0, 0, -Math.PI / 2.0)); 
 
+        public static final Transform2d QUESTNAV_OFFSET = new Transform2d(0.0,0.0,Rotation2d.kZero);
+
         public static final List<Rotation2d> AVAILABLE_CAMERA_OFFSETS = List.of(
             new Rotation2d(FRONT_CAMERA_OFFSET.getRotation().getMeasureZ())
         );
@@ -568,6 +571,11 @@ public final class Constants {
         };
         
         public static final Matrix<N3, N1> VISION_STANDARD_DEVIATION = new Matrix<>(N3.instance, N1.instance, VISION_STANDARD_DEVIATION_COEFFICIENTS);
+        public static final Matrix<N3, N1> QUESTNAV_STANDARD_DEVIATION = VecBuilder.fill(
+            0.02,
+            0.02,
+            0.035
+        );
 
         // Pipeline settings
         public static final int APRIL_TAG_PIPELINE = 0;
