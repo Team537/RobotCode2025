@@ -27,7 +27,6 @@ import frc.robot.util.upper_assembly.UpperAssemblyFactory;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -148,9 +147,10 @@ public class RobotContainer {
         SmartDashboard.putNumber("Deploy Rotations (degrees)", NarwhalConstants.NarwhalClimberConstants.DEPLOYED_WINCH_ROTATIONS.getDegrees());
 
         // Add autonomous configuration options.
-        SmartDashboard.putNumber("Auto Score Offset X", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getX());
-        SmartDashboard.putNumber("Auto Score Offset Y", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getY());
-        SmartDashboard.putNumber("Auto Score Offset Rot", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getRotation().getDegrees());
+        for (var offset : Configs.Offsets.CORAL_SCORE_POSITION_OFFSETS.entrySet()) {
+            SmartDashboard.putNumber("Reef " + offset.getKey().toString() + " Offset X", offset.getValue().getX());
+            SmartDashboard.putNumber("Reef " + offset.getKey().toString() + " Offset Y", offset.getValue().getY());
+        }
 
         SmartDashboard.putNumber("Kraken Kp", DriveConstants.KrakenX60Driving.KP);
         SmartDashboard.putNumber("Kraken Ki", DriveConstants.KrakenX60Driving.KI);
@@ -184,11 +184,16 @@ public class RobotContainer {
         this.delayTimeSeconds = SmartDashboard.getNumber("Auto Delay", this.delayTimeSeconds);
         this.startWithTushPush = SmartDashboard.getBoolean("Tush Push Mode", this.startWithTushPush);
 
-        double autoScoreOffsetX = SmartDashboard.getNumber("Auto Score Offset X", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getX());
-        double autoScoreOffsetY = SmartDashboard.getNumber("Auto Score Offset Y", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getY());
-        double autoScoreOffsetRot = SmartDashboard.getNumber("Auto Score Offset Rot", NarwhalConstants.SCORING_RELATIVE_TRANSFORM.getRotation().getDegrees());
+        for (var offset : Configs.Offsets.CORAL_SCORE_POSITION_OFFSETS.entrySet()) {
+            var key = offset.getKey();
+            var value = offset.getValue();
+            value = new Translation2d(
+                SmartDashboard.getNumber("Reef " + key.toString() + " Offset X", value.getX()),
+                SmartDashboard.getNumber("Reef " + key.toString() + " Offset Y", value.getY())
+            );
+            Configs.Offsets.CORAL_SCORE_POSITION_OFFSETS.put(key, value);
+        }
 
-        NarwhalConstants.SCORING_RELATIVE_TRANSFORM = new Transform2d(new Translation2d(autoScoreOffsetX, autoScoreOffsetY), Rotation2d.fromDegrees(autoScoreOffsetRot));
 
         // --- Section: Get routine/alliance selections
         AutonomousRoutine autonomousRoutine = autonomousSelector.getSelected();

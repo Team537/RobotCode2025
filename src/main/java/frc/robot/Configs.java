@@ -1,13 +1,17 @@
 package frc.robot;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.util.field.ReefScoringLocation;
 
 public final class Configs {
-    
     public static final class Swerve {
 
         public static final class Driving {
@@ -147,20 +151,24 @@ public final class Configs {
                 NEO_550_TURNING_CONFIG
                     .idleMode(DriveConstants.Neo550Turning.IDLE_MODE)
                     .smartCurrentLimit(DriveConstants.Neo550Turning.CURRENT_LIMIT);
-
             }
-
         }
-
-
     }
 
-    public static final class Squid {
-
+    public static final class Offsets {
+        public static Map<ReefScoringLocation, Translation2d> CORAL_SCORE_POSITION_OFFSETS = new HashMap<>(Map.ofEntries(
+            Map.entry(ReefScoringLocation.A, Translation2d.kZero),
+            Map.entry(ReefScoringLocation.B, Translation2d.kZero),
+            Map.entry(ReefScoringLocation.C, Translation2d.kZero),
+            Map.entry(ReefScoringLocation.D, Translation2d.kZero),
+            Map.entry(ReefScoringLocation.E, Translation2d.kZero),
+            Map.entry(ReefScoringLocation.F, Translation2d.kZero),
+            Map.entry(ReefScoringLocation.G, Translation2d.kZero),
+            Map.entry(ReefScoringLocation.H, new Translation2d(0.4, 0.019)), // H is our Center Score
+            Map.entry(ReefScoringLocation.I, Translation2d.kZero),
+            Map.entry(ReefScoringLocation.J, new Translation2d(0, 0.1)),
+            Map.entry(ReefScoringLocation.K, new Translation2d(-0.1, 0)),
+            Map.entry(ReefScoringLocation.L, Translation2d.kZero)
+        ));
     }
-
-    public static final class Narwhal {
-
-    }
-
 }

@@ -34,7 +34,7 @@ public class NarwhalClimber extends SubsystemBase {
     private final SparkMax climber;
     private final SparkMaxConfig climberConfig;
     private final SparkClosedLoopController climberPID;
-    private Rotation2d currentTarget = new Rotation2d(0);
+    private Rotation2d currentTarget = Rotation2d.kZero;
     
     /**
      * Creates a new instance of the NarwhalClimber class, setting up all necessary hardware in the process.
