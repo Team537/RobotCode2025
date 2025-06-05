@@ -28,7 +28,11 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.event.NetworkBooleanEvent;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -945,6 +949,17 @@ public class DriveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Theta Rotation", getRobotPose().getRotation().getRadians());
     }
 
+    StructArrayPublisher<SwerveModuleState> targetStatesPublisher = NetworkTableInstance.getDefault()
+.getStructArrayTopic("TargetStates", SwerveModuleState.struct).publish();
+    StructArrayPublisher<SwerveModuleState> statesPublisher = NetworkTableInstance.getDefault()
+.getStructArrayTopic("States", SwerveModuleState.struct).publish();
+    StructPublisher<ChassisSpeeds> targetSpeedsPublisher = NetworkTableInstance.getDefault()
+.getStructTopic("TargetSpeeds", ChassisSpeeds.struct).publish();
+    StructPublisher<ChassisSpeeds> speedsPublisher = NetworkTableInstance.getDefault()
+.getStructTopic("Speeds", ChassisSpeeds.struct).publish();
+    StructPublisher<Pose2d> posePublisher = NetworkTableInstance.getDefault()
+    .getStructTopic("Pose",Pose2d.struct).publish();
+
     /**
      * Periodically updates the drive subsystem.
      * <p>
@@ -960,6 +975,12 @@ public class DriveSubsystem extends SubsystemBase {
     public void periodic() {
         // Update module states using the target velocities.
         setModules(targetVelocities);
+
+        targetStatesPublisher.set(setpoint.moduleStates());
+        statesPublisher.set(getSwerveModuleStates());
+        targetSpeedsPublisher.set(ChassisSpeeds.fromFieldRelativeSpeeds(targetVelocities,getRobotPose().getRotation()));
+        speedsPublisher.set(DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(getSwerveModuleStates()));
+        posePublisher.set(getRobotPose());
 
         // Refresh dynamic pathfinding obstacles.
         /*pathfindingObstacles.clear();
