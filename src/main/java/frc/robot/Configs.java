@@ -1,5 +1,6 @@
 package frc.robot;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -155,7 +156,7 @@ public final class Configs {
     }
 
     public static final class Offsets {
-        public static Map<ReefScoringLocation, Translation2d> CORAL_SCORE_POSITION_OFFSETS = Map.ofEntries(
+        public static Map<ReefScoringLocation, Translation2d> CORAL_SCORE_POSITION_OFFSETS = new HashMap<>(Map.ofEntries(
             Map.entry(ReefScoringLocation.A, Translation2d.kZero),
             Map.entry(ReefScoringLocation.B, Translation2d.kZero),
             Map.entry(ReefScoringLocation.C, Translation2d.kZero),
@@ -165,9 +166,9 @@ public final class Configs {
             Map.entry(ReefScoringLocation.G, Translation2d.kZero),
             Map.entry(ReefScoringLocation.H, new Translation2d(0.4, 0.019)), // H is our Center Score
             Map.entry(ReefScoringLocation.I, Translation2d.kZero),
-            Map.entry(ReefScoringLocation.J, Translation2d.kZero),
-            Map.entry(ReefScoringLocation.K, Translation2d.kZero),
+            Map.entry(ReefScoringLocation.J, new Translation2d(0, 0.1)),
+            Map.entry(ReefScoringLocation.K, new Translation2d(-0.1, 0)),
             Map.entry(ReefScoringLocation.L, Translation2d.kZero)
-        );
+        ));
     }
 }

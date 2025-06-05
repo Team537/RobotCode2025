@@ -103,7 +103,7 @@ public final class Constants {
             0.006611986432, 0.3500199104, 0
         };
 
-        public static final double AUTO_DRIVING_TRANSLATIONAL_SPEED_SAFETY_FACTOR = 0.15;
+        public static final double AUTO_DRIVING_TRANSLATIONAL_SPEED_SAFETY_FACTOR = 0.1;
         public static final double AUTO_DRIVING_TRANSLATIONAL_ACCELERATION_SAFETY_FACTOR = 0.4;
         public static final double AUTO_DRIVING_ROTATIONAL_SPEED_SAFETY_FACTOR = 0.25;
         public static final double AUTO_DRIVING_ROTATIONAL_ACCELERATION_FACTOR = 0.5;

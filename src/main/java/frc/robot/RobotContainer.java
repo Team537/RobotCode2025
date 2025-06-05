@@ -191,7 +191,9 @@ public class RobotContainer {
                 SmartDashboard.getNumber("Reef " + key.toString() + " Offset X", value.getX()),
                 SmartDashboard.getNumber("Reef " + key.toString() + " Offset Y", value.getY())
             );
+            Configs.Offsets.CORAL_SCORE_POSITION_OFFSETS.put(key, value);
         }
+
 
         // --- Section: Get routine/alliance selections
         AutonomousRoutine autonomousRoutine = autonomousSelector.getSelected();
