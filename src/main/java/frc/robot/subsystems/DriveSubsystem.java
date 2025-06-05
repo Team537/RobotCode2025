@@ -16,6 +16,7 @@ import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -31,6 +32,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -41,7 +43,10 @@ import frc.robot.Constants.FieldConstants.ReefConstants;
 import frc.robot.Constants.NarwhalConstants;
 import frc.robot.Constants.SquidConstants;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.commands.DriveToPoseCommand;
+import frc.robot.commands.DriveToRotationCommand;
+import frc.robot.commands.DriveToTranslationCommand;
+import frc.robot.commands.DriveWithRotationalVelocityCommand;
+import frc.robot.commands.DriveWithTranslationalVelocityCommand;
 import frc.robot.commands.XboxManualDriveCommand;
 import frc.robot.util.math.DeltaTime;
 import frc.robot.util.swerve.DriveState;
@@ -53,7 +58,6 @@ import frc.robot.util.field.CoralStationSide;
 import frc.robot.util.field.ReefScoringLocation;
 import frc.robot.util.swerve.TurningMotorType;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
-import frc.robot.util.math.Vector2d;
 
 /**
  * <h2> DriveSubsystem </h2>
@@ -66,6 +70,79 @@ import frc.robot.util.math.Vector2d;
  * @see {@link edu.wpi.first.wpilibj2.command.SubsystemBase}
  */
 public class DriveSubsystem extends SubsystemBase {
+
+    //////////////////////////////////////////////////////////////////////////////
+    // Component Subsystems
+    //////////////////////////////////////////////////////////////////////////////
+
+    public class TranslationalSubsystem extends SubsystemBase {
+
+        // Stores the current target translational velocity in meters per second (robot-relative)
+        private Translation2d translationalVelocity = Translation2d.kZero;
+    
+        /**
+         * Returns the current target translational velocity.
+         * <p>
+         * This represents the desired velocity of the robot in the XY plane,
+         * typically set by a command such as autonomous movement or teleop control.
+         * </p>
+         *
+         * @return the robot-relative translational velocity in meters per second
+         */
+        public Translation2d getTargetTranslationalVelocity() {
+            return translationalVelocity;
+        }
+    
+        /**
+         * Sets the target translational velocity.
+         * <p>
+         * This value is usually set continuously by a velocity control command.
+         * It represents how fast and in what direction the robot should move along the field.
+         * </p>
+         *
+         * @param velocity the desired robot-relative translational velocity in meters per second
+         */
+        public void setTargetTranslationalVelocity(Translation2d velocity) {
+            translationalVelocity = velocity;
+        }
+    }
+    
+
+    public class RotationalSubsystem extends SubsystemBase {
+
+        // Stores the current target rotational velocity in radians per second (counterclockwise positive)
+        private double rotationalVelocity = 0.0;
+    
+        /**
+         * Returns the current target rotational velocity.
+         * <p>
+         * This represents how quickly the robot should rotate in place.
+         * Positive values typically indicate counterclockwise rotation.
+         * </p>
+         *
+         * @return the angular velocity in radians per second
+         */
+        public double getTargetRotationalVelocity() {
+            return rotationalVelocity;
+        }
+    
+        /**
+         * Sets the target rotational velocity.
+         * <p>
+         * This value is typically set continuously by a velocity control command
+         * during teleop or autonomous driving.
+         * </p>
+         *
+         * @param velocity the desired angular velocity in radians per second
+         */
+        public void setTargetRotationalVelocity(double velocity) {
+            rotationalVelocity = velocity;
+        }
+    }
+
+    // Creating the Component Subsystems
+    TranslationalSubsystem translationalSubsystem = new TranslationalSubsystem();
+    RotationalSubsystem rotationalSubsystem = new RotationalSubsystem();
 
     //////////////////////////////////////////////////////////////////////////////
     // Swerve Modules
@@ -114,22 +191,19 @@ public class DriveSubsystem extends SubsystemBase {
     /** Gyroscope sensor for obtaining the robot's heading. */
     private Pigeon2 gyroscope = new Pigeon2(DriveConstants.GYROSCOPE_DEVICE_ID);
 
-    /** PID controllers for linear (X and Y) and rotational (theta) control. */
-    private PIDController xController = new PIDController(DriveConstants.LINEAR_KP, DriveConstants.LINEAR_KI, DriveConstants.LINEAR_KD);
-    private PIDController yController = new PIDController(DriveConstants.LINEAR_KP, DriveConstants.LINEAR_KI, DriveConstants.LINEAR_KD);
+    /** PID controllers for translational (X and Y) and rotational (theta) control. */
+    private PIDController xController = new PIDController(DriveConstants.TRANSLATIONAL_KP, DriveConstants.TRANSLATIONAL_KI, DriveConstants.TRANSLATIONAL_KD);
+    private PIDController yController = new PIDController(DriveConstants.TRANSLATIONAL_KP, DriveConstants.TRANSLATIONAL_KI, DriveConstants.TRANSLATIONAL_KD);
     private PIDController thetaController = new PIDController(DriveConstants.ROTATIONAL_KP, DriveConstants.ROTATIONAL_KI, DriveConstants.ROTATIONAL_KD);
 
     //////////////////////////////////////////////////////////////////////////////
     // Motion and Pose Estimation
     //////////////////////////////////////////////////////////////////////////////
 
-    /** The desired chassis speeds toward which the system will accelerate. */
-    private ChassisSpeeds targetVelocities = new ChassisSpeeds();
-
     /** The last chassis speeds actually commanded to the swerve modules. */
     private ChassisSpeeds commandedVelocities = new ChassisSpeeds();
 
-    private Supplier<Boolean> narwahlCanRemoveAlgaeSupplier = (() -> {return true;});
+    private Supplier<Boolean> narwhalCanRemoveAlgaeSupplier = (() -> {return true;});
 
     /**
      * Pose estimator for the robot’s position. Note: Although this is initialized via field
@@ -156,7 +230,7 @@ public class DriveSubsystem extends SubsystemBase {
     // private DeltaTime testTime = new DeltaTime(); Commented out due to lack of use.
 
     //////////////////////////////////////////////////////////////////////////////
-    // Motor and Assembly Configuration
+    // Motor and Upper Assembly Configuration
     //////////////////////////////////////////////////////////////////////////////
 
     private DrivingMotorType drivingMotorType = Defaults.DEFAULT_DRIVING_MOTOR;
@@ -178,7 +252,6 @@ public class DriveSubsystem extends SubsystemBase {
 
     private DeltaTime testTime = new DeltaTime();
 
-    // Temp 
     private double translationThreshold;
     private double rotationThreshold;
 
@@ -198,7 +271,7 @@ public class DriveSubsystem extends SubsystemBase {
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
         
         // Update all configuration settings (motor types, module configurations, etc.).
-        setConfigs();
+        setPathPlannerConfigs();
 
         // Pathfinding.setPathfinder(pathfinder);
         // pathfinder.setAvailableTags(AprilTagFields.k2025ReefscapeWelded, DriveConstants.AVAILABLE_SENTINEL_TAGS);
@@ -217,9 +290,9 @@ public class DriveSubsystem extends SubsystemBase {
     //////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Updates the swerve drive configurations including upper assembly, motor, module, and auto-builder settings.
+     * Updates the Path Planner configurations including upper assembly, motor, module, and auto-builder settings.
      */
-    public void setConfigs() {
+    public void setPathPlannerConfigs() {
 
         // IMU Configuration
         // Increase the gyroscope update speed. This puts it in sync with the rest of the code.
@@ -304,7 +377,7 @@ public class DriveSubsystem extends SubsystemBase {
 
         // --- Controller Configuration ---
         PPHolonomicDriveController controller = new PPHolonomicDriveController(
-                new PIDConstants(DriveConstants.LINEAR_KP, DriveConstants.LINEAR_KI, DriveConstants.LINEAR_KD),
+                new PIDConstants(DriveConstants.TRANSLATIONAL_KP, DriveConstants.TRANSLATIONAL_KI, DriveConstants.TRANSLATIONAL_KD),
                 new PIDConstants(DriveConstants.ROTATIONAL_KP, DriveConstants.ROTATIONAL_KI, DriveConstants.ROTATIONAL_KD)
         );
 
@@ -314,23 +387,23 @@ public class DriveSubsystem extends SubsystemBase {
         // Determine the effective radius of the drivetrain.
         double effectiveRadius = Math.hypot(DriveConstants.WHEEL_BASE / 2.0, DriveConstants.TRACK_WIDTH / 2.0);
 
-        // Compute maximum angular velocity and acceleration.
-        double maxAngularVelocity = maxDriveVelocity / effectiveRadius;
-        double maxAngularAcceleration = (DriveConstants.WHEEL_COEFFICIENT_FRICTION * DriveConstants.GRAVITY_ACCELERATION * robotMass * effectiveRadius) / robotMOI;
+        // Compute maximum rotational velocity and acceleration.
+        double maxRotationalVelocity = maxDriveVelocity / effectiveRadius;
+        double maxRotationalAcceleration = (DriveConstants.WHEEL_COEFFICIENT_FRICTION * DriveConstants.GRAVITY_ACCELERATION * robotMass * effectiveRadius) / robotMOI;
 
         // --- Swerve and Auto-Builder Configuration ---
         RobotConfig swerveConfig = new RobotConfig(robotMass, robotMOI, moduleConfig, DriveConstants.MODULE_POSITIONS.toArray(new Translation2d[0]));
         constraints = new PathConstraints(
             DriveConstants.AUTO_DRIVING_TRANSLATIONAL_SPEED_SAFETY_FACTOR * maxDriveVelocity, 
             DriveConstants.AUTO_DRIVING_TRANSLATIONAL_ACCELERATION_SAFETY_FACTOR * maxTranslationalAcceleration, 
-            DriveConstants.AUTO_DRIVING_ROTATIONAL_SPEED_SAFETY_FACTOR * maxAngularVelocity, 
-            DriveConstants.AUTO_DRIVING_ROTATIONAL_ACCELERATION_FACTOR * maxAngularAcceleration);
+            DriveConstants.AUTO_DRIVING_ROTATIONAL_SPEED_SAFETY_FACTOR * maxRotationalVelocity, 
+            DriveConstants.AUTO_DRIVING_ROTATIONAL_ACCELERATION_FACTOR * maxRotationalAcceleration);
 
         AutoBuilder.configure(
                 this::getRobotPose,                  // Supplier for current pose
                 this::setRobotPose,                  // Consumer to update pose
-                this::getChassisSpeeds,              // Supplier for chassis speeds
-                (chassisSpeeds, feedforward) -> driveRobotRelative(chassisSpeeds), // Drive command (field-relative)
+                this::getVelocity,              // Supplier for chassis speeds
+                (chassisSpeeds, feedforward) -> drivePositionalRobotRelative(chassisSpeeds), // Drive command (field-relative)
                 controller,                          // Holonomic drive controller
                 swerveConfig,                        // Swerve configuration
                 () -> false,                         // (Optional) condition for additional behavior
@@ -341,109 +414,337 @@ public class DriveSubsystem extends SubsystemBase {
         setpointGenerator = new SwerveSetpointGenerator(swerveConfig, maxTurningSpeed);
     }
 
-    /**
-     * sets the supplier for whether the drivetrain can move to remove algae from the reef
-     * @param supplier the supplier, that when true, will move the drivetrain.
-     */
-    public void setNarwhalCanRemoveAlgaeSupplier(Supplier<Boolean> supplier) {
-        narwahlCanRemoveAlgaeSupplier = supplier;
-    }
-
     //////////////////////////////////////////////////////////////////////////////
-    // Driving Command Methods
+    // Component Setup Methods
     //////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Commands the robot to drive in a field-relative manner.
-     *
-     * @param velocities the desired chassis speeds (m/s and rad/s)
-     */
-    public void drive(ChassisSpeeds velocities) {
-        targetVelocities = velocities;
+    * Sets the default command for the translational sub-subsystem.
+    * This command will run whenever no other command is using the translational subsystem.
+    *
+    * @param command the default command to run
+    */
+    public void setTranslationalDefaultCommand(Command command) {
+        translationalSubsystem.setDefaultCommand(command);
     }
 
     /**
-     * Commands the robot to drive using robot-relative speeds.
+     * Sets the default command for the rotational sub-subsystem.
+     * This command will run whenever no other command is using the rotational subsystem.
      *
-     * @param velocities the desired chassis speeds (m/s and rad/s)
+     * @param command the default command to run
      */
-    public void driveRobotRelative(ChassisSpeeds velocities) {
-        targetVelocities = ChassisSpeeds.fromRobotRelativeSpeeds(velocities, getRobotPose().getRotation());
+    public void setRotationalDefaultCommand(Command command) {
+        rotationalSubsystem.setDefaultCommand(command);
     }
 
-    /**
-     * Updates the states of the swerve modules based on the current target velocities.
-     *
-     * @param targetVelocities the desired chassis speeds (m/s and rad/s)
-     */
-    private void setModules(ChassisSpeeds targetVelocities) {
-        // Generate a new setpoint from the previous one.
-        setpoint = setpointGenerator.generateSetpoint(setpoint, ChassisSpeeds.fromFieldRelativeSpeeds(targetVelocities, getRobotPose().getRotation()), setpointDeltaTime.getDeltaTime());
+    //////////////////////////////////////////////////////////////////////////////
+    // Command Methods
+    //////////////////////////////////////////////////////////////////////////////
+    
+    @Deprecated
+    public Command getManualCommand(XboxController controller, Alliance alliance) {
+        return new XboxManualDriveCommand(this, controller, alliance);
+    }
 
-        // Update the record of commanded velocities.
-        commandedVelocities = ChassisSpeeds.fromRobotRelativeSpeeds(
-                DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(setpoint.moduleStates()),
-                getRobotPose().getRotation()
+    //////////////////////////////////////////////////////////////////////////////
+    // Velocity Commands
+    //////////////////////////////////////////////////////////////////////////////
+    
+    // ------------------------------
+    // Positional (ChassisSpeeds) Commands
+    // ------------------------------
+
+    /**
+     * Creates a command that drives the robot using both translational and rotational velocity.
+     * These velocities are supplied as a full ChassisSpeeds object.
+     * <p>
+     * The command runs two sub-commands in parallel:
+     * - One for handling field-relative translational movement (vx, vy)
+     * - One for handling rotational velocity (omega)
+     * </p>
+     * 
+     * @param velocitySupplier a supplier for ChassisSpeeds representing desired velocities (field-relative)
+     * @return a command that drives the robot using those velocities
+     */
+    public Command getPositionalVelocityCommand(Supplier<ChassisSpeeds> velocitySupplier) {
+        return new ParallelCommandGroup(
+            getTranslationalVelocityCommand(() -> 
+                new Translation2d(
+                    velocitySupplier.get().vxMetersPerSecond,
+                    velocitySupplier.get().vyMetersPerSecond
+                )
+            ),
+            getRotationalVelocityCommand(() -> 
+                velocitySupplier.get().omegaRadiansPerSecond
+            )
         );
-
-        // Command each swerve module with its new state.
-        frontLeftModule.setState(setpoint.moduleStates()[0]);
-        frontRightModule.setState(setpoint.moduleStates()[1]);
-        rearLeftModule.setState(setpoint.moduleStates()[2]);
-        rearRightModule.setState(setpoint.moduleStates()[3]);
     }
 
-    //////////////////////////////////////////////////////////////////////////////
-    // Feedback and Navigation Methods
-    //////////////////////////////////////////////////////////////////////////////
+    /**
+     * Creates a command that drives the robot using a fixed, field-relative translational and rotational velocity.
+     *
+     * @param velocity the fixed field-relative chassis speeds (vx, vy, omega)
+     * @return a command that drives the robot at the specified field-relative velocity
+     */
+    public Command getPositionalVelocityCommand(ChassisSpeeds velocity) {
+        return getPositionalVelocityCommand(() -> velocity);
+    }
 
     /**
-     * Returns the linear velocity value from the PID controllers, as a Vector2d.
-     * 
-     * @param target The target position.
-     * @return The linear velocity, as a Vector2d.
+     * Creates a command that drives the robot using zero field-relative translational and rotational velocity.
+     * Useful for stopping the robot using the same structure as velocity-based commands.
+     *
+     * @return a command that stops the robot (field-relative)
      */
-    public Vector2d getLinearFeedback(Translation2d target) {
-        Vector2d feedback = new Vector2d(
-                xController.calculate(getRobotPose().getX(), target.getX()),
-                yController.calculate(getRobotPose().getY(), target.getY())
+    public Command getPositionalStopCommand() {
+        return getPositionalVelocityCommand(new ChassisSpeeds());
+    }
+
+    /**
+     * Creates a command that drives the robot using both translational and rotational velocity.
+     * These velocities are supplied as a full ChassisSpeeds object, interpreted as robot-relative.
+     * <p>
+     * The command runs two sub-commands in parallel:
+     * - One for handling robot-relative translational movement (vx, vy)
+     * - One for handling rotational velocity (omega)
+     * </p>
+     *
+     * @param velocitySupplier a supplier for ChassisSpeeds representing desired velocities (robot-relative)
+     * @return a command that drives the robot using those robot-relative velocities
+     */
+    public Command getRobotRelativePositionalVelocityCommand(Supplier<ChassisSpeeds> velocitySupplier) {
+        return new ParallelCommandGroup(
+            getRobotRelativeTranslationalVelocityCommand(() -> 
+                new Translation2d(
+                    velocitySupplier.get().vxMetersPerSecond,
+                    velocitySupplier.get().vyMetersPerSecond
+                )
+            ),
+            getRotationalVelocityCommand(() -> 
+                velocitySupplier.get().omegaRadiansPerSecond
+            )
         );
-        return feedback.normalize().scale(Math.tanh(feedback.magnitude()));
     }
 
     /**
-     * Returns a rotational velocity value from the PID controller, as a double.
-     * 
-     * @param target The target orientation.
-     * @return The value to go towards.
+     * Creates a command that drives the robot using a fixed, robot-relative translational and rotational velocity.
+     *
+     * @param velocity the fixed robot-relative chassis speeds (vx, vy, omega)
+     * @return a command that drives the robot at the specified robot-relative velocity
      */
-    public double getRotationalFeedback(Rotation2d target) {
-        return Math.tanh(thetaController.calculate(getRobotPose().getRotation().getRadians(), target.getRadians()));
+    public Command getRobotRelativePositionalVelocityCommand(ChassisSpeeds velocity) {
+        return getRobotRelativePositionalVelocityCommand(() -> velocity);
+    }
+
+    // ------------------------------
+    // Translational (Translation2d) Commands
+    // ------------------------------
+
+    /**
+     * Creates a command to control translational velocity in a field-relative way.
+     * This does not affect the robot’s rotation.
+     *
+     * @param velocitySupplier supplier for desired translational velocity in field coordinates (m/s)
+     * @return a command that drives the robot translationally
+     */
+    public Command getTranslationalVelocityCommand(Supplier<Translation2d> velocitySupplier) {
+        Command command = new DriveWithTranslationalVelocityCommand(this, velocitySupplier);
+        command.addRequirements(translationalSubsystem); // ensures no other command can use this subsystem concurrently
+        return command;
     }
 
     /**
-     * Returns this DriveSubsystem's gyroscope heading, as a Rotation2d. 
-     * 
-     * @return this DriveSubsystem's gyroscope heading, as a Rotation2d. 
-     * Generates a command that drives the robot to a specific pose
-     * 
+     * Creates a command to drive the robot at a constant field-relative translational velocity.
+     * This does not affect the robot’s rotation.
+     *
+     * @param velocity a constant field-relative translation vector (m/s)
+     * @return a command that drives the robot translationally at the given velocity
+     */
+    public Command getTranslationalVelocityCommand(Translation2d velocity) {
+        return getTranslationalVelocityCommand(() -> velocity);
+    }
+
+    /**
+     * Creates a command that drives the robot translationally with zero velocity (stopped).
+     *
+     * @return a command that stops the robot's translation
+     */
+    public Command getTranslationalStoppedCommand() {
+        return getTranslationalVelocityCommand(Translation2d.kZero);
+    }
+
+    /**
+     * Creates a command to control translational velocity in a robot-relative way.
+     * Converts robot-relative translation to field-relative using current robot heading.
+     *
+     * @param robotRelativeVelocitySupplier supplier of robot-relative Translation2d (m/s)
+     * @return a command that drives the robot translationally based on robot-relative input
+     */
+    public Command getRobotRelativeTranslationalVelocityCommand(Supplier<Translation2d> robotRelativeVelocitySupplier) {
+        Command command = new DriveWithTranslationalVelocityCommand(
+            this,
+            () -> robotRelativeVelocitySupplier.get().rotateBy(getRobotPose().getRotation()) // convert to field-relative
+        );
+        command.addRequirements(translationalSubsystem); // lock the translational subsystem
+        return command;
+    }
+
+    /**
+     * Creates a command to drive the robot at a constant robot-relative translational velocity.
+     * Converts the input to field-relative using the robot’s current heading at runtime.
+     *
+     * @param robotRelativeVelocity a constant robot-relative translation vector (m/s)
+     * @return a command that drives the robot at the given robot-relative velocity
+     */
+    public Command getRobotRelativeTranslationalVelocityCommand(Translation2d robotRelativeVelocity) {
+        return getRobotRelativeTranslationalVelocityCommand(() -> robotRelativeVelocity);
+    }
+
+    // ------------------------------
+    // Rotational (Double) Commands
+    // ------------------------------
+
+    /**
+     * Creates a command to control rotational velocity.
+     * This does not affect the robot’s translational movement.
+     *
+     * @param velocitySupplier supplier for desired rotational velocity in radians per second
+     * @return a command that drives the robot rotationally
+     */
+    public Command getRotationalVelocityCommand(Supplier<Double> velocitySupplier) {
+        Command command = new DriveWithRotationalVelocityCommand(this, velocitySupplier);
+        command.addRequirements(rotationalSubsystem); // ensures exclusive access to rotation control
+        return command;
+    }
+
+    /**
+     * Creates a command to drive the robot at a constant rotational velocity.
+     * This does not affect the robot’s translational movement.
+     *
+     * @param velocity a fixed rotational velocity in radians per second
+     * @return a command that drives the robot rotationally at the given velocity
+     */
+    public Command getRotationalVelocityCommand(double velocity) {
+        return getRotationalVelocityCommand(() -> velocity);
+    }
+
+    /**
+     * Creates a command that drives the robot with zero rotational velocity (stopped).
+     * This does not affect the robot’s translational movement.
+     *
+     * @return a command that stops the robot’s rotation
+     */
+    public Command getRotationalStoppedCommand() {
+        return getRotationalVelocityCommand(0.0);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////
+    // Targeting Commands
+    //////////////////////////////////////////////////////////////////////////////
+    
+    // ------------------------------
+    // Positional (Pose2d) Commands
+    // ------------------------------
+
+    /**
+     * Generates a command that drives the robot to a specific pose (XY and heading).
+     * The command finishes once both the translation and rotation are within their thresholds.
+     *
      * @param pose the target Pose2d to reach
-     * @return a Command that, when executed, will drive to the target pose
+     * @return a Command that drives to the specified pose
      */
     public Command getDriveToPoseCommand(Pose2d pose) {
-        return new DriveToPoseCommand(this, pose, this.translationThreshold, this.rotationThreshold);
+        return getDriveToPoseCommand(() -> pose);
     }
 
     /**
-     * Set the translational and rotational thresholds.
-     * 
-     * @param translationalThreshold The translational threshold.
-     * @param rotationalThreshold The rotational threshold.
+     * Generates a command that drives the robot to a pose dynamically supplied at runtime.
+     * Both translation and rotation targets are extracted from the pose returned by the supplier.
+     *
+     * @param poseSupplier supplies the target Pose2d during execution
+     * @return a Command that drives to the supplied pose target
      */
-     public void setThresholds(double translationalThreshold, double rotationalThreshold) {
-        this.translationThreshold = translationalThreshold;
-        this.rotationThreshold = rotationalThreshold;
-     }
+    public Command getDriveToPoseCommand(Supplier<Pose2d> poseSupplier) {
+        return getDriveToTranslationCommand(() -> poseSupplier.get().getTranslation())
+            .alongWith(getDriveToRotationCommand(() -> poseSupplier.get().getRotation()));
+    }
+
+    // ------------------------------
+    // Positional (Translation2d) Commands
+    // ------------------------------
+
+    /**
+     * Generates a command that drives the robot to a specific translation (XY position).
+     * The robot will attempt to reach and stop at the given fixed translation.
+     *
+     * @param translation the target Translation2d to reach
+     * @return a Command that drives to the specified translation
+     */
+    public Command getDriveToTranslationCommand(Translation2d translation) {
+        return getDriveToTranslationCommand(() -> translation);
+    }
+
+    /**
+     * Generates a command that drives the robot to a dynamically provided translation.
+     * The supplier will be polled continuously while the command is active.
+     *
+     * @param translationSupplier supplies the target Translation2d during execution
+     * @return a Command that drives to the supplied translation target
+     */
+    public Command getDriveToTranslationCommand(Supplier<Translation2d> translationSupplier) {
+        return new DriveToTranslationCommand(this, translationSupplier, translationThreshold);
+    }
+
+    // ------------------------------
+    // Rotational (Rotation2d) Commands
+    // ------------------------------
+
+    /**
+     * Generates a command that rotates the robot to a specific heading (theta).
+     * The robot will turn until it is within a defined threshold of the fixed rotation.
+     *
+     * @param rotation the target Rotation2d to reach
+     * @return a Command that rotates the robot to the specified heading
+     */
+    public Command getDriveToRotationCommand(Rotation2d rotation) {
+        return getDriveToRotationCommand(() -> rotation);
+    }
+
+    /**
+     * Generates a command that rotates the robot toward a heading provided by a supplier.
+     * The supplier will be evaluated continuously while the command is running.
+     *
+     * @param rotationSupplier supplies the target Rotation2d during execution
+     * @return a Command that rotates the robot to the supplied heading
+     */
+    public Command getDriveToRotationCommand(Supplier<Rotation2d> rotationSupplier) {
+        return new DriveToRotationCommand(this, rotationSupplier, rotationThreshold);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////
+    // Pathfinding Commands
+    //////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Generates a command that uses pathfinding to drive the robot to a specified pose.
+     *
+     * @param pose the target Pose2d to reach
+     * @return a Command that, when executed, will pathfind to the target pose
+     */
+    public Command getPathfindingCommand(Pose2d pose) {
+        return AutoBuilder.pathfindToPose(pose, constraints, 0.0)
+            .andThen(getDriveToPoseCommand(pose));
+    }
+
+    //////////////////////////////////////////////////////////////////////////////
+    // Action Commands
+    //////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------
+    // Scoring Command
+    // ------------------------------
+
 
     /**
      * Creates a scoring command using a specific scoring location.
@@ -453,41 +754,8 @@ public class DriveSubsystem extends SubsystemBase {
      * @return a Command that will drive the robot to the scoring pose.
      */
     public Command getScoringCommand(Alliance alliance, ReefScoringLocation location) {
-        Pose2d targetPose;
-        // Choose the appropriate scoring pose based on alliance and location.
-        if (alliance == Alliance.BLUE) {
-            switch (location) {
-                case A: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_A; break;
-                case B: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_B; break;
-                case C: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_C; break;
-                case D: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_D; break;
-                case E: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_E; break;
-                case F: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_F; break;
-                case G: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_G; break;
-                case H: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_H; break;
-                case I: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_I; break;
-                case J: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_J; break;
-                case K: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_K; break;
-                case L: targetPose = ReefConstants.BLUE_CORAL_SCORE_POSITION_L; break;
-                default: throw new IllegalArgumentException("Invalid scoring location: " + location);
-            }
-        } else { // Alliance.RED
-            switch (location) {
-                case A: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_A; break;
-                case B: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_B; break;
-                case C: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_C; break;
-                case D: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_D; break;
-                case E: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_E; break;
-                case F: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_F; break;
-                case G: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_G; break;
-                case H: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_H; break;
-                case I: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_I; break;
-                case J: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_J; break;
-                case K: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_K; break;
-                case L: targetPose = ReefConstants.RED_CORAL_SCORE_POSITION_L; break;
-                default: throw new IllegalArgumentException("Invalid scoring location: " + location);
-            }
-        }
+
+        Pose2d targetPose = ReefConstants.CORAL_SCORE_POSITIONS.get(alliance).get(location);
 
         if (upperAssemblyType == UpperAssemblyType.NARWHAL || upperAssemblyType == UpperAssemblyType.NONE) {
             targetPose = targetPose.transformBy(NarwhalConstants.SCORING_RELATIVE_TRANSFORM);
@@ -498,12 +766,16 @@ public class DriveSubsystem extends SubsystemBase {
             (
                 new InstantCommand(() -> {state = DriveState.SCORING;inScorePose = false;})
             ).andThen(
-                getPathfindingCommand(targetPose) 
+                wrapNarwhalLiftRaising(getPathfindingCommand(targetPose),targetPose) 
             ).andThen(
                 new InstantCommand(() -> {inScorePose = true;})
             );
             
     }
+
+    // ------------------------------
+    // Algae Removal Command
+    // ------------------------------
 
     /**
      * Creates an algae removal command using a specific algae removal position.
@@ -513,35 +785,14 @@ public class DriveSubsystem extends SubsystemBase {
      * @return a Command that will drive the robot to the algae removal pose.
      */
     public Command getAlgaeRemovalCommand(Alliance alliance, AlgaeRemovalPosition position) {
-        Pose2d targetPose;
-        // Choose the appropriate algae removal pose.
-        if (alliance == Alliance.BLUE) {
-            switch (position) {
-                case AB: targetPose = ReefConstants.BLUE_ALGAE_REMOVAL_POSITION_AB; break;
-                case CD: targetPose = ReefConstants.BLUE_ALGAE_REMOVAL_POSITION_CD; break;
-                case EF: targetPose = ReefConstants.BLUE_ALGAE_REMOVAL_POSITION_EF; break;
-                case GH: targetPose = ReefConstants.BLUE_ALGAE_REMOVAL_POSITION_GH; break;
-                case IJ: targetPose = ReefConstants.BLUE_ALGAE_REMOVAL_POSITION_IJ; break;
-                case KL: targetPose = ReefConstants.BLUE_ALGAE_REMOVAL_POSITION_KL; break;
-                default: throw new IllegalArgumentException("Invalid algae removal position: " + position);
-            }
-        } else { // Alliance.RED
-            switch (position) {
-                case AB: targetPose = ReefConstants.RED_ALGAE_REMOVAL_POSITION_AB; break;
-                case CD: targetPose = ReefConstants.RED_ALGAE_REMOVAL_POSITION_CD; break;
-                case EF: targetPose = ReefConstants.RED_ALGAE_REMOVAL_POSITION_EF; break;
-                case GH: targetPose = ReefConstants.RED_ALGAE_REMOVAL_POSITION_GH; break;
-                case IJ: targetPose = ReefConstants.RED_ALGAE_REMOVAL_POSITION_IJ; break;
-                case KL: targetPose = ReefConstants.RED_ALGAE_REMOVAL_POSITION_KL; break;
-                default: throw new IllegalArgumentException("Invalid algae removal position: " + position);
-            }
-        }
+        
+        Pose2d targetPose = ReefConstants.ALGAE_REMOVAL_POSITIONS.get(alliance).get(position);
 
         Command moveAfterUpperAssemblyCommand;
         if (upperAssemblyType == UpperAssemblyType.NARWHAL || upperAssemblyType == UpperAssemblyType.NONE) {
             targetPose = targetPose.transformBy(NarwhalConstants.ALGAE_REMOVAL_RELATIVE_TRANSFORM);
-            moveAfterUpperAssemblyCommand = new WaitUntilCommand(narwahlCanRemoveAlgaeSupplier::get)
-                .andThen(getPathfindingCommand(targetPose.transformBy(DriveConstants.NARWHAL_RAKE_ALAGE_TRANSFORM)));
+            moveAfterUpperAssemblyCommand = new WaitUntilCommand(narwhalCanRemoveAlgaeSupplier::get)
+                .andThen(getPathfindingCommand(targetPose.transformBy(DriveConstants.NARWHAL_RAKE_ALGAE_TRANSFORM)));
         } else {
             moveAfterUpperAssemblyCommand = new InstantCommand();
         }
@@ -550,13 +801,17 @@ public class DriveSubsystem extends SubsystemBase {
             (
                 new InstantCommand(() -> {state = DriveState.REMOVING;inAlgaeRemovePose = false;})
             ).andThen(
-                getPathfindingCommand(targetPose) 
+                wrapNarwhalLiftRaising(getPathfindingCommand(targetPose),targetPose) 
             ).andThen(
                 new InstantCommand(() -> {inAlgaeRemovePose = true;})
             ).andThen(
                 moveAfterUpperAssemblyCommand
             );
     }
+
+    // ------------------------------
+    // Intake Command
+    // ------------------------------
 
     /**
      * Creates an intake command using a specific CoralStationSide and slot index.
@@ -596,35 +851,132 @@ public class DriveSubsystem extends SubsystemBase {
             (
                 new InstantCommand(() -> {state = DriveState.INTAKING;inIntakePose = false;})
             ).andThen(
-                getPathfindingCommand(targetPose) 
+                wrapNarwhalLiftRaising(getPathfindingCommand(targetPose),targetPose) 
             ).andThen(
                 new InstantCommand(() -> {inIntakePose = true;})
             );
     }
 
+    //////////////////////////////////////////////////////////////////////////////
+    // Helper Commands
+    //////////////////////////////////////////////////////////////////////////////
+
     /**
-     * Generates a command that uses pathfinding to drive the robot to a specified pose.
+     * Wraps a command with logic for controlling narwhal lift activation.
+     * Prevents the lift from raising until the robot is near the target.
      *
-     * @param pose the target Pose2d to reach
-     * @return a Command that, when executed, will pathfind to the target pose
+     * @param command the core command (e.g., pathfinding or driving)
+     * @param pose the target pose to compare distance against
+     * @return a wrapped command with narwhal lift logic
      */
-    public Command getPathfindingCommand(Pose2d pose) {
-        Command command =
-            (
-                new InstantCommand(() -> narwhalCanRaiseLift = false)
-            ).andThen(
-                AutoBuilder.pathfindToPose(pose, constraints, 0.0)
-                .andThen(getDriveToPoseCommand(pose))
-            ).deadlineFor(
-                new RunCommand(
-                    () -> {
-                        narwhalCanRaiseLift = getRobotPose().getTranslation().getDistance(pose.getTranslation()) <= DriveConstants.NARWHAL_CAN_RAISE_LIFT_DISTANCE;
-                    }
-                )
+    private Command wrapNarwhalLiftRaising(Command command, Pose2d pose) {
+        return new InstantCommand(() -> narwhalCanRaiseLift = false)
+            .andThen(command)
+            .deadlineFor(
+                new RunCommand(() -> {
+                    narwhalCanRaiseLift =
+                        getRobotPose().getTranslation().getDistance(pose.getTranslation())
+                        <= DriveConstants.NARWHAL_CAN_RAISE_LIFT_DISTANCE;
+                })
             )
-            .andThen(new InstantCommand(() -> {narwhalCanRaiseLift = true;}));
-        return command;
+            .andThen(new InstantCommand(() -> narwhalCanRaiseLift = true));
     }
+
+    //////////////////////////////////////////////////////////////////////////////
+    // Driving Command Methods
+    //////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Commands the robot to drive with both translational and rotational velocity in a field-relative manner.
+     *
+     * @param velocity the desired velocities, where dx/dy are in meters per second and dtheta is in radians per second.
+     */
+    public void drivePositional(ChassisSpeeds velocity) {
+        driveTranslational(new Translation2d(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond)); // field-relative translational
+        driveRotational(velocity.omegaRadiansPerSecond);                             // rotational velocity
+    }
+
+    /**
+     * Commands the robot to drive with a field-relative translational velocity.
+     *
+     * @param velocity the desired field-relative translational velocity (m/s)
+     */
+    public void driveTranslational(Translation2d velocity) {
+        translationalSubsystem.setTargetTranslationalVelocity(velocity);
+    }
+
+    /**
+     * Commands the robot to rotate at a specified rotational velocity.
+     *
+     * @param velocity the desired rotational velocity in radians per second
+     */
+    public void driveRotational(double velocity) {
+        rotationalSubsystem.setTargetRotationalVelocity(velocity);
+    }
+
+    /**
+     * Commands the robot to drive with both translational and rotational velocity in a robot-relative manner.
+     *
+     * @param velocity the desired robot-relative velocities (dx, dy in m/s; dtheta in rad/s)
+     */
+    public void drivePositionalRobotRelative(ChassisSpeeds velocity) {
+        Rotation2d robotHeading = getRobotPose().getRotation();
+        drivePositional(ChassisSpeeds.fromFieldRelativeSpeeds(velocity, robotHeading));
+    }
+    
+    /**
+     * Commands the robot to drive with a translational velocity relative to the robot's current orientation.
+     *
+     * @param velocity the desired robot-relative translational velocity (m/s)
+     */
+    public void driveTranslationalRobotRelative(Translation2d velocity) {
+        Rotation2d robotHeading = getRobotPose().getRotation();
+        Translation2d fieldRelativeVelocity = velocity.rotateBy(robotHeading);
+        driveTranslational(fieldRelativeVelocity);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////
+    // Feedback and Navigation Methods
+    //////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Returns the translational velocity value from the PID controllers, as a Vector2d.
+     * 
+     * @param target The target position.
+     * @return The translational velocity, as a Vector2d.
+     */
+    public Translation2d getTranslationalFeedback(Translation2d target) {
+        Translation2d feedback = new Translation2d(
+                xController.calculate(getRobotPose().getX(), target.getX()),
+                yController.calculate(getRobotPose().getY(), target.getY())
+        );
+        return feedback.div(feedback.getNorm()).times(Math.tanh(feedback.getNorm()));
+    }
+
+    /**
+     * Returns a rotational velocity value from the PID controller, as a double.
+     * 
+     * @param target The target orientation.
+     * @return The value to go towards.
+     */
+    public double getRotationalFeedback(Rotation2d target) {
+        return Math.tanh(thetaController.calculate(getRobotPose().getRotation().getRadians(), target.getRadians()));
+    }
+
+    /**
+     * Set the translational and rotational thresholds.
+     * 
+     * @param translationalThreshold The translational threshold.
+     * @param rotationalThreshold The rotational threshold.
+     */
+     public void setThresholds(double translationalThreshold, double rotationalThreshold) {
+        this.translationThreshold = translationalThreshold;
+        this.rotationThreshold = rotationalThreshold;
+     }
+
+    //////////////////////////////////////////////////////////////////////////////
+    // Upper Assembly Helped Methods
+    //////////////////////////////////////////////////////////////////////////////
 
     /**
      * Returns whether the robot has reached the scoring pose.
@@ -670,15 +1022,6 @@ public class DriveSubsystem extends SubsystemBase {
     public boolean getNarwhalCanRaiseLift() {
         return narwhalCanRaiseLift;
     }
-
-    ///////////////////////////////////////////////////////////////////////// /////
-    // Manual Command Methods
-    //////////////////////////////////////////////////////////////////////////////
-    
-    public Command getManualCommand(XboxController controller, Alliance alliance) {
-        return new XboxManualDriveCommand(this, controller, alliance);
-    }
-
 
     //////////////////////////////////////////////////////////////////////////////
     // Sensor and Pose Estimation Methods
@@ -729,7 +1072,7 @@ public class DriveSubsystem extends SubsystemBase {
      *
      * @return the chassis speeds (m/s and rad/s)
      */
-    public ChassisSpeeds getChassisSpeeds() {
+    public ChassisSpeeds getVelocity() {
         return DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(getSwerveModuleStates());
     }
 
@@ -817,6 +1160,14 @@ public class DriveSubsystem extends SubsystemBase {
         this.upperAssemblyType = upperAssemblyType;
     }
 
+    /**
+     * sets the supplier for whether the drivetrain can move to remove algae from the reef
+     * @param supplier the supplier, that when true, will move the drivetrain.
+     */
+    public void setNarwhalCanRemoveAlgaeSupplier(Supplier<Boolean> supplier) {
+        narwhalCanRemoveAlgaeSupplier = supplier;
+    }
+
     //////////////////////////////////////////////////////////////////////////////
     // Pathfinding Obstacle Methods
     //////////////////////////////////////////////////////////////////////////////
@@ -845,83 +1196,43 @@ public class DriveSubsystem extends SubsystemBase {
      * @param obstacles a list of circular obstacles
      * @return a list of pairs representing the bottom-left and top-right corners of the inscribed squares
      */
-    // private List<Pair<Translation2d, Translation2d>> translatePathfindingObstacles(List<Obstacle> obstacles) {
-    //     List<Pair<Translation2d, Translation2d>> inscribedSquareCorners = new ArrayList<>();
-    //     for (Obstacle obstacle : obstacles) {
-    //         Translation2d center = obstacle.getObstacleTranslation();
-    //         double radius = obstacle.getObstacleRadius();
-    //         // Calculate the inscribed square's bottom-left and top-right corners.
-    //         Translation2d bottomLeft = new Translation2d(center.getX() - radius, center.getY() - radius);
-    //         Translation2d topRight = new Translation2d(center.getX() + radius, center.getY() + radius);
-    //         inscribedSquareCorners.add(new Pair<>(bottomLeft, topRight));
-    //     }
-    //     return inscribedSquareCorners;
-    // }
+    private List<Pair<Translation2d, Translation2d>> translatePathfindingObstacles(List<Obstacle> obstacles) {
+        List<Pair<Translation2d, Translation2d>> inscribedSquareCorners = new ArrayList<>();
+        for (Obstacle obstacle : obstacles) {
+            Translation2d center = obstacle.getObstacleTranslation();
+            double radius = obstacle.getObstacleRadius();
+            // Calculate the inscribed square's bottom-left and top-right corners.
+            Translation2d bottomLeft = new Translation2d(center.getX() - radius, center.getY() - radius);
+            Translation2d topRight = new Translation2d(center.getX() + radius, center.getY() + radius);
+            inscribedSquareCorners.add(new Pair<>(bottomLeft, topRight));
+        }
+        return inscribedSquareCorners;
+    }
 
     //////////////////////////////////////////////////////////////////////////////
-    // Commanded Velocity Getters
+    // Setting Modules Method
     //////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Retrieves the last commanded chassis speeds.
+     * Updates the states of the swerve modules based on the current target velocities.
      *
-     * @return the last commanded ChassisSpeeds (m/s and rad/s)
+     * @param targetVelocity the desired field relative chassis speeds (m/s and rad/s)
      */
-    public ChassisSpeeds getCommandedVelocities() {
-        return commandedVelocities;
-    }
+    private void setModules(ChassisSpeeds targetVelocity) {
+        // Generate a new setpoint from the previous one.
+        setpoint = setpointGenerator.generateSetpoint(setpoint, ChassisSpeeds.fromFieldRelativeSpeeds(targetVelocity, getRobotPose().getRotation()), setpointDeltaTime.getDeltaTime());
 
-    /**
-     * Retrieves the last commanded linear velocity as a 2D vector.
-     *
-     * @return a Vector2d representing the linear velocity (m/s)
-     */
-    public Vector2d getCommandedLinearVelocity() {
-        return new Vector2d(commandedVelocities.vxMetersPerSecond, commandedVelocities.vyMetersPerSecond);
-    }
+        // Update the record of commanded velocities.
+        commandedVelocities = ChassisSpeeds.fromRobotRelativeSpeeds(
+                DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(setpoint.moduleStates()),
+                getRobotPose().getRotation()
+        );
 
-    /**
-     * Retrieves the last commanded rotational velocity.
-     *
-     * @return the rotational velocity in radians per second
-     */
-    public double getCommandedRotationalVelocity() {
-        return commandedVelocities.omegaRadiansPerSecond;
-    }
-
-    /**
-     * Sets each module`s drive motor`s PID coefficients to the given values. 
-     * Currently this only works for the KrakenX60 motor.
-     * 
-     * @param kp The proportional term.
-     * @param ki The integral term.
-     * @param kd The derivative term.
-     */
-    public void setDriveMotorPIDCoefficients(double kp, double ki, double kd) {
-        this.frontLeftModule.setDriveMotorPIDCoefficients(kp, ki, kd);
-        this.frontRightModule.setDriveMotorPIDCoefficients(kp, ki, kd);
-        this.rearRightModule.setDriveMotorPIDCoefficients(kp, ki, kd);
-        this.rearLeftModule.setDriveMotorPIDCoefficients(kp, ki, kd);
-    }
-
-     /**
-     * Sets the path follower`s PID coefficients to the given values. 
-     * 
-     * @param kp The proportional term.
-     * @param ki The integral term.
-     * @param kd The derivative term.
-     */
-    public void setFollowerPIDCoefficients(double kp, double ki, double kd) {
-
-        // Configure X controller.
-        this.xController.setP(kp);
-        this.xController.setI(ki);
-        this.xController.setD(kd);
-
-        // Configure Y controller.
-        this.yController.setP(kp);
-        this.yController.setI(ki);
-        this.yController.setD(kd);
+        // Command each swerve module with its new state.
+        frontLeftModule.setState(setpoint.moduleStates()[0]);
+        frontRightModule.setState(setpoint.moduleStates()[1]);
+        rearLeftModule.setState(setpoint.moduleStates()[2]);
+        rearRightModule.setState(setpoint.moduleStates()[3]);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -957,13 +1268,18 @@ public class DriveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // Update module states using the target velocities.
-        setModules(targetVelocities);
+        ChassisSpeeds targetVelocity = new ChassisSpeeds(
+            translationalSubsystem.getTargetTranslationalVelocity().getX(),
+            translationalSubsystem.getTargetTranslationalVelocity().getY(),
+            rotationalSubsystem.getTargetRotationalVelocity()
+        );
+        setModules(targetVelocity);
 
         // Refresh dynamic pathfinding obstacles.
-        /*pathfindingObstacles.clear();
+        List<Obstacle> pathfindingObstacles = new ArrayList<>();
         pathfindingObstaclesSuppliers.forEach(supplier -> pathfindingObstacles.addAll(supplier.get()));
-        translatedPathfindingObstacles = translatePathfindingObstacles(pathfindingObstacles);
-        Pathfinding.setDynamicObstacles(translatedPathfindingObstacles, getRobotPose().getTranslation());*/
+        List<Pair<Translation2d,Translation2d>> translatedPathfindingObstacles = translatePathfindingObstacles(pathfindingObstacles);
+        //Pathfinding.setDynamicObstacles(translatedPathfindingObstacles, getRobotPose().getTranslation());
     }
 
     @Override

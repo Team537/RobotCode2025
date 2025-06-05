@@ -9,7 +9,6 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.util.autonomous.Alliance;
-import frc.robot.util.math.Vector2d;
 
 public abstract class ManualDriveCommand extends Command {
     
@@ -43,9 +42,9 @@ public abstract class ManualDriveCommand extends Command {
     // private Translation2d xyLockTranslation = new Translation2d(0.0, 0.0);
 
     /**
-     * Tracks whether linear velocity has been reset.
+     * Tracks whether translational velocity has been reset.
      */
-    private boolean linearVelocityReset = false;
+    private boolean translationalVelocityReset = false;
 
     /**
      * If the robot's heading is locked.
@@ -89,10 +88,10 @@ public abstract class ManualDriveCommand extends Command {
 
     /**
      * Drives the robot using manual inputs or target-based controls. This method calculates 
-     * the final linear and rotational velocities based on the input parameters and applies 
+     * the final translational and rotational velocities based on the input parameters and applies 
      * them to the robot.
      *
-     * @param linearVelocity The target linear velocity of the robot. Used when useTargetTranslation is false.
+     * @param translationalVelocity The target translational velocity of the robot. Used when useTargetTranslation is false.
      *                       This is represented as a vector on a unit circle.
      * @param rotationalVelocity The target rotational velocity of the robot. Used when useTargetRotation is false.
      *                           This is a unit value (range [-1, 1]).
@@ -107,7 +106,7 @@ public abstract class ManualDriveCommand extends Command {
      * @param fieldCentric Whether or not this drive subsystem will drive in a field centric manner.
      */
     protected void manualDrive(
-        Vector2d linearVelocity, 
+        Translation2d translationalVelocity, 
         double rotationalVelocity, 
         Translation2d targetTranslationOffset, 
         boolean useTargetTranslation, 
@@ -119,62 +118,62 @@ public abstract class ManualDriveCommand extends Command {
         boolean fieldCentric
     ) {
         // The final velocities that will be used for driving the robot
-        Vector2d finalLinearVelocity;
+        Translation2d finalTranslationalVelocity;
         double finalRotationalVelocity;
 
-        // --- Handling linear velocity ---
+        // --- Handling translational velocity ---
         if (!useTargetTranslation) {
-            // Target translation is not active, so use joystick input for linear control
+            // Target translation is not active, so use joystick input for translational control
             targetTranslationActive = false;
 
             // Rotate and curve the input for smoother control
             if (fieldCentric) {
-                linearVelocity = linearVelocity.rotateBy(driverRotationalOffset.times(1.0)); // Adjust for driver orientation
+                translationalVelocity = translationalVelocity.rotateBy(driverRotationalOffset.times(1.0)); // Adjust for driver orientation
             } else {
-                linearVelocity = linearVelocity.rotateBy(driveSubsystem.getRobotPose().getRotation().times(1.0).rotateBy(new Rotation2d(0.5 * Math.PI)));
+                translationalVelocity = translationalVelocity.rotateBy(driveSubsystem.getRobotPose().getRotation().times(1.0).rotateBy(new Rotation2d(0.5 * Math.PI)));
             }
 
-            double linearSpeed = linearVelocity.magnitude();
-            linearVelocity = linearVelocity.normalize().scale(Math.pow(linearSpeed,OperatorConstants.LINEAR_INPUT_CURVE_POWER));
+            double translationalSpeed = translationalVelocity.getNorm();
+            translationalVelocity = translationalVelocity.div(translationalSpeed).times(Math.pow(translationalSpeed,OperatorConstants.TRANSLATIONAL_INPUT_CURVE_POWER));
 
-            // Resetting linear velocity when no input is provided
-            if (linearVelocity.magnitude() < 1e-3) {
-                linearVelocityReset = true;
+            // Resetting translational velocity when no input is provided
+            if (translationalVelocity.getNorm() < 1e-3) {
+                translationalVelocityReset = true;
             }
-            if (!linearVelocityReset) {
-                linearVelocity = new Vector2d(0, 0);
+            if (!translationalVelocityReset) {
+                translationalVelocity = Translation2d.kZero;
             }
 
             // TODO: test and fix this, delete the "false && " to activate
-            if (linearVelocity.magnitude() < 1e-3) {
-                if (!xyLockActive && driveSubsystem.getCommandedLinearVelocity().magnitude() < 1e-3) {
+            if (translationalVelocity.getNorm() < 1e-3) {
+                if (!xyLockActive && Math.hypot(driveSubsystem.getVelocity().vxMetersPerSecond,driveSubsystem.getVelocity().vyMetersPerSecond) < 1e-3) {
                     xyLockActive = true;
                     // xyLockTranslation = driveSubsystem.getRobotPose().getTranslation();
                 }
 
                 /*
                 if (false && xyLockActive) {
-                    finalLinearVelocity = driveSubsystem.getLinearFeedback(xyLockTranslation).scale(DriveConstants.LINEAR_MAX_SPEED);
+                    finalTranslationalVelocity = driveSubsystem.getTranslationalFeedback(xyLockTranslation).scale(DriveConstants.TRANSLATIONAL_MAX_SPEED);
                 } else {
-                    finalLinearVelocity = new Vector2d(0.0,0.0);
+                    finalTranslationalVelocity = new Vector2d(0.0,0.0);
                 }
                 */
-                finalLinearVelocity = new Vector2d(0.0,0.0);
+                finalTranslationalVelocity = Translation2d.kZero;
             } else {
 
                 xyLockActive = false;
 
                 // Apply throttle for speed control
-                double linearThrottleMultiplier;
+                double translationalThrottleMultiplier;
                 if (slow < 1e-2) {
-                    linearThrottleMultiplier = OperatorConstants.NORMAL_LINEAR_MAX_SPEED + throttle * 
-                        (OperatorConstants.THROTTLE_LINEAR_MAX_SPEED - OperatorConstants.NORMAL_LINEAR_MAX_SPEED);
+                    translationalThrottleMultiplier = OperatorConstants.NORMAL_TRANSLATIONAL_MAX_SPEED + throttle * 
+                        (OperatorConstants.THROTTLE_TRANSLATIONAL_MAX_SPEED - OperatorConstants.NORMAL_TRANSLATIONAL_MAX_SPEED);
                 } else {
-                    linearThrottleMultiplier = OperatorConstants.NORMAL_LINEAR_MAX_SPEED + slow * 
-                        (OperatorConstants.SLOW_LINEAR_MAX_SPEED - OperatorConstants.NORMAL_LINEAR_MAX_SPEED);
+                    translationalThrottleMultiplier = OperatorConstants.NORMAL_TRANSLATIONAL_MAX_SPEED + slow * 
+                        (OperatorConstants.SLOW_TRANSLATIONAL_MAX_SPEED - OperatorConstants.NORMAL_TRANSLATIONAL_MAX_SPEED);
                 }
                 
-                finalLinearVelocity = linearVelocity.scale(linearThrottleMultiplier);
+                finalTranslationalVelocity = translationalVelocity.times(translationalThrottleMultiplier);
             }
 
         } else {
@@ -196,8 +195,8 @@ public abstract class ManualDriveCommand extends Command {
             }
 
             // Use PID feedback to calculate the velocity toward the target position
-            finalLinearVelocity = driveSubsystem.getLinearFeedback(targetTranslationOrigin.plus(targetTranslationOffset)).scale(DriveConstants.LINEAR_MAX_SPEED);
-            linearVelocityReset = false; // Prevent accidental movement when deactivating
+            finalTranslationalVelocity = driveSubsystem.getTranslationalFeedback(targetTranslationOrigin.plus(targetTranslationOffset)).times(DriveConstants.TRANSLATIONAL_MAX_SPEED);
+            translationalVelocityReset = false; // Prevent accidental movement when deactivating
         }
 
         // --- Handling rotational velocity ---
@@ -221,7 +220,7 @@ public abstract class ManualDriveCommand extends Command {
             // Lock the robot's orientation if no rotation is commanded
 
             if (Math.abs(rotationalVelocity) < 1e-3) {
-                if (!thetaLockActive && Math.abs(driveSubsystem.getCommandedRotationalVelocity()) < 1e-3) {
+                if (!thetaLockActive && Math.abs(driveSubsystem.getVelocity().omegaRadiansPerSecond) < 1e-3) {
                     thetaLockActive = true;
                     // thetaLockRotation = driveSubsystem.getRobotPose().getRotation();
                 }
@@ -275,7 +274,7 @@ public abstract class ManualDriveCommand extends Command {
         }
 
         // --- Apply the calculated velocities to the robot ---
-        driveSubsystem.drive(new ChassisSpeeds(finalLinearVelocity.getX(),finalLinearVelocity.getY(),finalRotationalVelocity));
+        driveSubsystem.drivePositional(new ChassisSpeeds(finalTranslationalVelocity.getX(),finalTranslationalVelocity.getY(),finalRotationalVelocity));
     }
 
 }

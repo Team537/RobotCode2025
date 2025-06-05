@@ -156,9 +156,9 @@ public class RobotContainer {
         SmartDashboard.putNumber("Kraken Ki", DriveConstants.KrakenX60Driving.KI);
         SmartDashboard.putNumber("Kraken Kd", DriveConstants.KrakenX60Driving.KD);
 
-        SmartDashboard.putNumber("Drive Kp", DriveConstants.LINEAR_KP);
-        SmartDashboard.putNumber("Drive Ki", DriveConstants.LINEAR_KI);
-        SmartDashboard.putNumber("Drive Kd", DriveConstants.LINEAR_KD);
+        SmartDashboard.putNumber("Drive Kp", DriveConstants.TRANSLATIONAL_KP);
+        SmartDashboard.putNumber("Drive Ki", DriveConstants.TRANSLATIONAL_KI);
+        SmartDashboard.putNumber("Drive Kd", DriveConstants.TRANSLATIONAL_KD);
 
         SmartDashboard.putNumber("Translational Threshold", DriveConstants.TRANSLATION_THRESHOLD);
         SmartDashboard.putNumber("Rotational Threshold", DriveConstants.ROTATION_THRESHOLD);
@@ -195,7 +195,7 @@ public class RobotContainer {
         Alliance alliance = allianceSelector.getSelected();
 
         // --- Section: Subsystem setup
-        driveSubsystem.setConfigs();
+        driveSubsystem.setPathPlannerConfigs();
 
         upperAssembly.setRobotInScoringPositionSupplier(driveSubsystem::getInScorePose);
         upperAssembly.setRobotInIntakingPositionSupplier(driveSubsystem::getInIntakePose);
@@ -281,7 +281,7 @@ public class RobotContainer {
         SmartDashboard.putString("Selected Alliance", alliance.toString());
 
         // The Drive Command
-        driveSubsystem.setConfigs();
+        driveSubsystem.setPathPlannerConfigs();
         upperAssembly.setDefaultCommand(upperAssembly.getManualCommand(xBoxController));
         driveSubsystem.setDefaultCommand(driveSubsystem.getManualCommand(xBoxController, alliance));
     }

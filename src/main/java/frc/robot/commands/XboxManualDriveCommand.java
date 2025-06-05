@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.util.autonomous.Alliance;
-import frc.robot.util.math.Vector2d;
 
 public class XboxManualDriveCommand extends ManualDriveCommand {
 
@@ -25,14 +24,14 @@ public class XboxManualDriveCommand extends ManualDriveCommand {
     @Override
     public void execute() {
 
-        // --- Linear Velocity Control ---
-        // Calculate linear velocity based on the left stick input (x for strafe, y for forward/backward).
+        // --- Translational Velocity Control ---
+        // Calculate translational velocity based on the left stick input (x for strafe, y for forward/backward).
         // Apply a deadband to ignore small joystick movements and normalize the vector if it's too large.
-        Vector2d linearVelocity = new Vector2d(controller.getLeftX(), -controller.getLeftY());
-        if (linearVelocity.magnitude() < OperatorConstants.XBOX_CONTROLLER_JOYSTICK_DEADBAND_RADIUS) {
-            linearVelocity = new Vector2d(0, 0); // Ignore small joystick movements
-        } else if (linearVelocity.magnitude() > 1.0) {
-            linearVelocity = linearVelocity.normalize(); // Normalize to keep within [-1, 1]
+        Translation2d translationalVelocity = new Translation2d(controller.getLeftX(), -controller.getLeftY());
+        if (translationalVelocity.getNorm() < OperatorConstants.XBOX_CONTROLLER_JOYSTICK_DEADBAND_RADIUS) {
+            translationalVelocity = new Translation2d(0, 0); // Ignore small joystick movements
+        } else if (translationalVelocity.getNorm() > 1.0) {
+            translationalVelocity = translationalVelocity.div(translationalVelocity.getNorm()); // Normalize to keep within [-1, 1]
         }
 
         // --- Rotational Velocity Control ---
@@ -49,12 +48,12 @@ public class XboxManualDriveCommand extends ManualDriveCommand {
         // Calculate a target offset for translation based on the left stick and right trigger.
         // The trigger adjusts the radius of the target offset, ranging from minimum to maximum radius.
         // Activates when the left stick button is pressed.
-        double linearTargetRadius = OperatorConstants.XBOX_CONTROLLER_TARGET_RADIUS 
+        double translationalTargetRadius = OperatorConstants.XBOX_CONTROLLER_TARGET_RADIUS 
             + controller.getRightTriggerAxis() * (OperatorConstants.XBOX_CONTROLLER_TARGET_THROTTLE_RADIUS 
             - OperatorConstants.XBOX_CONTROLLER_TARGET_RADIUS);
         Translation2d targetTranslationOffset = new Translation2d(
-            controller.getLeftX() * linearTargetRadius, 
-            -controller.getLeftY() * linearTargetRadius
+            controller.getLeftX() * translationalTargetRadius, 
+            -controller.getLeftY() * translationalTargetRadius
         );
         boolean useTargetTranslation = controller.getLeftStickButton();
 
@@ -64,12 +63,12 @@ public class XboxManualDriveCommand extends ManualDriveCommand {
         // - The right stick button is pressed, OR
         // - The right stick's Y-axis exceeds a specific activation zone, OR
         // - Rotation targeting was already active and the right stick magnitude is above the deactivation threshold.
-        Vector2d rightStickVector = new Vector2d(controller.getRightX(), -controller.getRightY());
-        Rotation2d targetRotationOffset = rightStickVector.angle();
+        Translation2d rightStickVector = new Translation2d(controller.getRightX(), -controller.getRightY());
+        Rotation2d targetRotationOffset = rightStickVector.getAngle();
         if (
             controller.getRightStickButton() ||
             Math.abs(controller.getRightY()) > OperatorConstants.XBOX_CONTROLLER_ROTATIONAL_TARGET_ACTIVATION_ZONE || // Activate if pushed enough
-            (orientationOffsetTargetActive && rightStickVector.magnitude() > OperatorConstants.XBOX_CONTROLLER_ROTATIONAL_TARGET_DEACTIVATION_ZONE) // Stay active if above threshold
+            (orientationOffsetTargetActive && rightStickVector.getNorm() > OperatorConstants.XBOX_CONTROLLER_ROTATIONAL_TARGET_DEACTIVATION_ZONE) // Stay active if above threshold
         ) {
             orientationOffsetTargetActive = true; // Enable rotation targeting
         } else {
@@ -90,7 +89,7 @@ public class XboxManualDriveCommand extends ManualDriveCommand {
         // --- Call the Manual Drive Method ---
         // Pass all calculated values to the manualDrive method for execution.
         manualDrive(
-            linearVelocity,
+            translationalVelocity,
             rotationalVelocity,
             targetTranslationOffset,
             useTargetTranslation,

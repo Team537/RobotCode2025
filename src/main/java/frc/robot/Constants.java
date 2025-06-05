@@ -6,6 +6,7 @@ package frc.robot;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 
 import org.photonvision.PhotonPoseEstimator;
@@ -24,6 +25,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import frc.robot.util.autonomous.Alliance;
+import frc.robot.util.field.AlgaeRemovalPosition;
+import frc.robot.util.field.ReefScoringLocation;
 import frc.robot.util.swerve.DrivingMotorType;
 import frc.robot.util.swerve.TurningMotorType;
 import frc.robot.util.upper_assembly.UpperAssemblyType;
@@ -65,11 +69,11 @@ public final class Constants {
         public static final Rotation2d DEMO_ALLIANCE_OFFSET = new Rotation2d(0.0);
 
         // Controller Constants
-        public static final double LINEAR_INPUT_CURVE_POWER = 2.5;
+        public static final double TRANSLATIONAL_INPUT_CURVE_POWER = 2.5;
         public static final double ROTATION_INPUT_CURVE_POWER = 2.5;
-        public static final double NORMAL_LINEAR_MAX_SPEED = 2.0; // Meters/per second
-        public static final double THROTTLE_LINEAR_MAX_SPEED = DriveConstants.LINEAR_MAX_SPEED; // Meters per second
-        public static final double SLOW_LINEAR_MAX_SPEED = 0.5; // Meters/per second
+        public static final double NORMAL_TRANSLATIONAL_MAX_SPEED = 2.0; // Meters/per second
+        public static final double THROTTLE_TRANSLATIONAL_MAX_SPEED = DriveConstants.TRANSLATIONAL_MAX_SPEED; // Meters per second
+        public static final double SLOW_TRANSLATIONAL_MAX_SPEED = 0.5; // Meters/per second
         public static final double NORMAL_ROTATIONAL_MAX_SPEED = 7.0; // Radians per second
         public static final double THROTTLE_ROTATIONAL_MAX_SPEED = DriveConstants.ROTATIONAL_MAX_SPEED; // Radians per second
         public static final double SLOW_ROTATIONAL_MAX_SPEED = 2.0; // Meters/per second
@@ -97,7 +101,7 @@ public final class Constants {
         public static final double ROTATION_THRESHOLD = 0.157; // Radians
 
         public static final double NARWHAL_CAN_RAISE_LIFT_DISTANCE = 1.0; // Meters
-        public static final Transform2d NARWHAL_RAKE_ALAGE_TRANSFORM = new Transform2d(0.5,0.0,new Rotation2d());
+        public static final Transform2d NARWHAL_RAKE_ALGAE_TRANSFORM = new Transform2d(0.5,0.0,new Rotation2d());
 
         public static final double[] DRIVE_STANDARD_DEVIATION_COEFFICIENTS = {
             0.006611986432, 0.3500199104, 0
@@ -182,16 +186,16 @@ public final class Constants {
         public static final double WHEEL_COEFFICIENT_FRICTION = 1.0;
     
         // Motion Constraints
-        public static final double LINEAR_MAX_SPEED = 4.8; // m/s
+        public static final double TRANSLATIONAL_MAX_SPEED = 4.8; // m/s
         public static final double ROTATIONAL_MAX_SPEED = 16.7; // rad/s
-        public static final double LINEAR_MAX_ACCELERATION = 11.4; // m/s²
+        public static final double TRANSLATIONAL_MAX_ACCELERATION = 11.4; // m/s²
         public static final double ROTATIONAL_MAX_ACCELERATION = 42.0; // rad/s²
         public static final double MAX_DELTA_TIME_RATE_LIMIT = 0.1; // Prevents excessive acceleration due to lag
 
         // Drive PID Controller Coefficients
-        public static final double LINEAR_KP = 1.0;
-        public static final double LINEAR_KI = 0.0;
-        public static final double LINEAR_KD = 0.0;
+        public static final double TRANSLATIONAL_KP = 1.0;
+        public static final double TRANSLATIONAL_KI = 0.0;
+        public static final double TRANSLATIONAL_KD = 0.0;
 
         public static final double ROTATIONAL_KP = 2.0;
         public static final double ROTATIONAL_KI = 0.0;
@@ -387,7 +391,7 @@ public final class Constants {
             public static final Rotation2d ALGAE_ANGLE =  Rotation2d.fromRadians(1.12 * Math.PI);
             public static final Rotation2d TRANSIT_ANGLE = Rotation2d.fromRadians(0.5 * Math.PI);
             
-            /** The angle tolerance for the wrxist to be considered at a specific state. */
+            /** The angle tolerance for the wrist to be considered at a specific state. */
             public static final Rotation2d WRIST_ANGLE_TOLERANCE = Rotation2d.fromDegrees(8);
         }
 
@@ -595,7 +599,7 @@ public final class Constants {
         public static final int DEFAULT_NUM_SAMPLES = 10;
     }
 
-    // TODO: Write better, mroe descriptivejavadoc comments for this portion of the code.
+    // TODO: Write better, more descriptive javadoc comments for this portion of the code.
     public static class FieldConstants {
 
         private static final Translation2d FIELD_ORIGIN = new Translation2d(8.775, 4.02);
@@ -751,6 +755,63 @@ public final class Constants {
             public static final Pose2d RED_ALGAE_REMOVAL_POSITION_GH = rotate180(BLUE_ALGAE_REMOVAL_POSITION_GH);
             public static final Pose2d RED_ALGAE_REMOVAL_POSITION_IJ = rotate180(BLUE_ALGAE_REMOVAL_POSITION_IJ);
             public static final Pose2d RED_ALGAE_REMOVAL_POSITION_KL = rotate180(BLUE_ALGAE_REMOVAL_POSITION_KL);
+
+            public static final EnumMap<Alliance, EnumMap<ReefScoringLocation, Pose2d>> CORAL_SCORE_POSITIONS = new EnumMap<>(Alliance.class);
+            public static final EnumMap<Alliance, EnumMap<AlgaeRemovalPosition, Pose2d>> ALGAE_REMOVAL_POSITIONS = new EnumMap<>(Alliance.class);
+
+            static {
+                // Coral scoring positions
+                EnumMap<ReefScoringLocation, Pose2d> blueCoral = new EnumMap<>(ReefScoringLocation.class);
+                blueCoral.put(ReefScoringLocation.A, BLUE_CORAL_SCORE_POSITION_A);
+                blueCoral.put(ReefScoringLocation.B, BLUE_CORAL_SCORE_POSITION_B);
+                blueCoral.put(ReefScoringLocation.C, BLUE_CORAL_SCORE_POSITION_C);
+                blueCoral.put(ReefScoringLocation.D, BLUE_CORAL_SCORE_POSITION_D);
+                blueCoral.put(ReefScoringLocation.E, BLUE_CORAL_SCORE_POSITION_E);
+                blueCoral.put(ReefScoringLocation.F, BLUE_CORAL_SCORE_POSITION_F);
+                blueCoral.put(ReefScoringLocation.G, BLUE_CORAL_SCORE_POSITION_G);
+                blueCoral.put(ReefScoringLocation.H, BLUE_CORAL_SCORE_POSITION_H);
+                blueCoral.put(ReefScoringLocation.I, BLUE_CORAL_SCORE_POSITION_I);
+                blueCoral.put(ReefScoringLocation.J, BLUE_CORAL_SCORE_POSITION_J);
+                blueCoral.put(ReefScoringLocation.K, BLUE_CORAL_SCORE_POSITION_K);
+                blueCoral.put(ReefScoringLocation.L, BLUE_CORAL_SCORE_POSITION_L);
+
+                EnumMap<ReefScoringLocation, Pose2d> redCoral = new EnumMap<>(ReefScoringLocation.class);
+                redCoral.put(ReefScoringLocation.A, RED_CORAL_SCORE_POSITION_A);
+                redCoral.put(ReefScoringLocation.B, RED_CORAL_SCORE_POSITION_B);
+                redCoral.put(ReefScoringLocation.C, RED_CORAL_SCORE_POSITION_C);
+                redCoral.put(ReefScoringLocation.D, RED_CORAL_SCORE_POSITION_D);
+                redCoral.put(ReefScoringLocation.E, RED_CORAL_SCORE_POSITION_E);
+                redCoral.put(ReefScoringLocation.F, RED_CORAL_SCORE_POSITION_F);
+                redCoral.put(ReefScoringLocation.G, RED_CORAL_SCORE_POSITION_G);
+                redCoral.put(ReefScoringLocation.H, RED_CORAL_SCORE_POSITION_H);
+                redCoral.put(ReefScoringLocation.I, RED_CORAL_SCORE_POSITION_I);
+                redCoral.put(ReefScoringLocation.J, RED_CORAL_SCORE_POSITION_J);
+                redCoral.put(ReefScoringLocation.K, RED_CORAL_SCORE_POSITION_K);
+                redCoral.put(ReefScoringLocation.L, RED_CORAL_SCORE_POSITION_L);
+
+                CORAL_SCORE_POSITIONS.put(Alliance.BLUE, blueCoral);
+                CORAL_SCORE_POSITIONS.put(Alliance.RED, redCoral);
+
+                // Algae removal positions
+                EnumMap<AlgaeRemovalPosition, Pose2d> blueAlgae = new EnumMap<>(AlgaeRemovalPosition.class);
+                blueAlgae.put(AlgaeRemovalPosition.AB, BLUE_ALGAE_REMOVAL_POSITION_AB);
+                blueAlgae.put(AlgaeRemovalPosition.CD, BLUE_ALGAE_REMOVAL_POSITION_CD);
+                blueAlgae.put(AlgaeRemovalPosition.EF, BLUE_ALGAE_REMOVAL_POSITION_EF);
+                blueAlgae.put(AlgaeRemovalPosition.GH, BLUE_ALGAE_REMOVAL_POSITION_GH);
+                blueAlgae.put(AlgaeRemovalPosition.IJ, BLUE_ALGAE_REMOVAL_POSITION_IJ);
+                blueAlgae.put(AlgaeRemovalPosition.KL, BLUE_ALGAE_REMOVAL_POSITION_KL);
+
+                EnumMap<AlgaeRemovalPosition, Pose2d> redAlgae = new EnumMap<>(AlgaeRemovalPosition.class);
+                redAlgae.put(AlgaeRemovalPosition.AB, RED_ALGAE_REMOVAL_POSITION_AB);
+                redAlgae.put(AlgaeRemovalPosition.CD, RED_ALGAE_REMOVAL_POSITION_CD);
+                redAlgae.put(AlgaeRemovalPosition.EF, RED_ALGAE_REMOVAL_POSITION_EF);
+                redAlgae.put(AlgaeRemovalPosition.GH, RED_ALGAE_REMOVAL_POSITION_GH);
+                redAlgae.put(AlgaeRemovalPosition.IJ, RED_ALGAE_REMOVAL_POSITION_IJ);
+                redAlgae.put(AlgaeRemovalPosition.KL, RED_ALGAE_REMOVAL_POSITION_KL);
+
+                ALGAE_REMOVAL_POSITIONS.put(Alliance.BLUE, blueAlgae);
+                ALGAE_REMOVAL_POSITIONS.put(Alliance.RED, redAlgae);
+            }
 
         }
 
