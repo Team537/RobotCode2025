@@ -11,6 +11,7 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.util.math.DeltaTime;
 import edu.wpi.first.wpilibj.DataLogManager;
 
 /**
@@ -23,6 +24,7 @@ public class Robot extends TimedRobot {
     private final RobotContainer robotContainer;
 
     StringLogEntry frc537StringLog;
+    DeltaTime deltaTime = new DeltaTime();
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -71,6 +73,11 @@ public class Robot extends TimedRobot {
         // interrupted commands, and running subsystem periodic() methods. This must be called from the robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
+
+        double dt = deltaTime.getDeltaTime();
+        if (dt > 0.025) {
+            System.out.println("Robot Periodic: " + dt + " seconds");
+        }
     }
 
     /**
