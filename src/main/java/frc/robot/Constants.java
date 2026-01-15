@@ -49,6 +49,19 @@ public final class Constants {
 
     }
 
+    public static class LEDConstants {
+
+        /**
+         * The PWM ID of the LED strip.
+         */
+        public static final int LED_ID = 1;
+
+        /**
+         * The total length of the LED strip, in # of LEDs.
+         */
+        public static final int STRIP_TOTAL_LENGTH = 200;
+    }
+
     /**
      * <h2>OperatorConstants</h2>
      * The {@code OperatorConstants} class is a subclass contained within the {@code Constants} class.

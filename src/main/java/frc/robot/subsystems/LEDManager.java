@@ -1,7 +1,10 @@
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.AddressableLEDBufferView;
 import frc.robot.util.LEDs.LEDConfiguration;
 
 /**
@@ -26,34 +29,69 @@ import frc.robot.util.LEDs.LEDConfiguration;
  */
 public class LEDManager {
 
+    private static LEDManager instance;
+
     // Hardware
     private AddressableLED ledStrip;
     private AddressableLEDBuffer ledBuffer;
 
     /**
-     * Creates a new LEDManager object using the provided PWM port number.
-     * 
-     * @param portNum The port number the LED strip is plugged into on the PWM.
+     * returns the singleton object of the LED Manager
+     * @return the singleton object
      */
-    public LEDManager(int portNum) {
+    public static LEDManager getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("LEDManager has not been initialized. Call initialize() first.");
+        }
+
+        return instance;
+    }
+
+    /**
+     * initialized the LEDManager object using the provided PWM port number and length.
+     * 
+     * @param port The port number the LED strip is plugged into on the PWM.
+     * @param length The number of LEDs in the strip
+     */
+    public static void initialize(int port, int length) {
+        if (instance != null) {
+            throw new IllegalStateException("LEDManager has already been initialized.");
+        }
+        instance = new LEDManager(port, length);
+    }
+
+    /**
+     * Creates a new LEDManager object using the provided PWM port number and length.
+     * 
+     * @param port The port number the LED strip is plugged into on the PWM.
+     * @param length The number of LEDs in the strip
+     */
+    private LEDManager(int port, int length) {
 
         // Create new AddressableLED and AddressableLEDBuffer objects.
-        this.ledStrip = new AddressableLED(portNum);
-        this.ledBuffer = new AddressableLEDBuffer(60); // TODO: Figure out actual number. 60 is just a placeholder.
+        this.ledStrip = new AddressableLED(port);
+        this.ledBuffer = new AddressableLEDBuffer(length);
         
         // Setup the LED strip hardware
         this.ledStrip.setLength(this.ledBuffer.getLength());
         this.ledStrip.setData(ledBuffer);
         this.ledStrip.start();
-    } 
+    }
 
     /**
-     * To set ledPattern, method taking in a LEDConfiguration value.
-     * 
-     * @param ledConfiguration The LEDConfiguration this LEDManager's LED strip will display.
+     * creates a view to control a segment of the led strip
+     * @param ledSegment the segment to create the view out of
+     * @return the view to control the segment
      */
-    public void LEDPatternSet(LEDConfiguration ledConfiguration) {
-        ledConfiguration.getLEDPattern().applyTo(this.ledBuffer);
-        this.ledStrip.setData(this.ledBuffer);
+    public static AddressableLEDBufferView getViewForSegment(LEDSegment ledSegment) {
+        return instance.ledBuffer.createView(ledSegment.getStartingIndex(),ledSegment.getEndingIndex());
     }
+
+    /**
+     * updates the LED strip.
+     */
+    public static void update() {
+        instance.ledStrip.setData(instance.ledBuffer);
+    }
+
 }
